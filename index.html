@@ -780,7 +780,7 @@
       navbar.classList.toggle('scrolled', window.scrollY > 50)
     })
 
-    // === ROTATING HERO TEXT ===
+    // === TYPING HERO TEXT ===
     const phrases = [
       'Grow Online \u2014 Without the Complexity',
       'Attract More Customers Every Day',
@@ -789,18 +789,36 @@
       'Automate Your Business Growth',
     ]
     let phraseIndex = 0
+    let charIndex = 0
+    let isDeleting = false
     const rotatingEl = document.querySelector('.hero-rotating')
     if (rotatingEl) {
-      setInterval(() => {
-        phraseIndex = (phraseIndex + 1) % phrases.length
-        rotatingEl.classList.remove('fade-in')
-        rotatingEl.classList.add('fade-out')
-        setTimeout(() => {
-          rotatingEl.textContent = phrases[phraseIndex]
-          rotatingEl.classList.remove('fade-out')
-          rotatingEl.classList.add('fade-in')
-        }, 400)
-      }, 10000)
+      rotatingEl.textContent = ''
+      rotatingEl.classList.add('typing-cursor')
+      function typeLoop() {
+        const current = phrases[phraseIndex]
+        if (!isDeleting) {
+          charIndex++
+          rotatingEl.textContent = current.slice(0, charIndex)
+          if (charIndex === current.length) {
+            isDeleting = true
+            setTimeout(typeLoop, 2000)
+            return
+          }
+          setTimeout(typeLoop, 55 + Math.random() * 30)
+        } else {
+          charIndex--
+          rotatingEl.textContent = current.slice(0, charIndex)
+          if (charIndex === 0) {
+            isDeleting = false
+            phraseIndex = (phraseIndex + 1) % phrases.length
+            setTimeout(typeLoop, 300)
+            return
+          }
+          setTimeout(typeLoop, 25 + Math.random() * 15)
+        }
+      }
+      setTimeout(typeLoop, 500)
     }
 
     // === SCROLL PROGRESS BAR ===

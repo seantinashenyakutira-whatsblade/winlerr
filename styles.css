@@ -1041,17 +1041,6 @@ body {
 }
 .hero-rotating {
   display:inline-block;
-  transition:opacity .6s ease, transform .6s cubic-bezier(.25,.46,.45,.94);
-  opacity:1;
-  transform:translateY(0);
-}
-.hero-rotating.fade-out {
-  opacity:0;
-  transform:translateY(-12px);
-}
-.hero-rotating.fade-in {
-  opacity:1;
-  transform:translateY(0);
 }
 
 /* ===== SCROLL PROGRESS BAR ===== */
