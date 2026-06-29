@@ -754,7 +754,202 @@
     </div>
   </div>
 
+  <!-- ===== FLOATING CHAT BOT ===== -->
+  <div class="chat-bot" id="chatBot">
+    <div class="chat-bot-tooltip" id="chatTooltip">Ask me anything <span class="chat-tooltip-arrow"></span></div>
+    <div class="chat-bot-btn" id="chatBotBtn">
+      <i class="fas fa-comment-dots"></i>
+    </div>
+  </div>
+
+  <div class="chat-modal" id="chatModal">
+    <div class="chat-modal-header">
+      <span><i class="fas fa-robot" style="color:var(--cyan)"></i> Winlerr Assistant</span>
+      <button class="chat-modal-close" id="chatModalClose">&times;</button>
+    </div>
+    <div class="chat-modal-body" id="chatBody">
+      <div class="chat-msg chat-bot-msg">
+        <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+        <div class="chat-bubble">Hey there! I'm Sean's assistant. Ask me anything about Winlerr, the free prototype, or early access. I'll do my best to help!</div>
+      </div>
+    </div>
+    <div class="chat-modal-footer">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything..." />
+      <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
   <script src="script.js" type="module"></script>
+  <script>
+    // === FLOATING CHAT BOT ===
+    const chatBot = document.getElementById('chatBot')
+    const chatBtn = document.getElementById('chatBotBtn')
+    const chatModal = document.getElementById('chatModal')
+    const chatClose = document.getElementById('chatModalClose')
+    const chatBody = document.getElementById('chatBody')
+    const chatInput = document.getElementById('chatInput')
+    const chatSend = document.getElementById('chatSendBtn')
+    const tooltip = document.getElementById('chatTooltip')
+
+    // Toggle chat
+    chatBtn.addEventListener('click', e => {
+      e.stopPropagation()
+      if (!chatModal.classList.contains('open')) {
+        if (!ensureGroqKey()) return
+      }
+      chatModal.classList.toggle('open')
+      chatBtn.classList.toggle('active')
+      tooltip.style.display = 'none'
+      if (chatModal.classList.contains('open')) chatInput.focus()
+    })
+    chatClose.addEventListener('click', () => {
+      chatModal.classList.remove('open')
+      chatBtn.classList.remove('active')
+    })
+
+    // Drag
+    let isDragging = false, startX, startY, origX, origY
+    chatBtn.addEventListener('mousedown', e => {
+      if (e.target.closest('.chat-bot-btn')) {
+        isDragging = true
+        const rect = chatBot.getBoundingClientRect()
+        startX = e.clientX
+        startY = e.clientY
+        origX = rect.left
+        origY = rect.top
+        chatBot.style.cursor = 'grabbing'
+        e.preventDefault()
+      }
+    })
+    document.addEventListener('mousemove', e => {
+      if (!isDragging) return
+      const dx = e.clientX - startX
+      const dy = e.clientY - startY
+      let newX = Math.max(8, Math.min(window.innerWidth - 70, origX + dx))
+      let newY = Math.max(8, Math.min(window.innerHeight - 70, origY + dy))
+      chatBot.style.left = newX + 'px'
+      chatBot.style.top = newY + 'px'
+      chatBot.style.right = 'auto'
+      // Move tooltip with it
+      tooltip.style.display = 'none'
+    })
+    document.addEventListener('mouseup', () => {
+      isDragging = false
+      chatBot.style.cursor = 'grab'
+    })
+
+    // Touch support
+    chatBtn.addEventListener('touchstart', e => {
+      const touch = e.touches[0]
+      const rect = chatBot.getBoundingClientRect()
+      startX = touch.clientX
+      startY = touch.clientY
+      origX = rect.left
+      origY = rect.top
+      isDragging = true
+    }, { passive: true })
+    document.addEventListener('touchmove', e => {
+      if (!isDragging) return
+      const touch = e.touches[0]
+      const dx = touch.clientX - startX
+      const dy = touch.clientY - startY
+      let newX = Math.max(8, Math.min(window.innerWidth - 70, origX + dx))
+      let newY = Math.max(8, Math.min(window.innerHeight - 70, origY + dy))
+      chatBot.style.left = newX + 'px'
+      chatBot.style.top = newY + 'px'
+      chatBot.style.right = 'auto'
+    }, { passive: true })
+    document.addEventListener('touchend', () => { isDragging = false })
+
+    // Groq AI config — set via prompt on first use
+    const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+    const GROQ_MODEL = 'llama3-8b-8192'
+    let GROQ_API_KEY = sessionStorage.getItem('groq_key') || ''
+
+    const chatHistory = [
+      { role: 'system', content: 'You are a friendly, helpful assistant for Winlerr — a business growth platform built by Sean for small businesses in Southern Africa. Answer questions about Winlerr: it helps businesses manage websites, social media, WhatsApp automation, content planning, and growth tracking from one place. Early access offers a free 30-day prototype. The founder is Sean. Keep answers concise, warm, and under 4 sentences. If asked something unrelated, gently steer back to Winlerr.' }
+    ]
+
+    function addMsg(text, isUser) {
+      const div = document.createElement('div')
+      div.className = 'chat-msg' + (isUser ? ' chat-user-msg' : '')
+      div.innerHTML = `
+        <div class="chat-avatar"><i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i></div>
+        <div class="chat-bubble">${text}</div>
+      `
+      chatBody.appendChild(div)
+      chatBody.scrollTop = chatBody.scrollHeight
+    }
+
+    function showTyping() {
+      const div = document.createElement('div')
+      div.className = 'chat-msg chat-bot-msg'
+      div.id = 'chatTyping'
+      div.innerHTML = `
+        <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+        <div class="chat-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>
+      `
+      chatBody.appendChild(div)
+      chatBody.scrollTop = chatBody.scrollHeight
+    }
+    function removeTyping() {
+      const el = document.getElementById('chatTyping')
+      if (el) el.remove()
+    }
+
+    function ensureGroqKey() {
+      if (!GROQ_API_KEY) {
+        GROQ_API_KEY = prompt('Enter your Groq API key to enable AI chat:')
+        if (GROQ_API_KEY) sessionStorage.setItem('groq_key', GROQ_API_KEY)
+      }
+      return !!GROQ_API_KEY
+    }
+
+    async function getGroqReply(msg) {
+      chatHistory.push({ role: 'user', content: msg })
+      try {
+        const res = await fetch(GROQ_API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + GROQ_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: GROQ_MODEL,
+            messages: chatHistory,
+            max_tokens: 200,
+            temperature: 0.7,
+          })
+        })
+        if (!res.ok) throw new Error('Groq error: ' + res.status)
+        const data = await res.json()
+        const reply = data.choices[0].message.content.trim()
+        chatHistory.push({ role: 'assistant', content: reply })
+        return reply
+      } catch (e) {
+        console.warn('[Chat] Groq failed:', e)
+        return "Sorry, I'm having trouble connecting to my brain right now. Feel free to check out the prototype section or join the waitlist above!"
+      }
+    }
+
+    function sendMessage() {
+      const msg = chatInput.value.trim()
+      if (!msg) return
+      if (!ensureGroqKey()) return
+      addMsg(msg, true)
+      chatInput.value = ''
+      showTyping()
+      getGroqReply(msg).then(reply => {
+        removeTyping()
+        addMsg(reply, false)
+      })
+    }
+
+    chatSend.addEventListener('click', sendMessage)
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendMessage()
+    })
+  </script>
   <script>
     // === Scroll Reveal ===
     const revealObserver = new IntersectionObserver(entries => {
