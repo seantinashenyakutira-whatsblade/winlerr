@@ -20,6 +20,24 @@
 </head>
 <body>
 
+  <!-- ===== SCROLL PROGRESS BAR ===== -->
+  <div class="scroll-progress" id="scrollProgress">
+    <div class="scroll-progress-track">
+      <div class="scroll-progress-fill" id="scrollProgressFill"></div>
+    </div>
+    <div class="scroll-progress-labels" id="scrollProgressLabels">
+      <div class="spl-item" data-section="hero"><span class="spl-dot"></span><span class="spl-label">Home</span></div>
+      <div class="spl-item" data-section="problem"><span class="spl-dot"></span><span class="spl-label">Challenge</span></div>
+      <div class="spl-item" data-section="solution"><span class="spl-dot"></span><span class="spl-label">Platform</span></div>
+      <div class="spl-item" data-section="prototype"><span class="spl-dot"></span><span class="spl-label">Prototype</span></div>
+      <div class="spl-item" data-section="how-it-works"><span class="spl-dot"></span><span class="spl-label">Process</span></div>
+      <div class="spl-item" data-section="suggest"><span class="spl-dot"></span><span class="spl-label">Suggest</span></div>
+      <div class="spl-item" data-section="video"><span class="spl-dot"></span><span class="spl-label">Video</span></div>
+      <div class="spl-item" data-section="trust"><span class="spl-dot"></span><span class="spl-label">Mission</span></div>
+      <div class="spl-item" data-section="waitlist"><span class="spl-dot"></span><span class="spl-label">Join</span></div>
+    </div>
+  </div>
+
   <!-- ===== NAVBAR ===== -->
   <nav class="navbar" id="navbar">
     <div class="container nav-container">
@@ -57,7 +75,7 @@
         <div class="hero-badge badge-animated">
           <i class="fas fa-rocket"></i> <span class="text-gradient-blue">Free 30-Day Prototype</span> for Early Businesses
         </div>
-        <h1 class="hero-title">I'm Building a Platform to Help Your Business <span class="text-gradient">Grow Online</span> — Without the Complexity</h1>
+        <h1 class="hero-title">I'm Building a Platform to Help Your Business <span class="hero-rotating-wrap"><span class="hero-rotating text-gradient">Grow Online — Without the Complexity</span></span></h1>
         <p class="hero-subtitle"><span class="font-display-light">I know running a business is already enough work.</span> You don't have time to become a marketing expert too. That's why I'm creating Winlerr — a single place where you can <strong>manage your website</strong>, <em>plan content</em>, <span class="underline-glow">automate replies</span>, and actually <span class="text-gradient-blue fw-800">grow your online presence</span> — without a full team.</p>
         <p class="hero-support">I'm opening <strong>early access spots</strong> for businesses that want a <span class="underline-cyan">free 30-day prototype</span> — a real preview of what your business could look like online, built around <em>your brand, your customers, and your goals.</em></p>
         <div class="hero-buttons">
@@ -760,6 +778,71 @@
     const navbar = document.getElementById('navbar')
     window.addEventListener('scroll', () => {
       navbar.classList.toggle('scrolled', window.scrollY > 50)
+    })
+
+    // === ROTATING HERO TEXT ===
+    const phrases = [
+      'Grow Online \u2014 Without the Complexity',
+      'Attract More Customers Every Day',
+      'Save Hours on Marketing Each Week',
+      'Look Professional in Minutes',
+      'Automate Your Business Growth',
+    ]
+    let phraseIndex = 0
+    const rotatingEl = document.querySelector('.hero-rotating')
+    if (rotatingEl) {
+      setInterval(() => {
+        phraseIndex = (phraseIndex + 1) % phrases.length
+        rotatingEl.classList.remove('fade-in')
+        rotatingEl.classList.add('fade-out')
+        setTimeout(() => {
+          rotatingEl.textContent = phrases[phraseIndex]
+          rotatingEl.classList.remove('fade-out')
+          rotatingEl.classList.add('fade-in')
+        }, 400)
+      }, 10000)
+    }
+
+    // === SCROLL PROGRESS BAR ===
+    const progressBar = document.getElementById('scrollProgress')
+    const progressFill = document.getElementById('scrollProgressFill')
+    const splItems = document.querySelectorAll('.spl-item')
+
+    function updateProgress() {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+      progressFill.style.height = progress + '%'
+
+      progressBar.classList.toggle('visible', scrollTop > 200)
+
+      let currentSection = 'hero'
+      splItems.forEach(item => {
+        const section = document.getElementById(item.dataset.section)
+        if (section) {
+          const rect = section.getBoundingClientRect()
+          if (rect.top <= window.innerHeight * 0.4) {
+            currentSection = item.dataset.section
+          }
+        }
+      })
+      splItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.section === currentSection)
+      })
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true })
+    window.addEventListener('resize', updateProgress)
+    updateProgress()
+
+    // Click progress label to scroll
+    splItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const section = document.getElementById(item.dataset.section)
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      })
     })
   </script>
 </body>
