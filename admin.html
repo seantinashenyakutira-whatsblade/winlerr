@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winlerr — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <script>
+    window.__SUPABASE_CONFIG = {
+      url: 'https://uqdeuiaymoolyroppwhy.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxZGV1aWF5bW9vbHlyb3Bwd2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0ODMxNjgsImV4cCI6MjA5ODA1OTE2OH0.G-9VVRoAqk0HOXv31UkTO4D7FnYqVwBOcMYOsEQUNDc',
+    }
+  </script>
+  <script src="supabaseClient.js" type="module"></script>
+</head>
+<body>
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <img src="logo-full-horizontal.png" alt="Winlerr" class="login-logo" />
+      <p class="login-subtitle">Admin Dashboard</p>
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required placeholder="admin@winlerr.com" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter your password" />
+        </div>
+        <div id="loginError" class="form-error" style="display:none"></div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+          <i class="fas fa-lock"></i> Sign In
+        </button>
+      </form>
+      <a href="index.html" class="login-back"><i class="fas fa-arrow-left"></i> Back to site</a>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN DASHBOARD ===== -->
+  <div id="adminDashboard" class="admin-layout" style="display:none">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <img src="logo-full-horizontal.png" alt="Winlerr" class="admin-logo-img" />
+      </div>
+      <nav class="admin-nav">
+        <a href="#" class="admin-nav-link active" data-tab="overview"><i class="fas fa-chart-pie"></i> <span>Overview</span></a>
+        <a href="#" class="admin-nav-link" data-tab="waitlist"><i class="fas fa-list"></i> <span>Waitlist</span> <span class="nav-badge" id="badge-waitlist">0</span></a>
+        <a href="#" class="admin-nav-link" data-tab="prototypes"><i class="fas fa-gem"></i> <span>Prototypes</span> <span class="nav-badge" id="badge-prototypes">0</span></a>
+        <a href="#" class="admin-nav-link" data-tab="suggestions"><i class="fas fa-lightbulb"></i> <span>Suggestions</span> <span class="nav-badge" id="badge-suggestions">0</span></a>
+        <a href="#" class="admin-nav-link" data-tab="newsletter"><i class="fas fa-envelope"></i> <span>Newsletter</span></a>
+        <a href="#" class="admin-nav-link" data-tab="settings"><i class="fas fa-cog"></i> <span>Settings</span></a>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="#" onclick="handleLogout()" class="admin-logout-link">
+          <i class="fas fa-sign-out-alt"></i> <span>Sign Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-header">
+        <h1 id="pageTitle">Overview</h1>
+        <div class="admin-header-actions">
+          <button class="admin-btn" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+          <button class="admin-btn" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
+        </div>
+      </header>
+
+      <!-- OVERVIEW TAB -->
+      <div class="admin-tab active" id="tab-overview">
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card stat-blue">
+            <div class="stat-card-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-card-info"><span class="stat-card-number" id="stat-waitlist">0</span><span class="stat-card-label">Total Leads</span></div>
+          </div>
+          <div class="stat-card stat-purple">
+            <div class="stat-card-icon"><i class="fas fa-gem"></i></div>
+            <div class="stat-card-info"><span class="stat-card-number" id="stat-prototypes">0</span><span class="stat-card-label">Prototypes</span></div>
+          </div>
+          <div class="stat-card stat-cyan">
+            <div class="stat-card-icon"><i class="fas fa-lightbulb"></i></div>
+            <div class="stat-card-info"><span class="stat-card-number" id="stat-suggestions">0</span><span class="stat-card-label">Suggestions</span></div>
+          </div>
+          <div class="stat-card stat-green">
+            <div class="stat-card-icon"><i class="fas fa-envelope"></i></div>
+            <div class="stat-card-info"><span class="stat-card-number" id="stat-campaigns">0</span><span class="stat-card-label">Campaigns</span></div>
+          </div>
+        </div>
+        <div class="overview-grid">
+          <div class="admin-card"><h3>Recent Waitlist Signups</h3><div id="recentWaitlist"><p class="empty-state">Loading...</p></div></div>
+          <div class="admin-card"><h3>Recent Prototype Requests</h3><div id="recentPrototypes"><p class="empty-state">Loading...</p></div></div>
+          <div class="admin-card"><h3>Top Countries</h3><div id="topCountries"><p class="empty-state">Loading...</p></div></div>
+          <div class="admin-card"><h3>Business Types</h3><div id="topBusinessTypes"><p class="empty-state">Loading...</p></div></div>
+        </div>
+      </div>
+
+      <!-- WAITLIST TAB -->
+      <div class="admin-tab" id="tab-waitlist">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>All Waitlist Leads</h3>
+            <div class="admin-search"><i class="fas fa-search"></i><input type="text" id="waitlistSearch" placeholder="Search..." oninput="renderWaitlist()" /></div>
+          </div>
+          <div class="table-wrapper"><table class="admin-table">
+            <thead><tr>
+              <th>Date</th><th>Name</th><th>Business</th><th>Country</th><th>Type</th><th>Goal</th><th>WhatsApp</th><th>Email</th><th>Website</th><th>Consent</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="waitlistBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- PROTOTYPES TAB -->
+      <div class="admin-tab" id="tab-prototypes">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Prototype Requests</h3>
+            <div class="admin-search"><i class="fas fa-search"></i><input type="text" id="prototypeSearch" placeholder="Search..." oninput="renderPrototypes()" /></div>
+          </div>
+          <div class="table-wrapper"><table class="admin-table">
+            <thead><tr>
+              <th>Date</th><th>Name</th><th>Business</th><th>Industry</th><th>Country</th><th>Type</th><th>Style</th><th>Actions</th><th>WhatsApp</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="prototypeBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- SUGGESTIONS TAB -->
+      <div class="admin-tab" id="tab-suggestions">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Feature Suggestions</h3>
+            <div class="admin-search"><i class="fas fa-search"></i><input type="text" id="suggestionSearch" placeholder="Search..." oninput="renderSuggestions()" /></div>
+          </div>
+          <div class="table-wrapper"><table class="admin-table">
+            <thead><tr>
+              <th>Date</th><th>Name</th><th>Business</th><th>Feature</th><th>Reason</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="suggestionBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- NEWSLETTER TAB -->
+      <div class="admin-tab" id="tab-newsletter">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Email Sequence</h3>
+            <button class="admin-btn admin-btn-primary" onclick="openNewsletterEditor()"><i class="fas fa-plus"></i> New Campaign</button>
+          </div>
+          <div class="table-wrapper"><table class="admin-table">
+            <thead><tr>
+              <th>#</th><th>Title</th><th>Subject</th><th>Status</th><th>Planned Date</th><th>Sent Date</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="newsletterBody"></tbody>
+          </table></div>
+        </div>
+        <div class="admin-card" style="margin-top:1.25rem">
+          <h3>Suggested Email Sequence</h3>
+          <div id="suggestedSequence">
+            <div class="sequence-item"><span class="seq-num">1</span><div><strong>Welcome to Winlerr Early Access</strong><p>Introduce the platform and what early users can expect.</p></div></div>
+            <div class="sequence-item"><span class="seq-num">2</span><div><strong>Why Online Presence Matters</strong><p>Help businesses understand the value of a professional digital presence.</p></div></div>
+            <div class="sequence-item"><span class="seq-num">3</span><div><strong>What Your Free 30-Day Prototype Can Include</strong><p>Explain the prototype offer in detail.</p></div></div>
+            <div class="sequence-item"><span class="seq-num">4</span><div><strong>How Winlerr Helps With Content, Customers, and Automation</strong><p>Showcase the core platform features.</p></div></div>
+            <div class="sequence-item"><span class="seq-num">5</span><div><strong>Invite to Request a Prototype</strong><p>Final CTA to convert subscribers into prototype requests.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div class="admin-tab" id="tab-settings">
+        <div class="admin-card">
+          <h3>Admin Profile</h3>
+          <p id="adminProfileInfo" style="color:var(--text-secondary);font-size:.9rem">Loading...</p>
+        </div>
+        <div class="admin-card" style="margin-top:1.25rem">
+          <h3>Failed Local Backups</h3>
+          <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:.75rem">Submissions that were saved locally when Supabase was unavailable.</p>
+          <div id="failedBackups"><p class="empty-state">No failed backups</p></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- NEWSLETTER EDITOR MODAL -->
+  <div class="modal-overlay" id="modal-newsletter">
+    <div class="modal-content modal-lg">
+      <button class="modal-close" onclick="closeNewsletterEditor()">&times;</button>
+      <h2 id="newsletterEditorTitle">New Campaign</h2>
+      <form id="newsletterForm" onsubmit="return saveNewsletter(event)">
+        <input type="hidden" id="newsletterId" />
+        <div class="form-group">
+          <label>Sequence Number</label>
+          <input type="number" id="newsletterSeq" min="1" placeholder="e.g. 1" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" id="newsletterTitle" required placeholder="e.g. Welcome to Winlerr" />
+          </div>
+          <div class="form-group">
+            <label>Subject *</label>
+            <input type="text" id="newsletterSubject" required placeholder="e.g. Welcome to Winlerr Early Access" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Body (HTML) *</label>
+          <textarea id="newsletterBodyHtml" rows="10" required placeholder="<h1>Your email HTML here...</h1>"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Planned Send Date</label>
+            <input type="datetime-local" id="newsletterDate" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="newsletterStatus">
+              <option value="Draft">Draft</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Sent">Sent</option>
+            </select>
+          </div>
+        </div>
+        <div class="newsletter-actions">
+          <button type="submit" class="btn btn-primary" id="newsletterSaveBtn"><i class="fas fa-save"></i> Save Campaign</button>
+          <button type="button" class="btn btn-secondary" onclick="sendTestNewsletter()"><i class="fas fa-flask"></i> Send Test</button>
+        </div>
+        <div id="newsletterSuccess" class="form-success" style="display:none"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PROTOTYPE DETAIL MODAL -->
+  <div class="modal-overlay" id="modal-prototype-detail">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('prototype-detail')">&times;</button>
+      <h2>Prototype Details</h2>
+      <div id="prototypeDetailContent" style="color:var(--text-secondary);font-size:.9rem;line-height:1.7;margin-top:1rem"></div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>Admin Notes</label>
+        <textarea id="prototypeAdminNotes" rows="3" placeholder="Add internal notes..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="savePrototypeNotes()"><i class="fas fa-save"></i> Save Notes</button>
+    </div>
+  </div>
+
+  <script src="admin.js" type="module"></script>
+</body>
+</html>

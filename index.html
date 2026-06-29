@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winlerr — Automate. Optimize. Grow.</title>
+  <meta name="description" content="Winlerr is an invite-first business growth platform helping businesses manage websites, social media, client engagement, and automation from one place." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    window.__SUPABASE_CONFIG = {
+      url: 'https://uqdeuiaymoolyroppwhy.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxZGV1aWF5bW9vbHlyb3Bwd2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0ODMxNjgsImV4cCI6MjA5ODA1OTE2OH0.G-9VVRoAqk0HOXv31UkTO4D7FnYqVwBOcMYOsEQUNDc',
+    }
+  </script>
+  <script src="supabaseClient.js" type="module"></script>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-container">
+      <a href="#" class="nav-logo">
+        <img src="logo-full-horizontal.png" alt="Winlerr" class="logo-img" />
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#problem" class="nav-link">Problem</a>
+        <a href="#solution" class="nav-link">Features</a>
+        <a href="#prototype" class="nav-link">Prototype</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#suggest" class="nav-link">Suggest Idea</a>
+        <a href="#waitlist" class="nav-cta-btn">Request Prototype</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fas fa-rocket"></i> Free 30-Day Prototype for Early Businesses
+        </div>
+        <h1 class="hero-title">Launch a Professional Online Presence for Your Business</h1>
+        <p class="hero-subtitle">Winlerr helps businesses get online, plan better content, respond faster to customers, and manage digital growth from one simple platform.</p>
+        <p class="hero-support">Join early and request a free 30-day business prototype built around your brand, customers, offers, and growth goals.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-lg" onclick="openModal('prototype')">
+            <i class="fas fa-gem"></i> Request My Free Prototype
+          </button>
+          <button class="btn btn-secondary btn-lg" onclick="openModal('waitlist')">
+            <i class="fas fa-list"></i> Join Early Access
+          </button>
+        </div>
+        <div class="hero-trust">
+          <span><i class="fas fa-check-circle"></i> Free prototype preview</span>
+          <span><i class="fas fa-check-circle"></i> No technical skills needed</span>
+          <span><i class="fas fa-check-circle"></i> Built for WhatsApp-first businesses</span>
+        </div>
+        <div class="hero-urgency">
+          <i class="fas fa-exclamation-circle"></i> Limited early prototype slots available while Winlerr is still in development.
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="mockup-wrapper">
+          <div class="mockup-dashboard">
+            <div class="mockup-header">
+              <div class="mockup-dots"><span></span><span></span><span></span></div>
+              <div class="mockup-tabs">
+                <span class="mockup-tab active">Dashboard</span>
+                <span class="mockup-tab">Sites</span>
+                <span class="mockup-tab">Social</span>
+                <span class="mockup-tab">Automation</span>
+              </div>
+            </div>
+            <div class="mockup-body">
+              <div class="mockup-row">
+                <div class="mockup-card card-blue">
+                  <i class="fas fa-globe"></i>
+                  <div class="mc-info"><span class="mc-label">Website</span><span class="mc-value">Live</span></div>
+                </div>
+                <div class="mockup-card card-cyan">
+                  <i class="fas fa-users"></i>
+                  <div class="mc-info"><span class="mc-label">Leads</span><span class="mc-value">+<span class="hero-count" data-count="47">0</span></span></div>
+                </div>
+              </div>
+              <div class="mockup-row">
+                <div class="mockup-card card-purple">
+                  <i class="fas fa-robot"></i>
+                  <div class="mc-info"><span class="mc-label">AI Assistant</span><span class="mc-value">Active</span></div>
+                </div>
+                <div class="mockup-card card-blue">
+                  <i class="fas fa-chart-line"></i>
+                  <div class="mc-info"><span class="mc-label">Growth</span><span class="mc-value"><span class="hero-count" data-count="23">0</span>%</span></div>
+                </div>
+              </div>
+              <div class="mockup-row">
+                <div class="mockup-card card-cyan">
+                  <i class="fab fa-whatsapp"></i>
+                  <div class="mc-info"><span class="mc-label">WhatsApp</span><span class="mc-value">Auto</span></div>
+                </div>
+                <div class="mockup-card card-purple">
+                  <i class="fas fa-calendar"></i>
+                  <div class="mc-info"><span class="mc-label">Content</span><span class="mc-value">12 Posts</span></div>
+                </div>
+              </div>
+              <div class="mockup-bar">
+                <div class="mockup-bar-fill" data-bar="73" style="width:0%"></div>
+                <span><span class="hero-bar-label" data-count="73">0</span>% Growth Score</span>
+              </div>
+            </div>
+          </div>
+          <div class="mockup-float float-1">
+            <span class="float-dot" style="background:#10B981"></span>
+            <span>WhatsApp Auto-Reply Ready</span>
+          </div>
+          <div class="mockup-float float-2">
+            <span class="float-dot" style="background:#0A84FF"></span>
+            <span>Prototype Preview</span>
+          </div>
+          <div class="mockup-float float-3">
+            <span class="float-dot" style="background:#7B2CFF"></span>
+            <span>12 Posts Planned</span>
+          </div>
+          <div class="mockup-float float-4">
+            <span class="float-dot" style="background:#00C2FF"></span>
+            <span>New Lead Captured</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROBLEM SECTION ===== -->
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-label">The Challenge</div>
+      <h2 class="section-title">Your Business May Be Good — But Online, Customers Judge What They See First</h2>
+      <p class="section-desc">Before a customer calls, visits, or buys, they usually check your online presence. If your business has no website, unclear social media, slow replies, or weak content, customers may choose a competitor who looks more prepared.</p>
+      <div class="grid-3">
+        <div class="problem-card">
+          <div class="problem-icon"><i class="fas fa-globe"></i></div>
+          <h3>No Professional Website</h3>
+          <p>Customers want to see who you are, what you offer, and how to contact you before they trust your business.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon"><i class="fas fa-ad"></i></div>
+          <h3>Inconsistent Social Media</h3>
+          <p>Posting without a plan makes your brand look inactive, even when your business is working every day.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon"><i class="fas fa-clock"></i></div>
+          <h3>Slow Customer Replies</h3>
+          <p>Late replies on WhatsApp, Instagram, or Facebook can turn interested customers into lost sales.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon"><i class="fas fa-lightbulb"></i></div>
+          <h3>No Clear Content Direction</h3>
+          <p>Many businesses know they need to post, but do not know what to say, when to post, or how to present offers.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon"><i class="fas fa-sitemap"></i></div>
+          <h3>Too Many Scattered Tools</h3>
+          <p>Websites, messages, designs, customer requests, and marketing ideas are often spread across different apps.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SOLUTION SECTION ===== -->
+  <section class="section section-dark" id="solution">
+    <div class="container">
+      <div class="section-label">The Platform</div>
+      <h2 class="section-title">Winlerr Brings Your Online Business Workflow Into One Place</h2>
+      <p class="section-desc">Winlerr is being built as a business growth control centre — helping you manage your website presence, content planning, customer engagement, automation, and digital strategy without needing a full marketing team.</p>
+      <div class="grid-3">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-paint-brush"></i></div>
+          <h3>Website & Landing Page Prototypes</h3>
+          <p>Request a business-specific website concept designed around your industry, offers, and customer actions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-brain"></i></div>
+          <h3>AI Content Planning</h3>
+          <p>Get post ideas, captions, campaign suggestions, and marketing direction based on your niche.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-calendar-week"></i></div>
+          <h3>Social Media Workflow Planning</h3>
+          <p>Plan reels, carousels, offers, product posts, announcements, and campaigns from one organized workflow.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-reply-all"></i></div>
+          <h3>WhatsApp & Client Engagement Automation</h3>
+          <p>Prepare faster replies, lead follow-ups, and customer response flows for WhatsApp, Instagram, and Facebook.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+          <h3>Business Growth Insights</h3>
+          <p>Understand what your online presence is missing and what actions can improve customer trust and conversions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-palette"></i></div>
+          <h3>Design & Brand Support</h3>
+          <p>Use Canva-style design workflows, templates, and brand direction to make your business look more professional.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROTOTYPE OFFER SECTION ===== -->
+  <section class="section" id="prototype">
+    <div class="container">
+      <div class="section-label">Free Offer</div>
+      <h2 class="section-title">Get a Free 30-Day Prototype of How Your Business Could Look Online</h2>
+      <p class="section-desc">Early Winlerr members can request a free business prototype. We'll use your business details to prepare a digital growth preview — including a website concept, customer action buttons, brand direction, and automation ideas.</p>
+      <p class="section-desc" style="margin-top:-1.5rem">This helps you see what your business could become online before paying for the full platform.</p>
+      <div class="prototype-grid">
+        <div class="prototype-item">
+          <i class="fas fa-calendar-check"></i>
+          <span>Free 30-day prototype access</span>
+        </div>
+        <div class="prototype-item">
+          <i class="fas fa-link"></i>
+          <span>Hosted under a Winlerr subdomain during testing</span>
+        </div>
+        <div class="prototype-item">
+          <i class="fas fa-store"></i>
+          <span>Website concept based on your business</span>
+        </div>
+        <div class="prototype-item">
+          <i class="fas fa-bullhorn"></i>
+          <span>WhatsApp, call, booking, or inquiry buttons</span>
+        </div>
+        <div class="prototype-item">
+          <i class="fas fa-paint-brush"></i>
+          <span>Brand style and layout direction</span>
+        </div>
+        <div class="prototype-item">
+          <i class="fas fa-hashtag"></i>
+          <span>Social media and automation suggestions</span>
+        </div>
+        <div class="prototype-item">
+          <i class="fas fa-comments"></i>
+          <span>Early feedback and improvement support</span>
+        </div>
+      </div>
+      <div class="prototype-urgency">
+        <i class="fas fa-exclamation-circle"></i> Early prototype slots will be limited while Winlerr is still in development.
+      </div>
+      <div class="text-center" style="margin-top:2rem">
+        <button class="btn btn-primary btn-lg" onclick="openModal('prototype')">
+          <i class="fas fa-gem"></i> Request My Free Prototype
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS SECTION ===== -->
+  <section class="section section-dark" id="how-it-works">
+    <div class="container">
+      <div class="section-label">The Process</div>
+      <h2 class="section-title">How Early Access Works</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Join the Waitlist</h3>
+          <p>Enter your name, email, business name, country, and business type.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Tell Us About Your Business</h3>
+          <p>Share what your business does, what you sell, and what digital support you need.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Request a Prototype</h3>
+          <p>Choose whether you want a website concept, automation idea, social media plan, or full business growth preview.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Get Early Access Updates</h3>
+          <p>Receive updates as Winlerr develops, including beta invitations, prototype updates, and launch offers.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <h3>Start Growing Smarter</h3>
+          <p>Use the platform to improve marketing, communication, and online presence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SUGGEST FEATURE SECTION ===== -->
+  <section class="section" id="suggest">
+    <div class="container">
+      <div class="section-label">Your Voice</div>
+      <h2 class="section-title">Help Shape Winlerr Before It Launches</h2>
+      <p class="section-desc">Winlerr is being built with real business needs in mind. If there is a feature your business needs, share it with us. Your feedback helps us build a platform that solves real problems, not just fancy software ideas.</p>
+      <div class="form-wrapper" style="max-width:640px;margin:0 auto">
+        <form id="suggestForm" class="glass-form" onsubmit="return submitSuggest(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="suggestName">Full Name</label>
+              <input type="text" id="suggestName" required placeholder="e.g. Thandi Mwale" />
+            </div>
+            <div class="form-group">
+              <label for="suggestBusiness">Business Name</label>
+              <input type="text" id="suggestBusiness" required placeholder="e.g. Mwale Fresh Produce" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="suggestEmail">Email</label>
+              <input type="email" id="suggestEmail" required placeholder="you@business.com" />
+            </div>
+            <div class="form-group">
+              <label for="suggestWhatsapp">WhatsApp Number</label>
+              <input type="tel" id="suggestWhatsapp" required placeholder="+260 97 123 4567" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="suggestFeature">What feature would you like Winlerr to include?</label>
+            <textarea id="suggestFeature" rows="3" required placeholder="Describe the feature you need..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="suggestWhy">Why would this feature help your business?</label>
+            <textarea id="suggestWhy" rows="3" required placeholder="Tell us how it would make a difference..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label consent-label">
+              <input type="checkbox" id="suggestConsent" required />
+              I agree to receive Winlerr early access updates and prototype communication.
+            </label>
+          </div>
+          <p class="privacy-note">We'll only use your details to contact you about Winlerr, your prototype request, and early access updates.</p>
+          <button type="submit" class="btn btn-primary btn-block" id="suggestSubmitBtn">
+            <i class="fas fa-lightbulb"></i> Submit My Feature Idea
+          </button>
+          <div id="suggestSuccess" class="form-success" style="display:none">
+            <i class="fas fa-check-circle"></i> Thank you for helping shape Winlerr. Your idea has been submitted.
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIDEO SECTION ===== -->
+  <section class="section section-dark" id="video">
+    <div class="container">
+      <div class="section-label">From the Founder</div>
+      <h2 class="section-title">A Message From the Founder</h2>
+      <p class="section-desc">Watch a short message explaining why Winlerr is being built, which businesses it is designed for, and how early members can benefit from joining before launch.</p>
+      <div class="video-placeholder">
+        <div class="video-placeholder-icon"><i class="fas fa-play"></i></div>
+        <p class="video-placeholder-text">Founder introduction video coming soon</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRUST SECTION ===== -->
+  <section class="section" id="trust">
+    <div class="container text-center">
+      <div class="section-label">Our Mission</div>
+      <h2 class="section-title">Built for Businesses That Want to Look Professional, Move Faster, and Grow Smarter</h2>
+      <p class="section-desc" style="max-width:720px;margin:0 auto">Winlerr is for business owners who know their online presence can be better but do not have the time, tools, or team to manage everything manually. Whether you are just starting or already serving customers, Winlerr is being designed to help your business become more visible, more organized, and more responsive.</p>
+      <div class="trust-stats">
+        <div class="stat-item">
+          <span class="stat-number" data-count="5">0</span>
+          <span class="stat-label">Countries Targeted</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-count="10">0</span>
+          <span class="stat-label">Business Types</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-count="30">0</span>
+          <span class="stat-label">Day Free Prototype</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-count="1">0</span>
+          <span class="stat-label">Platform. Everything.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FINAL CTA SECTION ===== -->
+  <section class="section section-cta" id="waitlist">
+    <div class="container text-center">
+      <h2 class="section-title" style="color:#fff">Be One of the First Businesses to Grow With Winlerr</h2>
+      <p class="section-desc" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 2rem">Join early, request your prototype, and help shape a platform built for real businesses that want better websites, stronger marketing, faster replies, and smarter growth.</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary btn-lg" onclick="openModal('prototype')">
+          <i class="fas fa-gem"></i> Request Free Prototype
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="openModal('waitlist')">
+          <i class="fas fa-list"></i> Join Early Access
+        </button>
+        <button class="btn btn-outline btn-lg" onclick="openModal('suggest')">
+          <i class="fas fa-lightbulb"></i> Suggest a Feature
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo">
+            <img src="logo-full-horizontal.png" alt="Winlerr" class="logo-img" />
+          </a>
+          <p>Automate. Optimize. Grow.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Platform</h4>
+          <a href="#solution">Features</a>
+          <a href="#prototype">Prototype</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#waitlist">Waitlist</a>
+        </div>
+        <div class="footer-links">
+          <h4>Company</h4>
+          <a href="#trust">About</a>
+          <a href="#video">Founder</a>
+          <a href="#suggest">Feedback</a>
+          <a href="admin.html">Admin</a>
+        </div>
+        <div class="footer-links">
+          <h4>Support</h4>
+          <a href="mailto:hello@winlerr.com">hello@winlerr.com</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Winlerr. All rights reserved. Built for businesses in Southern Africa and beyond.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== MODAL: WAITLIST ===== -->
+  <div class="modal-overlay" id="modal-waitlist" onclick="closeModalOutside(event,'waitlist')">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('waitlist')">&times;</button>
+      <h2>Join the Early Access Waitlist</h2>
+      <p style="margin-bottom:1.5rem;color:var(--text-secondary)">Enter your details to secure your spot.</p>
+      <form id="waitlistForm" onsubmit="return submitWaitlist(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="wlName">Full Name</label>
+            <input type="text" id="wlName" required placeholder="e.g. Thandi Mwale" />
+          </div>
+          <div class="form-group">
+            <label for="wlEmail">Email Address</label>
+            <input type="email" id="wlEmail" required placeholder="you@business.com" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="wlWhatsapp">WhatsApp Number</label>
+            <input type="tel" id="wlWhatsapp" required placeholder="+260 97 123 4567" />
+          </div>
+          <div class="form-group">
+            <label for="wlBusiness">Business Name</label>
+            <input type="text" id="wlBusiness" required placeholder="e.g. Mwale Fresh Produce" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="wlCountry">Country</label>
+            <select id="wlCountry" required>
+              <option value="">Select country</option>
+              <option value="Zambia">Zambia</option>
+              <option value="Zimbabwe">Zimbabwe</option>
+              <option value="Botswana">Botswana</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Namibia">Namibia</option>
+              <option value="Malawi">Malawi</option>
+              <option value="Mozambique">Mozambique</option>
+              <option value="Angola">Angola</option>
+              <option value="DRC">DRC</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="wlType">Business Type</label>
+            <select id="wlType" required>
+              <option value="">Select type</option>
+              <option value="Retail / Shop">Retail / Shop</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Beauty / Salon">Beauty / Salon</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="School / Training">School / Training</option>
+              <option value="Online Seller">Online Seller</option>
+              <option value="Service Provider">Service Provider</option>
+              <option value="Agency">Agency</option>
+              <option value="Clinic / Health">Clinic / Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Do you currently have a website?</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="wlWebsite" value="Yes" required /> Yes</label>
+            <label class="radio-label"><input type="radio" name="wlWebsite" value="No" /> No</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="wlGoal">Main Goal</label>
+          <select id="wlGoal" required>
+            <option value="">Select your main goal</option>
+            <option value="More customers">More customers</option>
+            <option value="Better website">Better website</option>
+            <option value="Social media help">Social media help</option>
+            <option value="Automation">Automation</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label consent-label">
+            <input type="checkbox" id="wlConsent" required />
+            I agree to receive Winlerr early access updates and prototype communication.
+          </label>
+        </div>
+        <p class="privacy-note">We'll only use your details to contact you about Winlerr, your prototype request, and early access updates.</p>
+        <button type="submit" class="btn btn-primary btn-block" id="wlSubmitBtn">
+          <i class="fas fa-paper-plane"></i> Join Waitlist
+        </button>
+        <div id="waitlistSuccess" class="form-success" style="display:none">
+          <i class="fas fa-check-circle"></i> You're on the Winlerr early access list. We'll contact you soon with updates, prototype opportunities, and launch access.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: PROTOTYPE REQUEST ===== -->
+  <div class="modal-overlay" id="modal-prototype" onclick="closeModalOutside(event,'prototype')">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('prototype')">&times;</button>
+      <h2>Request a Free Business Prototype</h2>
+      <p style="margin-bottom:1.5rem;color:var(--text-secondary)">Describe your business and get a free 30-day prototype.</p>
+      <form id="prototypeForm" onsubmit="return submitPrototype(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="protoName">Full Name</label>
+            <input type="text" id="protoName" required placeholder="e.g. Thandi Mwale" />
+          </div>
+          <div class="form-group">
+            <label for="protoEmail">Email Address</label>
+            <input type="email" id="protoEmail" required placeholder="you@business.com" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="protoWhatsapp">WhatsApp Number</label>
+            <input type="tel" id="protoWhatsapp" required placeholder="+260 97 123 4567" />
+          </div>
+          <div class="form-group">
+            <label for="protoBusiness">Business Name</label>
+            <input type="text" id="protoBusiness" required placeholder="e.g. Mwale Fresh Produce" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="protoIndustry">Business Industry</label>
+            <input type="text" id="protoIndustry" required placeholder="e.g. Fresh Produce, Retail" />
+          </div>
+          <div class="form-group">
+            <label for="protoCountry">Country</label>
+            <select id="protoCountry" required>
+              <option value="">Select country</option>
+              <option value="Zambia">Zambia</option>
+              <option value="Zimbabwe">Zimbabwe</option>
+              <option value="Botswana">Botswana</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Namibia">Namibia</option>
+              <option value="Malawi">Malawi</option>
+              <option value="Mozambique">Mozambique</option>
+              <option value="Angola">Angola</option>
+              <option value="DRC">DRC</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="protoWebsiteLink">Existing Website Link (optional)</label>
+          <input type="url" id="protoWebsiteLink" placeholder="https://yourbusiness.com" />
+        </div>
+        <div class="form-group">
+          <label for="protoSocialLinks">Social Media Links (optional)</label>
+          <input type="text" id="protoSocialLinks" placeholder="Instagram, Facebook, WhatsApp links" />
+        </div>
+        <div class="form-group">
+          <label>What type of prototype do you want?</label>
+          <select id="protoType" required>
+            <option value="">Select prototype type</option>
+            <option value="Website landing page">Website landing page</option>
+            <option value="Full business website">Full business website</option>
+            <option value="Social media content plan">Social media content plan</option>
+            <option value="WhatsApp automation flow">WhatsApp automation flow</option>
+            <option value="Complete business growth preview">Complete business growth preview</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="protoDesc">Describe your business</label>
+          <textarea id="protoDesc" rows="3" required placeholder="What does your business do, what do you sell, who are your customers?"></textarea>
+        </div>
+        <div class="form-group">
+          <label>What should customers do when they visit your website?</label>
+          <div class="checkbox-group">
+            <label class="checkbox-label"><input type="checkbox" name="protoAction" value="Call" /> Call</label>
+            <label class="checkbox-label"><input type="checkbox" name="protoAction" value="WhatsApp" /> WhatsApp</label>
+            <label class="checkbox-label"><input type="checkbox" name="protoAction" value="Book appointment" /> Book appointment</label>
+            <label class="checkbox-label"><input type="checkbox" name="protoAction" value="Buy product" /> Buy product</label>
+            <label class="checkbox-label"><input type="checkbox" name="protoAction" value="Fill form" /> Fill form</label>
+            <label class="checkbox-label"><input type="checkbox" name="protoAction" value="Visit location" /> Visit location</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="protoStyle">Preferred Brand Style</label>
+          <select id="protoStyle" required>
+            <option value="">Select style</option>
+            <option value="Modern">Modern</option>
+            <option value="Luxury">Luxury</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Friendly">Friendly</option>
+            <option value="Minimal">Minimal</option>
+            <option value="Bold">Bold</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label consent-label">
+            <input type="checkbox" id="protoConsent" required />
+            I agree to receive Winlerr early access updates and prototype communication.
+          </label>
+        </div>
+        <p class="privacy-note">We'll only use your details to contact you about Winlerr, your prototype request, and early access updates.</p>
+        <button type="submit" class="btn btn-primary btn-block" id="protoSubmitBtn">
+          <i class="fas fa-paper-plane"></i> Request Prototype
+        </button>
+        <div id="prototypeSuccess" class="form-success" style="display:none">
+          <i class="fas fa-check-circle"></i> Your prototype request has been received. The Winlerr team will review your business details and contact you about the next step.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: SUGGEST FEATURE (quick) ===== -->
+  <div class="modal-overlay" id="modal-suggest" onclick="closeModalOutside(event,'suggest')">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('suggest')">&times;</button>
+      <h2>Suggest a Feature</h2>
+      <p style="margin-bottom:1.5rem;color:var(--text-secondary)">Share what Winlerr needs to have for your business.</p>
+      <form id="suggestModalForm" onsubmit="return submitSuggestModal(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sugName">Full Name</label>
+            <input type="text" id="sugName" required placeholder="e.g. Thandi Mwale" />
+          </div>
+          <div class="form-group">
+            <label for="sugBusiness">Business Name</label>
+            <input type="text" id="sugBusiness" required placeholder="e.g. Mwale Fresh Produce" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sugEmail">Email</label>
+            <input type="email" id="sugEmail" required placeholder="you@business.com" />
+          </div>
+          <div class="form-group">
+            <label for="sugWhatsapp">WhatsApp Number</label>
+            <input type="tel" id="sugWhatsapp" required placeholder="+260 97 123 4567" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="sugFeature">What feature would you like Winlerr to include?</label>
+          <textarea id="sugFeature" rows="2" required placeholder="Describe the feature..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="sugWhy">Why would this feature help your business?</label>
+          <textarea id="sugWhy" rows="2" required placeholder="How would it help?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label consent-label">
+            <input type="checkbox" id="sugModalConsent" required />
+            I agree to receive Winlerr early access updates and prototype communication.
+          </label>
+        </div>
+        <p class="privacy-note">We'll only use your details to contact you about Winlerr, your prototype request, and early access updates.</p>
+        <button type="submit" class="btn btn-primary btn-block" id="sugModalSubmitBtn">
+          <i class="fas fa-lightbulb"></i> Submit Idea
+        </button>
+        <div id="suggestModalSuccess" class="form-success" style="display:none">
+          <i class="fas fa-check-circle"></i> Thank you for helping shape Winlerr. Your idea has been submitted.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>
