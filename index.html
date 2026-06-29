@@ -7,7 +7,7 @@
   <meta name="description" content="Winlerr is an invite-first business growth platform helping businesses manage websites, social media, client engagement, and automation from one place." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="styles.css" />
   <script>
@@ -44,16 +44,24 @@
   <section class="hero" id="hero">
     <div class="hero-bg-grid"></div>
     <div class="hero-glow"></div>
+    <div class="hero-floating-icons">
+      <i class="fas fa-globe"></i>
+      <i class="fas fa-robot"></i>
+      <i class="fas fa-chart-line"></i>
+      <i class="fab fa-whatsapp"></i>
+      <i class="fas fa-bolt"></i>
+      <i class="fas fa-palette"></i>
+    </div>
     <div class="container hero-container">
       <div class="hero-content">
-        <div class="hero-badge">
-          <i class="fas fa-rocket"></i> Free 30-Day Prototype for Early Businesses
+        <div class="hero-badge badge-animated">
+          <i class="fas fa-rocket"></i> <span class="text-gradient-blue">Free 30-Day Prototype</span> for Early Businesses
         </div>
-        <h1 class="hero-title">Launch a Professional Online Presence for Your Business</h1>
-        <p class="hero-subtitle">Winlerr helps businesses get online, plan better content, respond faster to customers, and manage digital growth from one simple platform.</p>
-        <p class="hero-support">Join early and request a free 30-day business prototype built around your brand, customers, offers, and growth goals.</p>
+        <h1 class="hero-title">I'm Building a Platform to Help Your Business <span class="text-gradient">Grow Online</span> — Without the Complexity</h1>
+        <p class="hero-subtitle"><span class="font-display-light">I know running a business is already enough work.</span> You don't have time to become a marketing expert too. That's why I'm creating Winlerr — a single place where you can <strong>manage your website</strong>, <em>plan content</em>, <span class="underline-glow">automate replies</span>, and actually <span class="text-gradient-blue fw-800">grow your online presence</span> — without a full team.</p>
+        <p class="hero-support">I'm opening <strong>early access spots</strong> for businesses that want a <span class="underline-cyan">free 30-day prototype</span> — a real preview of what your business could look like online, built around <em>your brand, your customers, and your goals.</em></p>
         <div class="hero-buttons">
-          <button class="btn btn-primary btn-lg" onclick="openModal('prototype')">
+          <button class="btn btn-primary btn-lg hover-glow" onclick="openModal('prototype')">
             <i class="fas fa-gem"></i> Request My Free Prototype
           </button>
           <button class="btn btn-secondary btn-lg" onclick="openModal('waitlist')">
@@ -66,7 +74,7 @@
           <span><i class="fas fa-check-circle"></i> Built for WhatsApp-first businesses</span>
         </div>
         <div class="hero-urgency">
-          <i class="fas fa-exclamation-circle"></i> Limited early prototype slots available while Winlerr is still in development.
+          <i class="fas fa-exclamation-circle"></i> <em>Limited early prototype slots available</em> — Winlerr is still in development and I'm selecting businesses that want to shape it with me.
         </div>
       </div>
       <div class="hero-visual">
@@ -142,10 +150,10 @@
   <!-- ===== PROBLEM SECTION ===== -->
   <section class="section" id="problem">
     <div class="container">
-      <div class="section-label">The Challenge</div>
-      <h2 class="section-title">Your Business May Be Good — But Online, Customers Judge What They See First</h2>
-      <p class="section-desc">Before a customer calls, visits, or buys, they usually check your online presence. If your business has no website, unclear social media, slow replies, or weak content, customers may choose a competitor who looks more prepared.</p>
-      <div class="grid-3">
+      <div class="section-label reveal">The Challenge</div>
+      <h2 class="section-title-xl reveal">I've Seen Great Businesses Lose Customers — Simply Because Their <span class="text-gradient">Online Presence</span> Didn't Match How Good They Really Are</h2>
+      <p class="section-desc reveal">Before a customer calls, visits, or buys from you — <em>they check your online presence first</em>. If your business has <strong>no website</strong>, <span class="underline-glow">unclear social media</span>, slow replies, or weak content, they <span class="text-gradient-blue fw-800">will choose a competitor who looks more prepared</span>. I don't want that to happen to you.</p>
+      <div class="grid-3 reveal-stagger">
         <div class="problem-card">
           <div class="problem-icon"><i class="fas fa-globe"></i></div>
           <h3>No Professional Website</h3>
@@ -178,10 +186,10 @@
   <!-- ===== SOLUTION SECTION ===== -->
   <section class="section section-dark" id="solution">
     <div class="container">
-      <div class="section-label">The Platform</div>
-      <h2 class="section-title">Winlerr Brings Your Online Business Workflow Into One Place</h2>
-      <p class="section-desc">Winlerr is being built as a business growth control centre — helping you manage your website presence, content planning, customer engagement, automation, and digital strategy without needing a full marketing team.</p>
-      <div class="grid-3">
+      <div class="section-label reveal">What I'm Building</div>
+      <h2 class="section-title-xl reveal">I'm Bringing Everything You Need Into <span class="text-gradient">One Place</span> — So You Can Focus on Running Your Business</h2>
+      <p class="section-desc reveal">I'm building Winlerr as a <strong>business growth control centre</strong> — not another tool you'll ignore. It's designed to help you manage <span class="underline-glow">your website</span>, plan content, engage customers, automate replies, and track your growth — <em>without needing a full marketing team or a big budget.</em></p>
+      <div class="grid-3 reveal-stagger">
         <div class="feature-card">
           <div class="feature-icon"><i class="fas fa-paint-brush"></i></div>
           <h3>Website & Landing Page Prototypes</h3>
@@ -219,11 +227,11 @@
   <!-- ===== PROTOTYPE OFFER SECTION ===== -->
   <section class="section" id="prototype">
     <div class="container">
-      <div class="section-label">Free Offer</div>
-      <h2 class="section-title">Get a Free 30-Day Prototype of How Your Business Could Look Online</h2>
-      <p class="section-desc">Early Winlerr members can request a free business prototype. We'll use your business details to prepare a digital growth preview — including a website concept, customer action buttons, brand direction, and automation ideas.</p>
-      <p class="section-desc" style="margin-top:-1.5rem">This helps you see what your business could become online before paying for the full platform.</p>
-      <div class="prototype-grid">
+      <div class="section-label reveal">My Gift to Early Believers</div>
+      <h2 class="section-title-xl reveal">I Want to <span class="text-gradient">Build You a Free</span> 30-Day Prototype — So You Can See What Your Business <em>Could</em> Look Like Online</h2>
+      <p class="section-desc reveal">Here's what I'm offering: if you join early, <strong>I'll personally prepare a free business prototype</strong> — a digital growth preview that includes a <span class="underline-glow">website concept</span>, customer action buttons, brand direction, and automation ideas. <em>All based on your actual business.</em></p>
+      <p class="section-desc reveal" style="margin-top:-1.5rem">I want you to <span class="text-gradient-blue fw-800">see the vision before you pay for anything</span>. This helps you understand what your business could become — and helps me build a platform that actually solves real problems.</p>
+      <div class="prototype-grid reveal-stagger">
         <div class="prototype-item">
           <i class="fas fa-calendar-check"></i>
           <span>Free 30-day prototype access</span>
@@ -253,11 +261,11 @@
           <span>Early feedback and improvement support</span>
         </div>
       </div>
-      <div class="prototype-urgency">
-        <i class="fas fa-exclamation-circle"></i> Early prototype slots will be limited while Winlerr is still in development.
+      <div class="prototype-urgency reveal">
+        <i class="fas fa-exclamation-circle"></i> I'm only opening a <strong>limited number of prototype slots</strong> while I'm still developing Winlerr. Once they're gone, early access closes.
       </div>
       <div class="text-center" style="margin-top:2rem">
-        <button class="btn btn-primary btn-lg" onclick="openModal('prototype')">
+        <button class="btn btn-primary btn-lg pulse-glow" onclick="openModal('prototype')">
           <i class="fas fa-gem"></i> Request My Free Prototype
         </button>
       </div>
@@ -267,9 +275,9 @@
   <!-- ===== HOW IT WORKS SECTION ===== -->
   <section class="section section-dark" id="how-it-works">
     <div class="container">
-      <div class="section-label">The Process</div>
-      <h2 class="section-title">How Early Access Works</h2>
-      <div class="steps-grid">
+      <div class="section-label reveal">How This Works</div>
+      <h2 class="section-title-xl reveal">Here's How You Can <span class="text-gradient">Join Me</span> in Building Something That Actually Helps Your Business</h2>
+      <div class="steps-grid reveal-stagger">
         <div class="step-card">
           <div class="step-number">1</div>
           <h3>Join the Waitlist</h3>
@@ -306,10 +314,10 @@
   <!-- ===== SUGGEST FEATURE SECTION ===== -->
   <section class="section" id="suggest">
     <div class="container">
-      <div class="section-label">Your Voice</div>
-      <h2 class="section-title">Help Shape Winlerr Before It Launches</h2>
-      <p class="section-desc">Winlerr is being built with real business needs in mind. If there is a feature your business needs, share it with us. Your feedback helps us build a platform that solves real problems, not just fancy software ideas.</p>
-      <div class="form-wrapper" style="max-width:640px;margin:0 auto">
+      <div class="section-label reveal">I'm Listening</div>
+      <h2 class="section-title-xl reveal"><span class="font-display-light">Tell Me What Your Business Needs</span> — I'm Building This for <em>You</em>, Not for Investors</h2>
+      <p class="section-desc reveal">I'm not building Winlerr in a boardroom. <strong>I'm building it based on what real business owners tell me they need.</strong> If there's a feature your business is missing, <span class="underline-glow">share it with me</span>. Your feedback goes directly into what I build next — <em>not a suggestion box that nobody reads.</em></p>
+      <div class="form-wrapper reveal" style="max-width:640px;margin:0 auto">
         <form id="suggestForm" class="glass-form" onsubmit="return submitSuggest(event)">
           <div class="form-row">
             <div class="form-group">
@@ -360,12 +368,12 @@
   <!-- ===== VIDEO SECTION ===== -->
   <section class="section section-dark" id="video">
     <div class="container">
-      <div class="section-label">From the Founder</div>
-      <h2 class="section-title">A Message From the Founder</h2>
-      <p class="section-desc">Watch a short message explaining why Winlerr is being built, which businesses it is designed for, and how early members can benefit from joining before launch.</p>
-      <div class="video-placeholder">
-        <div class="video-placeholder-icon"><i class="fas fa-play"></i></div>
-        <p class="video-placeholder-text">Founder introduction video coming soon</p>
+      <div class="section-label reveal">Straight From Me</div>
+      <h2 class="section-title-xl reveal">Why I'm Building Winlerr — <span class="font-display-light">And Why I Want You to Be Part of It</span></h2>
+      <p class="section-desc reveal">I recorded a short message explaining <strong>why I started building Winlerr</strong>, the businesses I'm designing it for, and how early members like you can <span class="underline-glow">shape the platform</span> before it launches. <em>No corporate script — just me talking honestly about what I'm trying to build.</em></p>
+      <div class="video-placeholder reveal-scale">
+        <div class="video-placeholder-icon pulse-glow"><i class="fas fa-play"></i></div>
+        <p class="video-placeholder-text">I'm recording this soon — <span class="underline-glow">join early and I'll share it with you first</span></p>
       </div>
     </div>
   </section>
@@ -373,10 +381,10 @@
   <!-- ===== TRUST SECTION ===== -->
   <section class="section" id="trust">
     <div class="container text-center">
-      <div class="section-label">Our Mission</div>
-      <h2 class="section-title">Built for Businesses That Want to Look Professional, Move Faster, and Grow Smarter</h2>
-      <p class="section-desc" style="max-width:720px;margin:0 auto">Winlerr is for business owners who know their online presence can be better but do not have the time, tools, or team to manage everything manually. Whether you are just starting or already serving customers, Winlerr is being designed to help your business become more visible, more organized, and more responsive.</p>
-      <div class="trust-stats">
+      <div class="section-label reveal">My Promise</div>
+      <h2 class="section-title-xl reveal">I'm Building This for <span class="text-gradient">Real Business Owners</span> — People Like You Who Deserve a Better Online Presence</h2>
+      <p class="section-desc reveal" style="max-width:720px;margin:0 auto">Winlerr isn't for big corporations. <strong>It's for you.</strong> The business owner who knows their online presence could be better, but just <em>doesn't have the time, tools, or team</em> to manage everything manually. Whether you're starting out or already serving customers daily — <span class="underline-glow">I'm designing this to help you become more visible, more organized, and more responsive.</span></p>
+      <div class="trust-stats reveal-stagger">
         <div class="stat-item">
           <span class="stat-number" data-count="5">0</span>
           <span class="stat-label">Countries Targeted</span>
@@ -400,9 +408,9 @@
   <!-- ===== FINAL CTA SECTION ===== -->
   <section class="section section-cta" id="waitlist">
     <div class="container text-center">
-      <h2 class="section-title" style="color:#fff">Be One of the First Businesses to Grow With Winlerr</h2>
-      <p class="section-desc" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 2rem">Join early, request your prototype, and help shape a platform built for real businesses that want better websites, stronger marketing, faster replies, and smarter growth.</p>
-      <div class="cta-buttons">
+      <h2 class="section-title-xl reveal" style="color:#fff">I'd Love for You to <span style="font-family:var(--font-display);font-weight:400;font-style:italic">Join Me</span> on This Journey</h2>
+      <p class="section-desc reveal" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 2rem">This isn't just another platform — <em>it's something I'm building for businesses like yours</em>. Join early, <span class="underline-glow" style="text-decoration-color:rgba(255,255,255,.5)">request your free prototype</span>, and help shape a tool that actually makes a difference for real businesses.</p>
+      <div class="cta-buttons reveal-stagger">
         <button class="btn btn-primary btn-lg" onclick="openModal('prototype')">
           <i class="fas fa-gem"></i> Request Free Prototype
         </button>
@@ -729,5 +737,30 @@
   </div>
 
   <script src="script.js" type="module"></script>
+  <script>
+    // === Scroll Reveal ===
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          revealObserver.unobserve(entry.target)
+        }
+      })
+    }, { threshold: .12, rootMargin: '0px 0px -40px 0px' })
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+      revealObserver.observe(el)
+    })
+
+    document.querySelectorAll('.reveal-stagger').forEach(el => {
+      revealObserver.observe(el)
+    })
+
+    // === Navbar scroll shadow ===
+    const navbar = document.getElementById('navbar')
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50)
+    })
+  </script>
 </body>
 </html>
