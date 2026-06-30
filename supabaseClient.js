@@ -64,6 +64,10 @@ async function insertPrototypeRequest(data) {
     customer_actions: data.customerActions || [],
     brand_style: data.brandStyle,
     email_consent: data.emailConsent || false,
+    selected_package: data.selectedPackage || null,
+    selected_currency: data.selectedCurrency || null,
+    displayed_setup_price: data.displayedSetupPrice || null,
+    displayed_monthly_price: data.displayedMonthlyPrice || null,
   })
 }
 

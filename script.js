@@ -153,6 +153,11 @@ async function submitPrototype(e) {
 
   const actions = [...document.querySelectorAll('input[name="protoAction"]:checked')].map(c => c.value)
 
+  const pkg = document.getElementById('protoSelectedPackage')?.value || ''
+  const currency = document.getElementById('protoSelectedCurrency')?.value || ''
+  const setupPrice = document.getElementById('protoDisplayedSetup')?.value || ''
+  const monthlyPrice = document.getElementById('protoDisplayedMonthly')?.value || ''
+
   const data = {
     fullName: document.getElementById('protoName').value.trim(),
     email: document.getElementById('protoEmail').value.trim(),
@@ -167,7 +172,18 @@ async function submitPrototype(e) {
     customerActions: actions,
     brandStyle: document.getElementById('protoStyle').value,
     emailConsent: document.getElementById('protoConsent')?.checked || false,
+    selectedPackage: pkg || (selectedPkgData?.pkg || null),
+    selectedCurrency: currency || (selectedPkgData?.currency || null),
+    displayedSetupPrice: setupPrice || (selectedPkgData?.setup || null),
+    displayedMonthlyPrice: monthlyPrice || (selectedPkgData?.monthly || null),
   }
+
+  // Clear hidden fields after submission
+  document.getElementById('protoSelectedPackage').value = ''
+  document.getElementById('protoSelectedCurrency').value = ''
+  document.getElementById('protoDisplayedSetup').value = ''
+  document.getElementById('protoDisplayedMonthly').value = ''
+  selectedPkgData = null
 
   if (!window.WinlerrDB) {
     saveToLocal('winlerr_prototypes_fallback', data)
@@ -390,6 +406,158 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   })
 })
 
+// ===== PRICING & CURRENCY SYSTEM =====
+
+// Base pricing in USD — these are the source-of-truth values
+const PRICING_USD = {
+  starter:  { setup: 75,  monthly: 10 },
+  business: { setup: 100, monthly: 20 },
+  automation: { setup: 125, monthly: 35 },
+  premium:   { setup: 150, monthly: 50 },
+}
+
+/**
+ * Fallback exchange rates — REPLACE these with live API rates before production.
+ * To integrate a live API (e.g., exchangerate-api.com, Open Exchange Rates, etc.):
+ *   fetch('https://api.exchangerate-api.com/v4/latest/USD')
+ *   .then(r => r.json())
+ *   .then(data => { FALLBACK_RATES = { ...FALLBACK_RATES, ...data.rates } })
+ * Then call updatePricing(selectedCurrency) again.
+ */
+let FALLBACK_RATES = {
+  USD: 1,
+  ZMW: 25.50,   // 1 USD = 25.50 ZMW
+  ZAR: 18.20,   // 1 USD = 18.20 ZAR
+  BWP: 13.50,   // 1 USD = 13.50 BWP
+  GBP: 0.79,    // 1 USD = 0.79 GBP
+  INR: 83.00,   // 1 USD = 83.00 INR
+  JPY: 155.00,  // 1 USD = 155.00 JPY
+}
+
+// Map country names to currency codes
+const COUNTRY_CURRENCY = {
+  'Zambia': 'ZMW',
+  'South Africa': 'ZAR',
+  'Botswana': 'BWP',
+  'Zimbabwe': 'USD',
+  'United States': 'USD',
+  'United Kingdom': 'GBP',
+  'India': 'INR',
+  'Japan': 'JPY',
+}
+
+// Currency symbol map
+const CURRENCY_SYMBOLS = {
+  USD: '$', ZMW: 'K', ZAR: 'R', BWP: 'P', GBP: '\u00a3', INR: '\u20b9', JPY: '\u00a5',
+}
+
+// ===== LOCALE-BASED CURRENCY DETECTION =====
+// Tries browser locale first, falls back to USD
+function detectUserCurrency() {
+  try {
+    // Try Intl.NumberFormat region detection
+    const region = Intl.NumberFormat?.resolvedOptions?.()?.locale?.split('-')?.[1]
+    if (region) {
+      const countryMap = {
+        US: 'United States', GB: 'United Kingdom', IN: 'India', JP: 'Japan',
+        ZA: 'South Africa', ZM: 'Zambia', BW: 'Botswana', ZW: 'Zimbabwe',
+      }
+      const country = countryMap[region]
+      if (country && COUNTRY_CURRENCY[country]) return COUNTRY_CURRENCY[country]
+    }
+  } catch (e) { /* ignore, fall back to USD */ }
+  return 'USD'
+}
+
+// ===== CONVERSION & FORMATTING =====
+function convertPrice(usdAmount, currency) {
+  const rate = FALLBACK_RATES[currency] || 1
+  return usdAmount * rate
+}
+
+function formatPrice(amount, currency) {
+  const symbol = CURRENCY_SYMBOLS[currency] || '$'
+  if (currency === 'JPY') {
+    return symbol + Math.round(amount).toLocaleString()
+  }
+  return symbol + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+// ===== UPDATE ALL PRICING CARDS =====
+function updatePricing(currency) {
+  if (!currency) currency = document.getElementById('currencySelect')?.value || 'USD'
+  const cards = document.querySelectorAll('.pricing-card')
+  cards.forEach(card => {
+    const pkg = card.dataset.pkg
+    if (!pkg || !PRICING_USD[pkg]) return
+    const usdSetup = parseFloat(card.dataset.setup)
+    const usdMonthly = parseFloat(card.dataset.monthly)
+    const convertedSetup = convertPrice(usdSetup, currency)
+    const convertedMonthly = convertPrice(usdMonthly, currency)
+    const symbol = CURRENCY_SYMBOLS[currency] || '$'
+
+    card.querySelector('.pricing-currency-symbol').textContent = symbol
+    card.querySelector('.pricing-setup').textContent = currency === 'JPY'
+      ? Math.round(convertedSetup).toLocaleString()
+      : convertedSetup.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    card.querySelector('.pricing-monthly').textContent = currency === 'JPY'
+      ? Math.round(convertedMonthly).toLocaleString()
+      : convertedMonthly.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  })
+}
+
+// ===== REQUEST A PACKAGE FROM PRICING =====
+let selectedPkgData = null
+
+function requestPackage(pkgKey, pkgName) {
+  const currency = document.getElementById('currencySelect')?.value || 'USD'
+  const card = document.querySelector(`.pricing-card[data-pkg="${pkgKey}"]`)
+  if (!card) return
+
+  const usdSetup = parseFloat(card.dataset.setup)
+  const usdMonthly = parseFloat(card.dataset.monthly)
+  const convertedSetup = convertPrice(usdSetup, currency)
+  const convertedMonthly = convertPrice(usdMonthly, currency)
+  const symbol = CURRENCY_SYMBOLS[currency] || '$'
+
+  // Format for hidden fields
+  const setupDisplay = currency === 'JPY'
+    ? symbol + Math.round(convertedSetup).toLocaleString()
+    : symbol + convertedSetup.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const monthlyDisplay = currency === 'JPY'
+    ? symbol + Math.round(convertedMonthly).toLocaleString()
+    : symbol + convertedMonthly.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+  // Set hidden fields
+  document.getElementById('protoSelectedPackage').value = pkgName
+  document.getElementById('protoSelectedCurrency').value = currency
+  document.getElementById('protoDisplayedSetup').value = setupDisplay
+  document.getElementById('protoDisplayedMonthly').value = monthlyDisplay
+
+  // Store for use in submitPrototype
+  selectedPkgData = { pkg: pkgName, currency, setup: setupDisplay, monthly: monthlyDisplay }
+
+  openModal('prototype')
+}
+
+// ===== INIT PRICING ON LOAD =====
+function initPricing() {
+  const select = document.getElementById('currencySelect')
+  if (!select) return
+
+  // Detect user's currency from locale
+  const detected = detectUserCurrency()
+  select.value = detected
+  updatePricing(detected)
+}
+
+// Run on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPricing)
+} else {
+  initPricing()
+}
+
 // ===== EXPOSE GLOBALLY =====
 window.submitWaitlist = submitWaitlist
 window.submitPrototype = submitPrototype
@@ -398,3 +566,5 @@ window.submitSuggestModal = submitSuggestModal
 window.openModal = openModal
 window.closeModal = closeModal
 window.closeModalOutside = closeModalOutside
+window.updatePricing = updatePricing
+window.requestPackage = requestPackage

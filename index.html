@@ -104,6 +104,7 @@
       <div class="spl-item" data-section="solution"><span class="spl-dot"></span><span class="spl-label">Platform</span></div>
       <div class="spl-item" data-section="prototype"><span class="spl-dot"></span><span class="spl-label">Prototype</span></div>
       <div class="spl-item" data-section="how-it-works"><span class="spl-dot"></span><span class="spl-label">Process</span></div>
+      <div class="spl-item" data-section="pricing"><span class="spl-dot"></span><span class="spl-label">Pricing</span></div>
       <div class="spl-item" data-section="suggest"><span class="spl-dot"></span><span class="spl-label">Suggest</span></div>
       <div class="spl-item" data-section="video"><span class="spl-dot"></span><span class="spl-label">Video</span></div>
       <div class="spl-item" data-section="trust"><span class="spl-dot"></span><span class="spl-label">Mission</span></div>
@@ -122,6 +123,7 @@
         <a href="#solution" class="nav-link">Features</a>
         <a href="#prototype" class="nav-link">Prototype</a>
         <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
         <a href="#suggest" class="nav-link">Suggest Idea</a>
         <a href="#waitlist" class="nav-cta-btn">Request Prototype</a>
       </div>
@@ -402,6 +404,166 @@
     </div>
   </section>
 
+  <!-- ===== PRICING SECTION ===== -->
+  <section class="section section-dark" id="pricing">
+    <div class="container">
+      <div class="section-label reveal visible">Simple Pricing</div>
+      <h2 class="section-title-xl reveal visible">Start Affordable. <span class="text-gradient">Upgrade as Your Business Grows.</span></h2>
+      <p class="section-desc reveal visible">Winlerr is built for businesses that want professional online growth without unnecessary high costs. Start with a website, then add automation, insights, content planning, and customer engagement support as your business grows.</p>
+
+      <div class="pricing-currency-bar reveal visible">
+        <span class="pricing-currency-label">Display prices in:</span>
+        <select id="currencySelect" class="pricing-currency-select" onchange="updatePricing(this.value)">
+          <option value="USD">$ USD</option>
+          <option value="ZMW">K ZMW</option>
+          <option value="ZAR">R ZAR</option>
+          <option value="BWP">P BWP</option>
+          <option value="GBP">&pound; GBP</option>
+          <option value="INR">&#8377; INR</option>
+          <option value="JPY">&yen; JPY</option>
+        </select>
+      </div>
+
+      <div class="pricing-grid reveal-stagger visible" id="pricingGrid">
+        <!-- Starter Presence -->
+        <div class="pricing-card" data-pkg="starter" data-setup="75" data-monthly="10">
+          <div class="pricing-card-header">
+            <h3 class="pricing-name">Starter Presence</h3>
+            <p class="pricing-desc">Best for small businesses that need a simple professional online presence.</p>
+          </div>
+          <div class="pricing-amounts">
+            <div class="pricing-amount-row">
+              <span class="pricing-amount-label">One-time setup</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-setup">75</span></span>
+            </div>
+            <div class="pricing-amount-row pricing-monthly-row">
+              <span class="pricing-amount-label">Monthly maintenance</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-monthly">10</span><span class="pricing-period">/month</span></span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> 1-page professional landing page</li>
+            <li><i class="fas fa-check"></i> Mobile responsive design</li>
+            <li><i class="fas fa-check"></i> WhatsApp click-to-chat button</li>
+            <li><i class="fas fa-check"></i> Call button</li>
+            <li><i class="fas fa-check"></i> Google Maps location section</li>
+            <li><i class="fas fa-check"></i> Basic business information setup</li>
+            <li><i class="fas fa-check"></i> Basic contact form</li>
+            <li><i class="fas fa-check"></i> Hosting support</li>
+            <li><i class="fas fa-check"></i> Minor monthly updates</li>
+          </ul>
+          <button class="btn btn-primary btn-block pricing-cta" onclick="requestPackage('starter','Starter Presence')">
+            <i class="fas fa-gem"></i> Request This Package
+          </button>
+        </div>
+
+        <!-- Business Growth (Popular) -->
+        <div class="pricing-card pricing-popular" data-pkg="business" data-setup="100" data-monthly="20">
+          <div class="pricing-popular-badge">Most Popular</div>
+          <div class="pricing-card-header">
+            <h3 class="pricing-name">Business Growth</h3>
+            <p class="pricing-desc">Best for businesses that want a stronger website and better customer inquiries.</p>
+          </div>
+          <div class="pricing-amounts">
+            <div class="pricing-amount-row">
+              <span class="pricing-amount-label">One-time setup</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-setup">100</span></span>
+            </div>
+            <div class="pricing-amount-row pricing-monthly-row">
+              <span class="pricing-amount-label">Monthly maintenance</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-monthly">20</span><span class="pricing-period">/month</span></span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> Everything in Starter Presence</li>
+            <li><i class="fas fa-check"></i> Up to 3 website sections/pages</li>
+            <li><i class="fas fa-check"></i> Services/products showcase</li>
+            <li><i class="fas fa-check"></i> Customer inquiry form</li>
+            <li><i class="fas fa-check"></i> Social media links</li>
+            <li><i class="fas fa-check"></i> Basic SEO setup</li>
+            <li><i class="fas fa-check"></i> Monthly performance check</li>
+            <li><i class="fas fa-check"></i> Content improvement suggestions</li>
+          </ul>
+          <button class="btn btn-primary btn-block pricing-cta" onclick="requestPackage('business','Business Growth')">
+            <i class="fas fa-gem"></i> Request This Package
+          </button>
+        </div>
+
+        <!-- Automation Plus -->
+        <div class="pricing-card" data-pkg="automation" data-setup="125" data-monthly="35">
+          <div class="pricing-card-header">
+            <h3 class="pricing-name">Automation Plus</h3>
+            <p class="pricing-desc">Best for businesses that want website, customer engagement, and simple automation.</p>
+          </div>
+          <div class="pricing-amounts">
+            <div class="pricing-amount-row">
+              <span class="pricing-amount-label">One-time setup</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-setup">125</span></span>
+            </div>
+            <div class="pricing-amount-row pricing-monthly-row">
+              <span class="pricing-amount-label">Monthly maintenance</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-monthly">35</span><span class="pricing-period">/month</span></span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> Everything in Business Growth</li>
+            <li><i class="fas fa-check"></i> WhatsApp inquiry flow planning</li>
+            <li><i class="fas fa-check"></i> Lead capture form</li>
+            <li><i class="fas fa-check"></i> Customer request tracking</li>
+            <li><i class="fas fa-check"></i> AI content ideas</li>
+            <li><i class="fas fa-check"></i> Monthly marketing suggestions</li>
+            <li><i class="fas fa-check"></i> Basic analytics review</li>
+            <li><i class="fas fa-check"></i> Priority support</li>
+          </ul>
+          <button class="btn btn-primary btn-block pricing-cta" onclick="requestPackage('automation','Automation Plus')">
+            <i class="fas fa-gem"></i> Request This Package
+          </button>
+        </div>
+
+        <!-- Premium Growth -->
+        <div class="pricing-card" data-pkg="premium" data-setup="150" data-monthly="50">
+          <div class="pricing-card-header">
+            <h3 class="pricing-name">Premium Growth</h3>
+            <p class="pricing-desc">Best for businesses that want full digital growth support.</p>
+          </div>
+          <div class="pricing-amounts">
+            <div class="pricing-amount-row">
+              <span class="pricing-amount-label">One-time setup</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-setup">150</span></span>
+            </div>
+            <div class="pricing-amount-row pricing-monthly-row">
+              <span class="pricing-amount-label">Monthly maintenance</span>
+              <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span><span class="pricing-monthly">50</span><span class="pricing-period">/month</span></span>
+            </div>
+          </div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> Everything in Automation Plus</li>
+            <li><i class="fas fa-check"></i> Up to 5 website sections/pages</li>
+            <li><i class="fas fa-check"></i> Advanced business inquiry flow</li>
+            <li><i class="fas fa-check"></i> Social media content planning support</li>
+            <li><i class="fas fa-check"></i> AI growth recommendations</li>
+            <li><i class="fas fa-check"></i> Pricing and offer improvement suggestions</li>
+            <li><i class="fas fa-check"></i> Monthly website improvement plan</li>
+            <li><i class="fas fa-check"></i> Growth consultation support</li>
+          </ul>
+          <button class="btn btn-primary btn-block pricing-cta" onclick="requestPackage('premium','Premium Growth')">
+            <i class="fas fa-gem"></i> Request This Package
+          </button>
+        </div>
+      </div>
+
+      <p class="pricing-footnote reveal visible">All packages include setup support, mobile-friendly design, and guidance to help your business look more professional online.</p>
+      <p class="pricing-disclaimer reveal visible">Final pricing may depend on project scope, number of pages, integrations, and maintenance needs.</p>
+
+      <div class="pricing-final-cta reveal visible">
+        <p class="pricing-final-text">Not sure which package fits your business?</p>
+        <button class="btn btn-secondary btn-lg" onclick="openModal('prototype')">
+          <i class="fas fa-gem"></i> Request a Free Prototype First
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== SUGGEST FEATURE SECTION ===== -->
   <section class="section" id="suggest">
     <div class="container">
@@ -536,6 +698,7 @@
           <a href="#solution">Features</a>
           <a href="#prototype">Prototype</a>
           <a href="#how-it-works">How It Works</a>
+          <a href="#pricing">Pricing</a>
           <a href="#waitlist">Waitlist</a>
         </div>
         <div class="footer-links">
@@ -758,6 +921,10 @@
             <option value="Other">Other</option>
           </select>
         </div>
+        <input type="hidden" id="protoSelectedPackage" name="selected_package" value="" />
+        <input type="hidden" id="protoSelectedCurrency" name="selected_currency" value="" />
+        <input type="hidden" id="protoDisplayedSetup" name="displayed_setup_price" value="" />
+        <input type="hidden" id="protoDisplayedMonthly" name="displayed_monthly_price" value="" />
         <div class="form-group">
           <label class="checkbox-label consent-label">
             <input type="checkbox" id="protoConsent" required />
@@ -992,37 +1159,6 @@
 
       return text
     }
-      const lower = text.toLowerCase()
-      // Apply mixed typography styles to bot messages for variety
-      let processed = text
-      // Greeting intro
-      if (['hi', 'hello', 'hey', 'howdy'].some(k => lower.includes(k))) {
-        processed = `<span class="font-display-light">${processed}</span>`
-      }
-      // Feature emphasis
-      if (['website', 'prototype', 'content', 'automation', 'whatsapp', 'social media'].some(k => lower.includes(k))) {
-        processed = processed.replace(/\*\*(.*?)\*\*/g, '<span class="fw-800">$1</span>')
-      }
-      // Tech/code references
-      if (['api key', 'prompt', 'integration', 'chatbot', 'assistant'].some(k => lower.includes(k))) {
-        processed = processed.replace(/`(.*?)`/g, '<span class="underline-glow">$1</span>')
-      }
-      // Important highlights for longer messages
-      if (processed.length > 80) {
-        processed = `<span class="font-display-light">${processed}</span>`
-      }
-      // Apply general mixed typography patterns
-      processed = processed.replace(/\*\*(.*?)\*\*/g, '<span class="fw-900">$1</span>')
-      processed = processed.replace(/\*(.*?)\*/g, '<span class="italic-text">$1</span>')
-      processed = processed.replace(/`(.*?)`/g, '<span class="underline-cyan">$1</span>')
-      return processed
-    }
-      div.innerHTML = `
-        <div class="chat-avatar"><i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i></div>
-      ` + bubble.outerHTML
-      chatBody.appendChild(div)
-      chatBody.scrollTop = chatBody.scrollHeight
-    }
 
     function showTyping() {
       const div = document.createElement('div')
@@ -1038,20 +1174,6 @@
     function removeTyping() {
       const el = document.getElementById('chatTyping')
       if (el) el.remove()
-    }
-
-
-      const isTechnical = ['api key','prompt','integration','chatbot','assistant'].some(k => lower.includes(k))
-      if (isTechnical) processed = processed.replace(/`(.*?)`/g, '<span class="underline-glow">$1</span>')
-      const isImportant = ['free','winlerr','early access','prototype','#'][0]
-      if (processed.length > 80) processed = `<span class="font-display-light">${processed}</span>`
-      // Replace markdown **bold** with font-display
-      processed = processed.replace(/\*\*(.*?)\*\*/g, '<span class="fw-900">$1</span>')
-      // Replace *italic* with italic-text
-      processed = processed.replace(/\*(.*?)\*/g, '<span class="italic-text">$1</span>')
-      // Replace `code` with underline-glow
-      processed = processed.replace(/`(.*?)`/g, '<span class="underline-glow">$1</span>')
-      element.innerHTML = processed
     }
 
     function ensureGroqKey() {
