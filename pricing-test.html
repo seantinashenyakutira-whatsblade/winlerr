@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winlerr Pricing Test</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0 }
+body { font-family: system-ui, -apple-system, sans-serif; background: #F8FAFC; color: #0F172A; line-height: 1.6 }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem }
+.section { padding: 5rem 0 }
+.section-dark { background: #F8FAFC }
+
+.section-label {
+  display: inline-block; font-size: .75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: #0A84FF;
+  margin-bottom: .75rem; border: 1px solid rgba(10,132,255,.2);
+  padding: .35rem 1rem; border-radius: 100px;
+}
+.section-title-xl {
+  font-size: clamp(2rem,5vw,3.5rem); font-weight: 900; line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+.section-desc { font-size: 1.05rem; color: #475569; max-width: 680px; margin-bottom: 2.5rem; line-height: 1.7 }
+.text-gradient {
+  background: linear-gradient(135deg, #0A84FF, #00C2FF, #7B2CFF);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* PRICING */
+.pricing-currency-bar { display: flex; align-items: center; justify-content: center; gap: .75rem; margin-bottom: 2.5rem }
+.pricing-currency-label { font-size: .85rem; font-weight: 600; color: #475569 }
+.pricing-currency-select {
+  padding: .5rem 1rem; border: 1px solid #E2E8F0; border-radius: 10px;
+  background: #fff; color: #0F172A; font-size: .9rem; font-weight: 600; cursor: pointer;
+}
+.pricing-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem }
+.pricing-card {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 16px;
+  padding: 2rem 1.5rem; display: flex; flex-direction: column;
+  transition: .3s ease; position: relative; overflow: hidden;
+}
+.pricing-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,.1) }
+.pricing-popular { border: 2px solid #0A84FF; box-shadow: 0 8px 32px rgba(10,132,255,.15); transform: scale(1.04); z-index: 2 }
+.pricing-popular:hover { box-shadow: 0 12px 40px rgba(10,132,255,.25); transform: scale(1.04) translateY(-6px) }
+.pricing-popular-badge {
+  position: absolute; top: 14px; right: -32px;
+  background: linear-gradient(135deg,#0A84FF,#00C2FF); color: #fff;
+  font-size: .68rem; font-weight: 700; padding: .3rem 2.5rem;
+  transform: rotate(45deg); text-transform: uppercase;
+}
+.pricing-card-header { margin-bottom: 1.25rem; padding-top: .5rem }
+.pricing-name { font-size: 1.2rem; font-weight: 800; color: #0F172A; margin-bottom: .35rem }
+.pricing-desc { font-size: .8rem; color: #94A3B8; line-height: 1.5 }
+.pricing-amounts { background: #F8FAFC; border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem; border: 1px solid #E2E8F0 }
+.pricing-amount-row { display: flex; justify-content: space-between; align-items: baseline; padding: .3rem 0 }
+.pricing-monthly-row { border-top: 1px solid #E2E8F0; margin-top: .3rem; padding-top: .6rem }
+.pricing-amount-label { font-size: .75rem; font-weight: 600; color: #475569; text-transform: uppercase }
+.pricing-amount-value { font-size: 1.3rem; font-weight: 900; color: #0F172A }
+.pricing-currency-symbol { font-size: 1rem; opacity: .6 }
+.pricing-period { font-size: .7rem; font-weight: 600; color: #94A3B8 }
+.pricing-features { list-style: none; padding: 0; margin: 0 0 1.5rem; flex: 1 }
+.pricing-features li { display: flex; align-items: flex-start; gap: .5rem; font-size: .82rem; color: #475569; padding: .35rem 0 }
+.pricing-features li i { color: #0A84FF; font-size: .75rem; margin-top: 3px; flex-shrink: 0 }
+.pricing-cta { margin-top: auto }
+.btn { display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.5rem; border-radius: 100px; font-weight: 600; font-size: .9rem; border: none; cursor: pointer; text-decoration: none; font-family: inherit }
+.btn-primary { background: linear-gradient(135deg,#0A84FF,#00C2FF); color: #fff; box-shadow: 0 4px 20px rgba(10,132,255,.3) }
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(10,132,255,.45) }
+.btn-secondary { background: #fff; border: 1px solid #E2E8F0; color: #0F172A; box-shadow: 0 1px 2px rgba(0,0,0,.04) }
+.btn-lg { padding: .9rem 2rem; font-size: 1rem }
+.btn-block { width: 100%; justify-content: center; padding: .9rem }
+.pricing-footnote { text-align: center; font-size: .9rem; color: #475569; margin-top: 2.5rem; font-weight: 500 }
+.pricing-disclaimer { text-align: center; font-size: .78rem; color: #94A3B8; margin-top: .5rem; font-style: italic }
+.pricing-final-cta { text-align: center; margin-top: 3rem; padding: 2rem; background: #fff; border: 1px solid #E2E8F0; border-radius: 16px }
+.pricing-final-text { font-size: 1.05rem; font-weight: 600; color: #0F172A; margin-bottom: 1rem }
+
+@media (max-width:1100px) { .pricing-grid { grid-template-columns: repeat(2,1fr) } .pricing-popular { transform: none } }
+@media (max-width:600px) { .pricing-grid { grid-template-columns: 1fr } }
+</style>
+</head>
+<body>
+
+<section class="section section-dark" id="pricing">
+  <div class="container">
+    <div class="section-label">Simple Pricing</div>
+    <h2 class="section-title-xl">Start Affordable. <span class="text-gradient">Upgrade as Your Business Grows.</span></h2>
+    <p class="section-desc">Winlerr is built for businesses that want professional online growth without unnecessary high costs. Start with a website, then add automation, insights, content planning, and customer engagement support as your business grows.</p>
+
+    <div class="pricing-currency-bar">
+      <span class="pricing-currency-label">Display prices in:</span>
+      <select id="currencySelect" class="pricing-currency-select">
+        <option value="USD">$ USD</option>
+        <option value="ZMW">K ZMW</option>
+        <option value="ZAR">R ZAR</option>
+        <option value="BWP">P BWP</option>
+        <option value="GBP">&pound; GBP</option>
+        <option value="INR">&#8377; INR</option>
+        <option value="JPY">&yen; JPY</option>
+      </select>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-card-header">
+          <h3 class="pricing-name">Starter Presence</h3>
+          <p class="pricing-desc">Best for small businesses that need a simple professional online presence.</p>
+        </div>
+        <div class="pricing-amounts">
+          <div class="pricing-amount-row">
+            <span class="pricing-amount-label">One-time setup</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>75</span>
+          </div>
+          <div class="pricing-amount-row pricing-monthly-row">
+            <span class="pricing-amount-label">Monthly maintenance</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>10<span class="pricing-period">/month</span></span>
+          </div>
+        </div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> 1-page professional landing page</li>
+          <li><i class="fas fa-check"></i> Mobile responsive design</li>
+          <li><i class="fas fa-check"></i> WhatsApp click-to-chat button</li>
+          <li><i class="fas fa-check"></i> Call button</li>
+          <li><i class="fas fa-check"></i> Google Maps location section</li>
+          <li><i class="fas fa-check"></i> Basic business information setup</li>
+          <li><i class="fas fa-check"></i> Basic contact form</li>
+          <li><i class="fas fa-check"></i> Hosting support</li>
+          <li><i class="fas fa-check"></i> Minor monthly updates</li>
+        </ul>
+        <button class="btn btn-primary btn-block pricing-cta">Request This Package</button>
+      </div>
+
+      <div class="pricing-card pricing-popular">
+        <div class="pricing-popular-badge">Most Popular</div>
+        <div class="pricing-card-header">
+          <h3 class="pricing-name">Business Growth</h3>
+          <p class="pricing-desc">Best for businesses that want a stronger website and better customer inquiries.</p>
+        </div>
+        <div class="pricing-amounts">
+          <div class="pricing-amount-row">
+            <span class="pricing-amount-label">One-time setup</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>100</span>
+          </div>
+          <div class="pricing-amount-row pricing-monthly-row">
+            <span class="pricing-amount-label">Monthly maintenance</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>20<span class="pricing-period">/month</span></span>
+          </div>
+        </div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Everything in Starter Presence</li>
+          <li><i class="fas fa-check"></i> Up to 3 website sections/pages</li>
+          <li><i class="fas fa-check"></i> Services/products showcase</li>
+          <li><i class="fas fa-check"></i> Customer inquiry form</li>
+          <li><i class="fas fa-check"></i> Social media links</li>
+          <li><i class="fas fa-check"></i> Basic SEO setup</li>
+          <li><i class="fas fa-check"></i> Monthly performance check</li>
+          <li><i class="fas fa-check"></i> Content improvement suggestions</li>
+        </ul>
+        <button class="btn btn-primary btn-block pricing-cta">Request This Package</button>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-card-header">
+          <h3 class="pricing-name">Automation Plus</h3>
+          <p class="pricing-desc">Best for businesses that want website, customer engagement, and simple automation.</p>
+        </div>
+        <div class="pricing-amounts">
+          <div class="pricing-amount-row">
+            <span class="pricing-amount-label">One-time setup</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>125</span>
+          </div>
+          <div class="pricing-amount-row pricing-monthly-row">
+            <span class="pricing-amount-label">Monthly maintenance</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>35<span class="pricing-period">/month</span></span>
+          </div>
+        </div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Everything in Business Growth</li>
+          <li><i class="fas fa-check"></i> WhatsApp inquiry flow planning</li>
+          <li><i class="fas fa-check"></i> Lead capture form</li>
+          <li><i class="fas fa-check"></i> Customer request tracking</li>
+          <li><i class="fas fa-check"></i> AI content ideas</li>
+          <li><i class="fas fa-check"></i> Monthly marketing suggestions</li>
+          <li><i class="fas fa-check"></i> Basic analytics review</li>
+          <li><i class="fas fa-check"></i> Priority support</li>
+        </ul>
+        <button class="btn btn-primary btn-block pricing-cta">Request This Package</button>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-card-header">
+          <h3 class="pricing-name">Premium Growth</h3>
+          <p class="pricing-desc">Best for businesses that want full digital growth support.</p>
+        </div>
+        <div class="pricing-amounts">
+          <div class="pricing-amount-row">
+            <span class="pricing-amount-label">One-time setup</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>150</span>
+          </div>
+          <div class="pricing-amount-row pricing-monthly-row">
+            <span class="pricing-amount-label">Monthly maintenance</span>
+            <span class="pricing-amount-value"><span class="pricing-currency-symbol">$</span>50<span class="pricing-period">/month</span></span>
+          </div>
+        </div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check"></i> Everything in Automation Plus</li>
+          <li><i class="fas fa-check"></i> Up to 5 website sections/pages</li>
+          <li><i class="fas fa-check"></i> Advanced business inquiry flow</li>
+          <li><i class="fas fa-check"></i> Social media content planning support</li>
+          <li><i class="fas fa-check"></i> AI growth recommendations</li>
+          <li><i class="fas fa-check"></i> Pricing and offer improvement suggestions</li>
+          <li><i class="fas fa-check"></i> Monthly website improvement plan</li>
+          <li><i class="fas fa-check"></i> Growth consultation support</li>
+        </ul>
+        <button class="btn btn-primary btn-block pricing-cta">Request This Package</button>
+      </div>
+    </div>
+
+    <p class="pricing-footnote">All packages include setup support, mobile-friendly design, and guidance to help your business look more professional online.</p>
+    <p class="pricing-disclaimer">Final pricing may depend on project scope, number of pages, integrations, and maintenance needs.</p>
+
+    <div class="pricing-final-cta">
+      <p class="pricing-final-text">Not sure which package fits your business?</p>
+      <button class="btn btn-secondary btn-lg">Request a Free Prototype First</button>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

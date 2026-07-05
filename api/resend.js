@@ -3,7 +3,7 @@
 // Never expose RESEND_API_KEY in frontend code
 
 const RESEND_API_KEY = import.meta.env.RESEND_API_KEY || process.env.RESEND_API_KEY
-const RESEND_FROM = import.meta.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM_EMAIL || 'Winlerr <hello@winlerr.com>'
+const RESEND_FROM = import.meta.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM_EMAIL || 'Winlerr <hello@winlerr.vip>'
 const ADMIN_EMAIL = import.meta.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL
 
 const RESEND_API = 'https://api.resend.com'
@@ -76,7 +76,7 @@ export async function sendWelcomeEmail({ email, fullName }) {
         </p>
         <p style="color:#475569;font-size:16px;line-height:1.6">
           We'll keep you updated as we build toward launch. In the meantime, feel free
-          to <a href="${process.env.SITE_URL || 'https://winlerr.com'}/#prototype" style="color:#0A84FF">request your free prototype</a>
+          to <a href="${process.env.SITE_URL || 'https://winlerr.vip'}/#prototype" style="color:#0A84FF">request your free prototype</a>
           and tell us what your business needs.
         </p>
         <hr style="border:none;border-top:1px solid #E2E8F0;margin:24px 0" />
@@ -101,7 +101,7 @@ export async function sendAdminNotification({ type, data }) {
           <tr><td style="padding:8px;border:1px solid #E2E8F0;font-weight:600">Type</td><td style="padding:8px;border:1px solid #E2E8F0">${data.prototypeType || 'Not specified'}</td></tr>
           <tr><td style="padding:8px;border:1px solid #E2E8F0;font-weight:600">Country</td><td style="padding:8px;border:1px solid #E2E8F0">${data.country || 'Not specified'}</td></tr>
         </table>
-        <p><a href="${process.env.SITE_URL || 'https://winlerr.com'}/admin.html" style="color:#0A84FF">View in admin panel</a></p>
+        <p><a href="${process.env.SITE_URL || 'https://winlerr.vip'}/admin.html" style="color:#0A84FF">View in admin panel</a></p>
       </div>
     `
   } else if (type === 'suggestion') {
