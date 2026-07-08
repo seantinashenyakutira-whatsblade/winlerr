@@ -1534,10 +1534,10 @@ body {
   margin-top:2rem;
 }
 .engine-card {
-  background:rgba(15,23,42,.6);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.1);
   border-radius:1rem;
   padding:1.5rem 1.25rem;
   display:flex;
@@ -1645,72 +1645,124 @@ body {
   .engine-grid { grid-template-columns:1fr }
 }
 
-/* ===== TOOLS CAROUSEL ===== */
-.tools-carousel-section {
-  margin-top:3.5rem;
+/* ===== LOGO CAROUSEL ===== */
+.logo-carousel-section {
+  margin-top:3rem;
+  padding:2rem 0;
   text-align:center;
 }
-.carousel-track-wrapper {
+.carousel-label {
+  font-size:.7rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.15em;
+  color:var(--accent);
+  margin-bottom:.35rem;
+}
+.carousel-headline {
+  font-size:1.5rem;
+  font-weight:800;
+  color:var(--text);
+  margin:0 0 .5rem;
+}
+.carousel-sub {
+  font-size:.88rem;
+  color:var(--text-muted);
+  max-width:600px;
+  margin:0 auto 2rem;
+  line-height:1.6;
+}
+.logo-row-wrapper {
   overflow:hidden;
   width:100%;
-  mask-image:linear-gradient(to right,transparent,black 3%,black 97%,transparent);
-  -webkit-mask-image:linear-gradient(to right,transparent,black 3%,black 97%,transparent);
+  margin-bottom:1rem;
+  mask-image:linear-gradient(to right,transparent,black 4%,black 96%,transparent);
+  -webkit-mask-image:linear-gradient(to right,transparent,black 4%,black 96%,transparent);
 }
-.carousel-track {
+.logo-row {
   display:flex;
-  gap:.65rem;
-  animation:scrollCarousel 80s linear infinite;
+  gap:.85rem;
   width:max-content;
+  animation:scrollLeft 60s linear infinite;
 }
-.carousel-track:hover {
+.logo-row-right {
+  animation:scrollRight 60s linear infinite;
+}
+.logo-row-wrapper:hover .logo-row,
+.logo-row-wrapper:hover .logo-row-right {
   animation-play-state:paused;
 }
-.carousel-pill {
+.logo-card {
   display:flex;
   align-items:center;
-  gap:.45rem;
-  padding:.4rem .85rem;
-  border-radius:999px;
-  background:var(--card-bg);
-  border:1px solid var(--card-border);
+  gap:.65rem;
+  min-width:190px;
+  height:76px;
+  padding:.75rem 1rem;
+  border-radius:12px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
   flex-shrink:0;
-  transition:all .25s ease;
-  white-space:nowrap;
+  transition:all .3s ease;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
 }
-.carousel-pill:hover {
-  border-color:var(--accent);
-  background:rgba(10,132,255,.06);
+.logo-card:hover {
+  transform:translateY(-4px);
+  border-color:rgba(10,132,255,.3);
+  box-shadow:0 8px 24px rgba(10,132,255,.12);
+  background:rgba(255,255,255,.1);
 }
-.pill-icon {
-  width:24px;
-  height:24px;
-  border-radius:6px;
-  background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(0,229,255,.06));
+.logo-icon {
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(10,132,255,.15),rgba(0,229,255,.08));
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:.65rem;
+  font-size:1.15rem;
   color:var(--accent);
   flex-shrink:0;
+  transition:all .3s ease;
 }
-.pill-name {
-  font-size:.78rem;
+.logo-card:hover .logo-icon {
+  transform:scale(1.08);
+  background:linear-gradient(135deg,rgba(10,132,255,.25),rgba(0,229,255,.12));
+}
+.logo-name {
+  font-size:.85rem;
   font-weight:600;
   color:var(--text);
+  white-space:nowrap;
 }
-.pill-tag {
-  font-size:.58rem;
+.logo-tag {
+  font-size:.6rem;
   font-weight:600;
-  padding:.12rem .4rem;
+  padding:.15rem .45rem;
   border-radius:999px;
   background:rgba(10,132,255,.08);
   color:var(--accent);
   text-transform:uppercase;
   letter-spacing:.04em;
+  margin-left:auto;
+  white-space:nowrap;
 }
-@keyframes scrollCarousel {
+@keyframes scrollLeft {
   0% { transform:translateX(0) }
   100% { transform:translateX(-50%) }
+}
+@keyframes scrollRight {
+  0% { transform:translateX(-50%) }
+  100% { transform:translateX(0) }
+}
+@media(max-width:768px) {
+  .logo-card { min-width:150px;height:64px;padding:.55rem .75rem }
+  .logo-icon { width:32px;height:32px;font-size:.95rem }
+  .logo-name { font-size:.78rem }
+  .logo-tag { font-size:.55rem;padding:.12rem .35rem }
+  .carousel-headline { font-size:1.2rem }
+  .logo-row-wrapper { margin-bottom:.65rem }
 }
 
 /* ===== INTEGRATION SUGGESTION CTA ===== */
