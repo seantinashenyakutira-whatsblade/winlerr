@@ -1,0 +1,23 @@
+﻿{
+  "name": "@winlerr/service-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Winlerr api service (placeholder)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests yet\" && exit 0",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "tsx": "^4.0.0"
+  }
+}

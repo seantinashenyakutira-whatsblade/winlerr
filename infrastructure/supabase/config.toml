@@ -1,0 +1,5 @@
+﻿# Supabase local config placeholder
+# See https://supabase.com/docs/guides/local-development/cli/config
+[api]
+enabled = true
+port = 54321
