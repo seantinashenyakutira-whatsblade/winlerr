@@ -1,101 +1,100 @@
 # Database Architecture — Winlerr
 
-- **Status:** Current Plan (establishes model, no full schema yet)
-- **Platform:** Supabase / PostgreSQL (ADR 0003)
-- **Related:** ADR 0004 (auth model), `infrastructure/supabase/`, `packages/database`, `docs/architecture/security.md`
+- **Status:** Current Plan (initial migration shipped as placeholder, RLS minimal, HQ decisions open)
+- **Date:** 2026-08-24
+- **Branch:** `feature/domain-persistence-foundation` (from `develop` 275d221, stacked on `feature/platform-contracts` a803b8b)
+- **Related:** `packages/database`, `infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql`, `docs/architecture/platform-contracts.md`
 
-## 1. Principles
+## 1. Platform
 
-- Multi-tenant by design: every business/client lives in an `organization`. No data leaks across organizations.
-- **RLS is the primary isolation boundary** — application scoping is defense-in-depth, RLS is the gate.
-- Migrations-only: `infrastructure/supabase/migrations/<timestamp>_<name>.sql`, committed, reviewed, reversible. No dashboard mutation without a migration.
-- Types via `@winlerr/database`; no raw SQL sprinkled without helpers.
+- **PostgreSQL via Supabase** — managed, RLS, `gen_random_uuid()`, `pgcrypto`.
+- **Supabase Auth** (`auth.users`) is the identity source; domain tables reference it.
+- **Migrations:** `infrastructure/supabase/migrations/<timestamp>_<name>.sql`, committed, reviewed, applied via Supabase CLI. Never mutate prod via dashboard.
 
-## 2. Domain Shape
+## 2. Domain Boundaries (Phase 4)
+
+Phase 4 establishes **only** the platform domain:
 
 ```
-Platform (Winlerr itself — provider)
-  └─ organization  (tenant: a business/client)
-      ├─ users  (Supabase auth.users, global)
-      ├─ memberships  (user ↔ organization, role)
-      ├─ roles / permissions
-      ├─ products  (which Winlerr products this org uses)
-      ├─ product data  (leads, bookings, contacts, conversations, etc. — all scoped by organization_id)
-      └─ audit_log (who did what, when, in which org)
+Platform
+  ↓
+Organization  (tenant — business/client)
+  ↓
+Membership  (user ↔ organization + role)
+  ↓
+User  (Supabase auth.users)
+  ↓
+Audit Log  (organization-scoped events)
 ```
 
-### 2.1 Core Tables (planned, not yet migrated)
+**Initial tables (migration 20260824120000):**
 
-| Table | Purpose | Key columns |
-|-------|---------|-------------|
-| `organizations` | Tenant identity | `id uuid pk`, `name`, `slug unique`, `created_at`, `owner_user_id fk` |
-| `users` | Supabase `auth.users` (managed) | `id uuid pk` (FK to auth), `email` |
-| `memberships` | User ↔ org, role | `user_id fk auth.users`, `organization_id fk`, `role text`, `created_at`; PK `(user_id, organization_id)` |
-| `roles` / `permissions` | RBAC | `role`, `permission` (e.g., `lead:read`), seed table; apps check `hasPermission(membership, permission)` |
-| `products` | Org entitlements | `organization_id fk`, `product text` (crm, booking, lead-response, whatsapp-agent), `enabled bool` |
-| `audit_log` | Auditability | `id uuid`, `organization_id fk`, `actor_user_id fk`, `action text`, `resource_type`, `resource_id`, `metadata jsonb`, `created_at` |
+| Table | Purpose | Key |
+|-------|---------|-----|
+| `organizations` | Tenant | `id uuid pk`, `name`, `slug unique`, `owner_user_id → auth.users`, `created_at`, `updated_at` |
+| `memberships` | Org membership + role | `user_id → auth.users`, `organization_id → organizations`, `role check (owner/admin/member/viewer)`, PK `(user_id, organization_id)` |
+| `audit_log` | Org-scoped events | `id uuid pk`, `organization_id → organizations`, `actor_user_id → auth.users`, `action`, `resource_type`, `resource_id`, `metadata jsonb`, `created_at` |
 
-> Product data (e.g., `leads`, `bookings`, `contacts`, `conversations`) not modeled here — each product will own its tables, all with `organization_id uuid not null references organizations(id)`.
+**Not created (future product phases):**
+`leads`, `bookings`, `customers`, `conversations`, `messages`, `campaigns`, `products`, `payments`, `subscriptions` — explicitly deferred.
 
-### 2.2 Example product tables (illustrative, not yet created)
+## 3. Multi-Tenancy
 
-```sql
--- all product tables follow this shape
-create table leads (
-  id uuid primary key default gen_random_uuid(),
-  organization_id uuid not null references organizations(id) on delete cascade,
-  created_by uuid references auth.users(id),
-  payload jsonb not null,
-  created_at timestamptz default now()
-);
--- every table gets RLS + index on organization_id
-```
+- **Every organization-scoped record has `organization_id uuid not null`** — except `organizations` itself (it *is* the tenant). This is the tenant isolation column.
+- **Application scoping:** All queries must include `organization_id` filter (defense-in-depth via `conventions.tenantColumn`).
+- **RLS is primary:** Row Level Security policies enforce tenant isolation at the DB layer, not just in app code.
 
-## 3. Tenant Isolation
+## 4. Row Level Security (Minimal, HQ-Blocked)
 
-1. **Application layer**: all queries include `.eq("organization_id", currentOrgId)` via `@winlerr/database` helpers. Helper enforces presence of org context — query without org throws.
-2. **RLS layer** (Postgres): per table policy:
+RLS is enabled on all three tables. Policies are **membership-based only**, not role-based, because the following remain **HQ decisions** (not silently converted):
 
-```sql
-alter table leads enable row level security;
-create policy "org-isolation" on leads
-  for all
-  using (
-    organization_id in (
-      select organization_id from memberships where user_id = auth.uid()
-    )
-  )
-  with check (
-    organization_id in (
-      select organization_id from memberships where user_id = auth.uid()
-    )
-  );
--- service_role bypasses RLS; anon/authenticated do not
-```
+1. Final role/permission matrix
+2. Multi-organization membership rules
+3. OAuth providers
+4. Legacy master branch
+5. First product priority
 
-Admin/service clients (`SUPABASE_SERVICE_ROLE_KEY`) bypass RLS — server-only, never exposed.
+**Implemented policies (see migration):**
 
-## 4. AuthN vs AuthZ
+- `organizations`: `select` where `id in (memberships where user_id = auth.uid())`; `insert` for `authenticated`; `update` where member.
+- `memberships`: `select` where `user_id = auth.uid()` or org in user's memberships; `insert` where self or org admin/owner.
+- `audit_log`: `select/insert` where `organization_id` in user's memberships and `actor_user_id = auth.uid()` (or null).
 
-- **AuthN** (Supabase Auth) proves `auth.uid()` is who they say they are.
-- **AuthZ** (membership + role + permission) proves they may access `organization_id` and action. Enforced server-side in Route Handlers via `@winlerr/auth` (`requireMembership`, `requirePermission`) and reinforced by RLS.
+**What is NOT implemented as RLS yet (blocked):**
+- Role-based write restrictions beyond membership existence (requires final role matrix)
+- Organization creation quotas, slug validation beyond uniqueness
+- Audit log retention / partitioning
 
-See `docs/architecture/authentication.md` and ADR 0004.
+These are documented as blockers, not invented.
 
-## 5. Migrations
+## 5. Server-Side Access & Boundaries
 
-- Location: `infrastructure/supabase/migrations/` as `<YYYYMMDDHHMMSS>_<name>.sql`
-- Workflow: branch → write migration → `supabase db push` locally → test RLS with `auth.uid()` → PR review → merge to `develop` → staging auto-applies → promote to `main` → production.
-- Data migrations: separate `data_migrations/` or reversible `up/down` scripts; reviewed, tested on staging, logged in `audit_log`.
+- **Browser:** `createBrowserClient({ supabaseUrl, supabaseAnonKey })` — anon key, RLS enforced.
+- **Server:** `createServerClient(config)` — anon key + cookies, throws on client.
+- **Admin:** `createAdminClient({ supabaseUrl, serviceRoleKey })` — **server-only**, `bypassRls: true`, throws on `window`. Never expose to client bundles.
+- Applications must import via `@winlerr/database`, not scatter `supabase-js` clients.
 
-## 6. What is NOT built yet
+## 6. Migration Discipline
 
-- No production schema beyond placeholder `infrastructure/supabase/config.toml`. No `leads`/`bookings` tables yet — intentionally. First real migration will be `organizations` + `memberships` + `audit_log`.
-- No partition strategy — premature. Postgres can handle Winlerr’s early scale without partitioning; revisit at >10M rows/table or per-tenant bulky history.
-- No read replicas / pgBouncer tuning — handled by Supabase defaults.
+- `infrastructure/supabase/migrations/.gitkeep` → `20260824120000_domain_persistence_foundation.sql` is the first real migration.
+- Includes: `pgcrypto`, tables, indexes, `handle_updated_at()` trigger, RLS `enable`, policies.
+- Future migrations must be reviewed, tested locally via `supabase db push`, and never mutate prod without commit.
 
-## 7. Next Steps (Current Plan)
+## 7. Types
 
-1. Product/HQ review of org/membership/role model (ADR 0004 open questions).
-2. First migration: `organizations`, `memberships`, seed `roles`, `audit_log` with RLS.
-3. `@winlerr/database` helpers: `createBrowserClient`, `createServerClient`, `createAdminClient`, `withOrganization` wrapper.
+- `packages/database/src/types.ts` defines `OrganizationRow`, `MembershipRow`, `AuditLogRow` aligned with SQL, and `Database` for `supabase-js` when wired.
+- Generated types location: `packages/database/src/types.generated.ts` (to be created via `supabase gen types` after first real DB).
+
+## 8. Security Notes
+
+- RLS policies use `auth.uid()` and `memberships` — no cross-tenant leakage via `organization_id`.
+- `audit_log.metadata` is `jsonb` — **never log secrets** there; `redactConfig()` pattern applies.
+- `SUPABASE_SERVICE_ROLE_KEY` is server-only; admin client enforces server-only.
+
+## 9. What Remains Future Work
+
+- Real Supabase project wiring (no prod DB yet)
+- Extending `Database` types via generation
+- Product tables (leads, bookings, etc.)
+- Role-based RLS refinement after HQ approves matrix
+- Audit log retention / GDPR handling

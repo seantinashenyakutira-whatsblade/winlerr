@@ -1,59 +1,56 @@
 # Security Architecture — Winlerr
 
-- **Status:** Current Plan (baseline documented, enforcement incremental)
-- **Related:** `AGENTS.md`, `docs/architecture/database-architecture.md`, `docs/architecture/authentication.md`, `docs/decisions/0003-supabase-postgresql.md`
+- **Status:** Current Plan (initial RLS + boundaries, HQ decisions open)
+- **Date:** 2026-08-24
+- **Related:** `docs/architecture/database-architecture.md`, `docs/architecture/authentication.md`, `packages/config`, `packages/database`, `packages/auth`
 
-## 1. Boundaries (at minimum)
+## 1. Secrets & Env
 
-### Secrets & Env
-- Never hardcode secrets; never commit `.env` (`.env.example` has empty placeholders, verified).
-- `.env` gitignored (`.gitignore:16`), production secrets in Vercel / Supabase / Cloudflare dashboards or secret manager — never in Git.
-- `NEXT_PUBLIC_*` is client-exposed; `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `WHATSAPP_*`, `CLOUDFLARE_*` are server-only. Verified: no leaked token via grep.
+- `.env` is gitignored (`.gitignore:16`), never committed. Verified via `git check-ignore .env`.
+- `.env.example` is source of truth, placeholders only — no real credentials.
+- `package.json:packageManager` and `.nvmrc` are canonical; no Volta/asdf competition.
 
-### Authentication & Authorization
-- AuthN: Supabase Auth (session, JWT, password recovery, OAuth-ready).
-- AuthZ: membership + role + permission, org-scoped; server-side `requireUser` / `requireMembership` / `requirePermission` via `@winlerr/auth`.
-- Client checks are UX hints; server re-checks every privileged operation.
+## 2. Tenant Isolation
 
-### Tenant Isolation
-- Every product table has `organization_id uuid not null`. App queries scoped by org; **RLS policies per table** enforce `organization_id IN (SELECT organization_id FROM memberships WHERE user_id = auth.uid())`. `service_role` bypasses RLS — server-only.
+- Every organization-scoped record has `organization_id` (except `organizations` itself).
+- RLS is primary: `organizations`, `memberships`, `audit_log` all have `enable row level security` + membership-based policies using `auth.uid()`.
+- App scoping via `organization_id` is defense-in-depth.
 
-### Database
-- Migrations-only (`infrastructure/supabase/migrations/`); no dashboard prod mutation without committed migration. Data migrations reviewed, reversible, tested on staging.
-- RLS considered core boundary, not optional (see `database-architecture.md`).
+## 3. Service-Role Boundary
 
-### API Validation & Error Handling
-- All inputs validated via Zod before use (body, query, headers, webhook payloads).
-- Shared error shape `{ error: { code, message } }`, appropriate HTTP status, no stack leaks in production.
+- `SUPABASE_SERVICE_ROLE_KEY` is server-only.
+- `packages/database:createAdminClient` throws if `window !== undefined` and has `bypassRls: true`.
+- `createBrowserClient`/`createServerClient` use anon key and respect RLS.
+- Never log service-role key — `redactConfig()` in `@winlerr/config`.
 
-### Webhooks
-- Treat as untrusted: verify HMAC signature (timing-safe), Zod-validate, idempotent retry handling, 200 fast then queue.
+## 4. Database Access
 
-### Rate Limiting
-- Public endpoints have auth + rate limiting (per-route, per-org, per-ip). Webhooks idempotent.
+- All access via `@winlerr/database` — no scattered Supabase clients.
+- Migrations in `infrastructure/supabase/migrations/` only, no dashboard prod mutation.
+- `pgcrypto` for `gen_random_uuid()`, indexes on `slug`, `organization_id`, `user_id`, `created_at`.
 
-### Logging & Audit
-- Do not log secrets/PII. Redact tokens. `audit_log` table (organization_id, actor_user_id, action, resource) for privileged actions and AI tool calls.
+## 5. AuthN vs AuthZ
 
-### AI Tool Permissions
-- Tools require explicit Zod schemas and bounded side effects. Agents have scoped permissions; AI writes to DB/external/customer require human approval or tightly-scoped policy. All tool calls audited (see `ai-architecture.md`).
+- AuthN via Supabase Auth; AuthZ via `memberships` + `role` + RLS.
+- Pure guards in `@winlerr/auth` (`hasPermission`, `isMember`, `hasRoleAtLeast`) are checked server-side before DB.
 
-### Service-Role Credentials
-- `SUPABASE_SERVICE_ROLE_KEY` is server-only; clients use `NEXT_PUBLIC_SUPABASE_ANON_KEY` + RLS. Never expose service-role to browser.
+## 6. Audit Logging
 
-## 2. Current Posture (Foundation)
+- `audit_log` is organization-scoped: `organization_id`, `actor_user_id`, `action`, `resource_type`, `resource_id`, `metadata jsonb`, `created_at`.
+- **Never log secrets** in `metadata` — redact before insert; no tokens, no service-role credentials.
 
-- **Documented**: AGENTS.md §2-§5 locks the rules; architecture docs reinforce them.
-- **Implemented**: `.env` ignorance, client/server key separation in `.env.example`, placeholder packages ready to host enforcement.
-- **Not yet enforced in code** (no real tables/policies yet) — correct; first migration will add RLS.
+## 7. What Is NOT Yet Enforced
 
-## 3. What is NOT claimed
+- Role-based RLS refinement (blocked on HQ role matrix)
+- OAuth provider secrets
+- Production Supabase project (no real DB yet)
+- Deployment secrets (Vercel/Cloudflare)
 
-- No specific regulatory framework (SOC2, GDPR, HIPAA) claimed — not required at this stage. When needed, add evaluation and recertify.
+These are documented as blockers, not claimed as established.
 
-## 4. Next Steps
+## 8. Verification
 
-1. First migration creates `organizations`, `memberships`, `audit_log` with RLS policies and indexes.
-2. `@winlerr/auth` implements `require*` guards; `@winlerr/database` enforces org scoping.
-3. Webhook adapter adds HMAC verifier + idempotency table scoped by org.
-4. Add protected CI check: `grep -r SUPABASE_SERVICE_ROLE_KEY --include="*.ts" | grep -v "server"` must not expose to client bundle (future CI Proposal).
+- `pnpm lint/typecheck/test/build` all pass without credentials.
+- `git diff` shows no secrets; `git check-ignore .env` passes.
+- Tests verify admin client cannot execute on client context and audit insert requires `organization_id`.
+
