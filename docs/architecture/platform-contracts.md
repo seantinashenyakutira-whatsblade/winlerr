@@ -80,22 +80,22 @@ Helpers: `ok()`, `err()`, `isOk()`, `isErr()`, `toHttpStatus()`, `createError()`
 
 This replaces ad-hoc `{ error }` shapes with a typed, consistent model for future apps. No giant enterprise framework.
 
-## 6. Database Contract — `@winlerr/database` (Established, interface only)
+## 6. Database Contract — `@winlerr/database` (Established, Phase 4 extends to real tables)
 
-**Files:** `packages/database/src/types.ts`, `client.ts`, `index.ts`
+**Files:** `packages/database/src/types.ts`, `client.ts`, `index.ts`, `infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql`
 
 - Provides architectural boundary: apps must import via `@winlerr/database`, not scatter Supabase client creation.
 - **Typed client factories:**
   - `createBrowserClient({ supabaseUrl, supabaseKey })` — browser, anon key, `bypassRls: false`
   - `createServerClient(config)` — server (Route Handler), anon key, throws on client
   - `createAdminClient(config)` — server-only, service-role, `bypassRls: true`, throws on client
-- **No real Supabase SDK imported** at foundation stage — factories return placeholder that throws `Database not wired` when queried. Will be wired to `@supabase/supabase-js` when first migration ships.
-- **Placeholder types:** `Database` with `public.Tables` etc., location `src/types.generated.ts` documented for future generation.
+- **No real Supabase SDK imported** at foundation stage — factories return placeholder that throws `Database not wired` when queried. Will be wired to `@supabase/supabase-js` when Supabase project is configured.
+- **Phase 4 persistence:** `organizations`, `memberships`, `audit_log` tables now defined in migration (with indexes, RLS, policies). Types `OrganizationRow`, `MembershipRow`, `AuditLogRow` in `types.ts` are aligned with SQL. Location `src/types.generated.ts` remains for future generated types.
 - **Conventions:** `organization_id` on every product table, RLS as primary tenant isolation, migrations in `infrastructure/supabase/migrations/`.
 
-**What is NOT implemented:** No production tables, no tenant tables, no migrations for users/orgs/leads/bookings/CRM, no real connection.
+**What is NOT implemented:** No product tables (leads, bookings, etc.), no real Supabase connection, no prod deployment.
 
-Tests: `packages/database/src/client.test.ts` (browser/server/admin factories, missing config, placeholder query, bypass flag) — no credentials required.
+Tests: `packages/database/src/client.test.ts` (factories, missing config, placeholder query, bypass flag) + `domain.test.ts` (row shapes, `organization_id` convention, migration file exists, RLS conventions) — no credentials required.
 
 ## 7. Auth Contract — `@winlerr/auth` (Established)
 

@@ -5,18 +5,18 @@
  * Supabase client creation throughout apps.
  *
  * Server/client separation:
- *  - createBrowserClient — browser, uses anon key, RLS enforced
- *  - createServerClient — server (Route Handler / Server Component), uses anon key + cookies
- *  - createAdminClient — server-only, uses service-role key, bypasses RLS (never on client)
+ *  - createBrowserClient — browser, anon key, RLS enforced
+ *  - createServerClient — server (Route Handler / Server Component), anon key + cookies
+ *  - createAdminClient — server-only, service-role key, bypasses RLS (never on client)
  *
- * No real Supabase SDK is imported here at foundation stage — factories return
- * a typed interface that will be wired to @supabase/supabase-js when first
- * product needs DB. This keeps the boundary stable without requiring credentials.
+ * Domain persistence: organizations, memberships, audit_log are the only tables
+ * in the initial migration. All organization-scoped queries must include organization_id.
+ * RLS is primary tenant isolation; app scoping is defense-in-depth.
  */
 
 export interface DatabaseClientConfig {
   supabaseUrl: string;
-  supabaseKey: string; // anon key for browser/server, service-role for admin
+  supabaseKey: string; // anon for browser/server, service-role for admin
 }
 
 export interface QueryResult<T> {
@@ -25,26 +25,19 @@ export interface QueryResult<T> {
 }
 
 export interface DatabaseClient {
-  /**
-   * Typed table access — placeholder. Replace with generated types when schema exists.
-   * Example: client.from("organizations").select()
-   */
   from<T = unknown>(table: string): {
     select: (columns?: string) => Promise<QueryResult<T>>;
     insert: (values: unknown) => Promise<QueryResult<T>>;
     update: (values: unknown) => Promise<QueryResult<T>>;
     delete: () => Promise<QueryResult<T>>;
   };
-  /**
-   * Whether this client bypasses RLS (admin only).
-   */
   readonly bypassRls: boolean;
 }
 
 function createPlaceholderClient(bypassRls: boolean): DatabaseClient {
   const notImplemented = () => {
     throw new Error(
-      "Database not wired — client is placeholder. Wire to @supabase/supabase-js when first migration ships."
+      "Database not wired — client is placeholder. Wire to @supabase/supabase-js when Supabase is configured. See packages/database/src/client.ts"
     );
   };
   return {
@@ -70,10 +63,6 @@ function createPlaceholderClient(bypassRls: boolean): DatabaseClient {
   };
 }
 
-/**
- * Browser client — uses anon key, RLS enforced.
- * Must be called on client/brower context.
- */
 export function createBrowserClient(config: DatabaseClientConfig): DatabaseClient {
   if (!config.supabaseUrl || !config.supabaseKey) {
     throw new Error("createBrowserClient: supabaseUrl and supabaseKey are required");
@@ -81,10 +70,6 @@ export function createBrowserClient(config: DatabaseClientConfig): DatabaseClien
   return createPlaceholderClient(false);
 }
 
-/**
- * Server client — for Route Handlers / Server Components.
- * Uses anon key + cookies (when Supabase Auth is wired).
- */
 export function createServerClient(config: DatabaseClientConfig): DatabaseClient {
   if (!config.supabaseUrl || !config.supabaseKey) {
     throw new Error("createServerClient: supabaseUrl and supabaseKey are required");
@@ -95,10 +80,6 @@ export function createServerClient(config: DatabaseClientConfig): DatabaseClient
   return createPlaceholderClient(false);
 }
 
-/**
- * Admin client — server-only, bypasses RLS.
- * Uses SUPABASE_SERVICE_ROLE_KEY — never expose to client.
- */
 export function createAdminClient(config: DatabaseClientConfig): DatabaseClient {
   if (typeof window !== "undefined") {
     throw new Error(
@@ -112,13 +93,30 @@ export function createAdminClient(config: DatabaseClientConfig): DatabaseClient 
 }
 
 /**
- * Documented access conventions:
- * - All product tables must include organization_id
- * - All queries must be scoped by organization_id
- * - RLS policies enforce tenant isolation; app scoping is defense-in-depth
- * - Migrations live in infrastructure/supabase/migrations/
+ * Domain helpers — to be used when Supabase is wired.
+ * These are conventions, not yet wired to real queries.
  */
+export const domainTables = {
+  organizations: "organizations" as const,
+  memberships: "memberships" as const,
+  auditLog: "audit_log" as const,
+} as const;
+
 export const conventions = {
   tenantColumn: "organization_id" as const,
   migrationsPath: "infrastructure/supabase/migrations" as const,
+  rlsEnabledTables: ["organizations", "memberships", "audit_log"] as const,
 } as const;
+
+/**
+ * Audit log helper type — ensures audit entries are organization-scoped and
+ * never log secrets. Use this shape when inserting into audit_log.
+ */
+export type AuditLogInsert = {
+  organization_id: string;
+  actor_user_id?: string | null;
+  action: string;
+  resource_type: string;
+  resource_id?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
