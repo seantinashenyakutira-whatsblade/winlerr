@@ -67,8 +67,8 @@ winlerr/
 
 ## Prerequisites
 
-- **Node.js** >= 20 (see `.nvmrc`)
-- **pnpm** >= 9 (`npm install -g pnpm` or `corepack enable`)
+- **Node.js** >= 22 (see `.nvmrc` — canonical: Node 22 LTS)
+- **pnpm** >= 10.22.0 (`packageManager: pnpm@10.22.0` — use `corepack enable`)
 - **Git** >= 2.40
 - **Supabase CLI** (optional, for local DB) — https://supabase.com/docs/guides/local-development/cli/getting-started
 - **Vercel CLI** (optional, for deployment preview) — `npm i -g vercel`
