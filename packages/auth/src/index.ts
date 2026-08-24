@@ -1,12 +1,13 @@
 /**
- * @winlerr/auth — authentication helpers
+ * @winlerr/auth — authentication & authorization contract
  *
- * Re-export Supabase auth utilities, session helpers, and RBAC primitives here.
- * Must not duplicate auth logic — all apps/services import from this package.
+ * Authentication (who you are) = Supabase Auth (user, session)
+ * Authorization (what you can do) = Membership + Role + Permission + RLS
  *
- * Example:
- * export { createClient } from "./client";
- * export { requireUser } from "./require-user";
+ * This package provides typed interfaces and pure utilities.
+ * No production auth flow, no OAuth, no Supabase connection here.
+ * Final role/permission matrix is HQ/Product decision.
  */
 
-export const placeholder = "auth" as const;
+export * from "./types.js";
+export * from "./guards.js";
