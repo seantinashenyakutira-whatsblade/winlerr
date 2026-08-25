@@ -100,4 +100,22 @@ describe("database/domain", () => {
     );
     expect(hasSecretGood).toBe(false);
   });
+
+  it("migration avoids recursive memberships RLS subqueries", () => {
+    const p = path.resolve(
+      process.cwd(),
+      "../../infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql"
+    );
+    const alt = path.resolve(
+      "infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql"
+    );
+    const sql = fs.readFileSync(fs.existsSync(p) ? p : alt, "utf8");
+    expect(sql).toContain("create or replace function public.is_org_member");
+    expect(sql).toContain("security definer");
+    expect(sql).toContain("set search_path = public");
+    expect(sql).toContain("public.is_org_admin_or_owner(organization_id)");
+    expect(sql).not.toContain(
+      "organization_id in (select organization_id from public.memberships where user_id = auth.uid())"
+    );
+  });
 });

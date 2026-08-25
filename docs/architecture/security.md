@@ -13,7 +13,7 @@
 ## 2. Tenant Isolation
 
 - Every organization-scoped record has `organization_id` (except `organizations` itself).
-- RLS is primary: `organizations`, `memberships`, `audit_log` all have `enable row level security` + membership-based policies using `auth.uid()`.
+- RLS is primary: `organizations`, `memberships`, `audit_log` all have `enable row level security` + membership-based policies using `auth.uid()` through narrowly scoped, fixed-`search_path` `SECURITY DEFINER` helpers.
 - App scoping via `organization_id` is defense-in-depth.
 
 ## 3. Service-Role Boundary
@@ -41,7 +41,7 @@
 
 ## 7. What Is NOT Yet Enforced
 
-- Role-based RLS refinement (blocked on HQ role matrix)
+- Role-based RLS refinement (blocked on HQ role matrix); current helpers provide membership isolation only.
 - OAuth provider secrets
 - Production Supabase project (no real DB yet)
 - Deployment secrets (Vercel/Cloudflare)

@@ -83,13 +83,52 @@ alter table public.audit_log enable row level security;
 -- HQ decisions remain open: final role/permission matrix, multi-org rules,
 -- OAuth providers. Therefore policies are membership-based only, not role-based.
 -- Service role bypasses RLS (server-only).
+--
+-- Membership policies must not query public.memberships directly while RLS is
+-- evaluating public.memberships: PostgreSQL otherwise detects policy recursion.
+-- These SECURITY DEFINER helpers are narrowly scoped, use a fixed search_path,
+-- and are executable only by authenticated users.
+
+create or replace function public.is_org_member(target_org_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.memberships m
+    where m.organization_id = target_org_id
+      and m.user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.is_org_admin_or_owner(target_org_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.memberships m
+    where m.organization_id = target_org_id
+      and m.user_id = auth.uid()
+      and m.role in ('owner', 'admin')
+  );
+$$;
+
+revoke all on function public.is_org_member(uuid) from public;
+revoke all on function public.is_org_admin_or_owner(uuid) from public;
+grant execute on function public.is_org_member(uuid) to authenticated;
+grant execute on function public.is_org_admin_or_owner(uuid) to authenticated;
 
 -- Organizations: members can read their organizations; authenticated can create
 drop policy if exists "organizations_select_member" on public.organizations;
 create policy "organizations_select_member" on public.organizations
-  for select using (
-    id in (select organization_id from public.memberships where user_id = auth.uid())
-  );
+  for select using (public.is_org_member(id));
 
 drop policy if exists "organizations_insert_authenticated" on public.organizations;
 create policy "organizations_insert_authenticated" on public.organizations
@@ -97,43 +136,33 @@ create policy "organizations_insert_authenticated" on public.organizations
 
 drop policy if exists "organizations_update_member" on public.organizations;
 create policy "organizations_update_member" on public.organizations
-  for update using (
-    id in (select organization_id from public.memberships where user_id = auth.uid())
-  ) with check (
-    id in (select organization_id from public.memberships where user_id = auth.uid())
-  );
+  for update using (public.is_org_member(id))
+  with check (public.is_org_member(id));
 
 -- Memberships: user can read their own memberships; members can read org memberships
 drop policy if exists "memberships_select_own" on public.memberships;
 create policy "memberships_select_own" on public.memberships
   for select using (
     user_id = auth.uid()
-    or organization_id in (select organization_id from public.memberships where user_id = auth.uid())
+    or public.is_org_member(organization_id)
   );
 
 drop policy if exists "memberships_insert_self" on public.memberships;
 create policy "memberships_insert_self" on public.memberships
   for insert with check (
     user_id = auth.uid()
-    or exists (
-      select 1 from public.memberships
-      where user_id = auth.uid()
-        and organization_id = memberships.organization_id
-        and role in ('owner', 'admin')
-    )
+    or public.is_org_admin_or_owner(organization_id)
   );
 
 -- Audit log: members can read org audit; members can insert audit for their org
 drop policy if exists "audit_log_select_member" on public.audit_log;
 create policy "audit_log_select_member" on public.audit_log
-  for select using (
-    organization_id in (select organization_id from public.memberships where user_id = auth.uid())
-  );
+  for select using (public.is_org_member(organization_id));
 
 drop policy if exists "audit_log_insert_member" on public.audit_log;
 create policy "audit_log_insert_member" on public.audit_log
   for insert with check (
-    organization_id in (select organization_id from public.memberships where user_id = auth.uid())
+    public.is_org_member(organization_id)
     and (actor_user_id is null or actor_user_id = auth.uid())
   );
 

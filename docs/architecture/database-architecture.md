@@ -56,9 +56,9 @@ RLS is enabled on all three tables. Policies are **membership-based only**, not 
 
 **Implemented policies (see migration):**
 
-- `organizations`: `select` where `id in (memberships where user_id = auth.uid())`; `insert` for `authenticated`; `update` where member.
-- `memberships`: `select` where `user_id = auth.uid()` or org in user's memberships; `insert` where self or org admin/owner.
-- `audit_log`: `select/insert` where `organization_id` in user's memberships and `actor_user_id = auth.uid()` (or null).
+- `organizations`: `select` through the locked-down `is_org_member(id)` helper; `insert` for `authenticated`; `update` through the membership helper.
+- `memberships`: `select` where `user_id = auth.uid()` or `is_org_member(organization_id)`; `insert` where self or `is_org_admin_or_owner(organization_id)`.
+- `audit_log`: `select/insert` through `is_org_member(organization_id)` with `actor_user_id = auth.uid()` (or null).
 
 **What is NOT implemented as RLS yet (blocked):**
 - Role-based write restrictions beyond membership existence (requires final role matrix)
@@ -87,7 +87,7 @@ These are documented as blockers, not invented.
 
 ## 8. Security Notes
 
-- RLS policies use `auth.uid()` and `memberships` — no cross-tenant leakage via `organization_id`.
+- RLS policies use `auth.uid()` through narrowly scoped `SECURITY DEFINER` membership helpers with a fixed `search_path`; this avoids recursive direct membership-policy subqueries while preserving `organization_id` isolation.
 - `audit_log.metadata` is `jsonb` — **never log secrets** there; `redactConfig()` pattern applies.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-only; admin client enforces server-only.
 
