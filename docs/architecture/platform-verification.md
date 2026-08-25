@@ -2,7 +2,7 @@
 
 - **Status:** Verification (Phase 5) — Established vs Current Plan explicitly labeled
 - **Date:** 2026-08-24
-- **Branch:** `feature/platform-verification` (from `develop` 275d221)
+- **Candidate branch:** `chore/foundation-reconciliation` (reconciled from PR #5’s `feature/platform-verification`, originally from `develop` 275d221)
 - **Audited branches:** `feature/platform-contracts` (a803b8b) and `feature/domain-persistence-foundation` (553007d)
 - **Related:** `docs/architecture/platform-contracts.md`, `docs/architecture/database-architecture.md`, `packages/*`, `infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql`
 
@@ -58,8 +58,9 @@
 All three tables have `enable row level security` — **Established**.
 
 - **Unauthenticated access:** Policies use `auth.uid()` — anon (`null`) cannot read/insert tenant data — **PASS**.
-- **Cross-tenant leakage:** `organizations` select where `id in (memberships where user_id=auth.uid())`; `memberships` select where own or member; `audit_log` where `organization_id in memberships` — **PASS**, no cross-org leakage.
-- **Membership modification:** `memberships_insert_self` requires `user_id=auth.uid()` or `role in (owner,admin)` in that org — prevents arbitrary insertion — **PASS**, but **Current Plan** notes role-based refinement is blocked (needs HQ matrix).
+- **Cross-tenant leakage:** `organizations` select through `is_org_member(id)`; `memberships` select where own or `is_org_member(organization_id)`; `audit_log` through `is_org_member(organization_id)` — **PASS**, no cross-org leakage.
+- **Organization creation:** `organizations_insert_authenticated` requires an authenticated caller and `owner_user_id=auth.uid()` — **PASS**, so an authenticated user cannot create an organization owned by another user.
+- **Membership modification:** `memberships_insert_self_or_admin` requires the caller to own the organization or be an owner/admin member — **PASS**, preventing arbitrary membership insertion while preserving the explicitly minimal role policy.
 - **Audit actor constraint:** `audit_log_insert_member` requires `actor_user_id is null or = auth.uid()` and `organization_id` in memberships — **PASS**.
 - **Service-role bypass:** Remains server-only via `createAdminClient` (throws on `window`) and Supabase `service_role` bypass — **Established**, never exposed to client.
 - **Role restrictions:** Correctly identified as **unresolved** — policies are membership-based only, not role-based — documented as blocker, not invented — **Current Plan/Proposal**.

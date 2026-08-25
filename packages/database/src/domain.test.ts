@@ -111,11 +111,17 @@ describe("database/domain", () => {
     );
     const sql = fs.readFileSync(fs.existsSync(p) ? p : alt, "utf8");
     expect(sql).toContain("create or replace function public.is_org_member");
+    expect(sql).toContain("create or replace function public.is_org_owner");
     expect(sql).toContain("security definer");
     expect(sql).toContain("set search_path = public");
+    expect(sql).toContain("owner_user_id = auth.uid()");
     expect(sql).toContain("public.is_org_admin_or_owner(organization_id)");
+    expect(sql).toContain("create policy \"memberships_insert_self_or_admin\"");
     expect(sql).not.toContain(
       "organization_id in (select organization_id from public.memberships where user_id = auth.uid())"
+    );
+    expect(sql).not.toContain(
+      "create policy \"memberships_insert_self\""
     );
   });
 });

@@ -2,7 +2,7 @@
 
 - **Status:** Current Plan (initial migration shipped as placeholder, RLS minimal, HQ decisions open)
 - **Date:** 2026-08-24
-- **Branch:** `feature/domain-persistence-foundation` (from `develop` 275d221, stacked on `feature/platform-contracts` a803b8b)
+- **Candidate branch:** `chore/foundation-reconciliation` (reconciled from PR #4’s `feature/domain-persistence-foundation`, originally stacked on `feature/platform-contracts` a803b8b)
 - **Related:** `packages/database`, `infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql`, `docs/architecture/platform-contracts.md`
 
 ## 1. Platform
@@ -56,8 +56,8 @@ RLS is enabled on all three tables. Policies are **membership-based only**, not 
 
 **Implemented policies (see migration):**
 
-- `organizations`: `select` through the locked-down `is_org_member(id)` helper; `insert` for `authenticated`; `update` through the membership helper.
-- `memberships`: `select` where `user_id = auth.uid()` or `is_org_member(organization_id)`; `insert` where self or `is_org_admin_or_owner(organization_id)`.
+- `organizations`: `select` through the locked-down `is_org_member(id)` helper; `insert` for an authenticated user whose `owner_user_id = auth.uid()`; `update` through the membership helper.
+- `memberships`: `select` where `user_id = auth.uid()` or `is_org_member(organization_id)`; `insert` where the caller owns the organization or is an owner/admin member.
 - `audit_log`: `select/insert` through `is_org_member(organization_id)` with `actor_user_id = auth.uid()` (or null).
 
 **What is NOT implemented as RLS yet (blocked):**

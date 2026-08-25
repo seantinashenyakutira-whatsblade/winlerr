@@ -120,19 +120,39 @@ as $$
   );
 $$;
 
+create or replace function public.is_org_owner(target_org_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.organizations o
+    where o.id = target_org_id
+      and o.owner_user_id = auth.uid()
+  );
+$$;
+
 revoke all on function public.is_org_member(uuid) from public;
 revoke all on function public.is_org_admin_or_owner(uuid) from public;
+revoke all on function public.is_org_owner(uuid) from public;
 grant execute on function public.is_org_member(uuid) to authenticated;
 grant execute on function public.is_org_admin_or_owner(uuid) to authenticated;
+grant execute on function public.is_org_owner(uuid) to authenticated;
 
--- Organizations: members can read their organizations; authenticated can create
+-- Organizations: members can read their organizations; authenticated callers can create organizations they own
 drop policy if exists "organizations_select_member" on public.organizations;
 create policy "organizations_select_member" on public.organizations
   for select using (public.is_org_member(id));
 
 drop policy if exists "organizations_insert_authenticated" on public.organizations;
 create policy "organizations_insert_authenticated" on public.organizations
-  for insert with check (auth.role() = 'authenticated');
+  for insert with check (
+    auth.role() = 'authenticated'
+    and owner_user_id = auth.uid()
+  );
 
 drop policy if exists "organizations_update_member" on public.organizations;
 create policy "organizations_update_member" on public.organizations
@@ -148,9 +168,9 @@ create policy "memberships_select_own" on public.memberships
   );
 
 drop policy if exists "memberships_insert_self" on public.memberships;
-create policy "memberships_insert_self" on public.memberships
+create policy "memberships_insert_self_or_admin" on public.memberships
   for insert with check (
-    user_id = auth.uid()
+    public.is_org_owner(organization_id)
     or public.is_org_admin_or_owner(organization_id)
   );
 
