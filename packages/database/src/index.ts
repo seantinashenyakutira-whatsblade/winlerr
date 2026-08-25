@@ -1,9 +1,10 @@
 /**
- * @winlerr/database — Supabase / PostgreSQL helpers
+ * @winlerr/database — Supabase / PostgreSQL boundary
  *
- * Expose typed clients (browser / server / admin) and query helpers here.
- * All data access should be scoped by tenant/org ID; RLS is the primary
- * enforcement layer.
+ * Applications must import database access via this package, not via
+ * direct Supabase SDK scattering. Server/client separation and
+ * organization_id scoping are enforced at this boundary.
  */
 
-export const placeholder = "database" as const;
+export * from "./types.js";
+export * from "./client.js";
