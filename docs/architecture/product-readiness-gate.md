@@ -47,11 +47,11 @@ These are **Established** (implemented, verified, and not to be re-debated witho
 
 These are **Current Plan** (intended direction, supported by implementation, but not yet requiring HQ re-approval):
 
-- **Database domain:** `organizations`, `memberships`, `audit_log` tables + indexes + `handle_updated_at()` trigger — Current Plan (migration 20260824120000) — will be Established after Supabase project wiring and `supabase gen types` replacement of manual `OrganizationRow` etc.
-- **RLS minimal:** Membership-based policies only (see §8) — Current Plan until HQ approves role matrix
-- **Auth role set:** `owner|admin|member|viewer` placeholder check + `ROLE_PERMISSIONS` illustrative map — Current Plan (not frozen)
-- **Generated types location:** `packages/database/src/types.generated.ts` — Current Plan (manual types Established for now)
-- **Migration workflow:** `supabase db push` locally → PR → develop → staging → prod — Current Plan
+- **Database domain:** `organizations`, `memberships`, `audit_log` tables + indexes + `handle_updated_at()` trigger — Established in non-production Winlerr Staging via migration `20260824120000`.
+- **RLS minimal:** Membership-based policies only (see §8) — Current Plan until HQ approves the final role matrix; helper functions are private-schema and advisor-clean in staging.
+- **Auth role set:** `owner|admin|member|viewer` placeholder check + `ROLE_PERMISSIONS` illustrative map — Current Plan (not frozen).
+- **Generated types:** `packages/database/src/types.generated.ts` — Established from Winlerr Staging; regenerate after reviewed schema changes.
+- **Migration workflow:** review migration → apply to non-production staging → generate types → runtime verification → PR → develop/staging → production — Current Plan
 - **Local dev:** `supabase` CLI + `config.toml` + `pnpm install --frozen-lockfile` + `pnpm lint/typecheck/test/build` — Current Plan
 - **AI wiring:** `chat()` placeholder throws `not wired` — Current Plan until first product needs LLM
 

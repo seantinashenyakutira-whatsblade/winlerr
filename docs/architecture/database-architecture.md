@@ -82,8 +82,9 @@ These are documented as blockers, not invented.
 
 ## 7. Types
 
-- `packages/database/src/types.ts` defines `OrganizationRow`, `MembershipRow`, `AuditLogRow` aligned with SQL, and `Database` for `supabase-js` when wired.
-- Generated types location: `packages/database/src/types.generated.ts` (to be created via `supabase gen types` after first real DB).
+- `packages/database/src/types.generated.ts` is generated from Winlerr Staging and contains the live `Database`, `Tables`, `TablesInsert`, and `TablesUpdate` types.
+- `packages/database/src/types.ts` derives the repository’s `OrganizationRow`, `MembershipRow`, `AuditLogRow`, and role aliases from the generated schema while preserving the public package boundary.
+- Regenerate with the documented Supabase project command after every reviewed staging migration; never commit secrets or environment values in generated output.
 
 ## 8. Security Notes
 
@@ -93,8 +94,8 @@ These are documented as blockers, not invented.
 
 ## 9. What Remains Future Work
 
-- Real Supabase project wiring (no prod DB yet)
-- Extending `Database` types via generation
+- Production Supabase project wiring; the current cloud project is explicitly non-production staging
+- Staging Supabase project `xvwgumawzoqjduvtnlcs` is live and contains only the foundation migration; generated `Database` types are now checked in
 - Product tables (leads, bookings, etc.)
 - Role-based RLS refinement after HQ approves matrix
 - Audit log retention / GDPR handling

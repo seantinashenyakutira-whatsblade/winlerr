@@ -90,10 +90,11 @@ This replaces ad-hoc `{ error }` shapes with a typed, consistent model for futur
   - `createServerClient(config)` — server (Route Handler), anon key, throws on client
   - `createAdminClient(config)` — server-only, service-role, `bypassRls: true`, throws on client
 - **No real Supabase SDK imported** at foundation stage — factories return placeholder that throws `Database not wired` when queried. Will be wired to `@supabase/supabase-js` when Supabase project is configured.
-- **Phase 4 persistence:** `organizations`, `memberships`, `audit_log` tables now defined in migration (with indexes, RLS, policies). Types `OrganizationRow`, `MembershipRow`, `AuditLogRow` in `types.ts` are aligned with SQL. Location `src/types.generated.ts` remains for future generated types.
-- **Conventions:** `organization_id` on every product table, RLS as primary tenant isolation, migrations in `infrastructure/supabase/migrations/`.
+- **Phase 4 persistence:** `organizations`, `memberships`, `audit_log` tables are defined in the migration with indexes, RLS, and policies. The live non-production staging schema was applied in Phase 5.
+- **Generated types:** `packages/database/src/types.generated.ts` is generated from the Winlerr Staging project; `types.ts` derives the public domain aliases from it. Regenerate after each reviewed staging migration.
+- **Conventions:** `organization_id` on every product table, RLS as primary tenant isolation, migrations in `infrastructure/supabase/migrations/`. RLS helper functions live in a private schema and are not exposed as public RPCs.
 
-**What is NOT implemented:** No product tables (leads, bookings, etc.), no real Supabase connection, no prod deployment.
+**What is NOT implemented:** No product tables (leads, bookings, etc.), no production Supabase connection, no live application client wiring, and no production deployment. The staging schema exists only as a non-production foundation.
 
 Tests: `packages/database/src/client.test.ts` (factories, missing config, placeholder query, bypass flag) + `domain.test.ts` (row shapes, `organization_id` convention, migration file exists, RLS conventions) — no credentials required.
 

@@ -15,8 +15,8 @@
 
 ### @winlerr/database — Established (interface → real tables in Phase 4)
 - **Phase 3:** Placeholder factories `createBrowserClient`/`createServerClient`/`createAdminClient` with `bypassRls` flag, no Supabase SDK — **Established**.
-- **Phase 4 extension:** `types.ts` now defines `OrganizationRow`, `MembershipRow`, `AuditLogRow`, `Database` with `public.Tables` — aligned with migration — **Established**. `client.ts` adds `domainTables`/`conventions`/`AuditLogInsert` — **Established**.
-- **Tests:** `client.test.ts` (6) + `domain.test.ts` (8) — PASS, migration file existence verified via `path.resolve(process.cwd(), "../../infrastructure/...")` workaround.
+- **Phase 4 extension:** `types.ts` derives `OrganizationRow`, `MembershipRow`, `AuditLogRow`, and `Database` from `types.generated.ts`, which was generated from the live non-production staging schema — **Established**. `client.ts` adds `domainTables`/`conventions`/`AuditLogInsert` — **Established**.
+- **Tests:** `client.test.ts` (6) + `domain.test.ts` (9) — PASS, migration file existence verified via the existing path-resolution workaround; generated-type aliases typecheck against the repository boundary.
 - **No violation:** Applications still placeholder, no bypass of package, `.env` not tracked.
 
 ### @winlerr/auth — Established
@@ -51,7 +51,7 @@
 - **audit_log:** `id uuid pk`, `organization_id → organizations`, `actor_user_id → auth.users`, `action`, `resource_type`, `resource_id`, `metadata jsonb`, `created_at`, indexes `org/org_created/actor/action` — **Established**
 - **UUIDs:** `gen_random_uuid()` via `pgcrypto` — **Established**
 - **No product tables:** `leads`, `customers`, `bookings`, `conversations`, `messages`, `campaigns`, `products`, `payments`, `subscriptions` — correctly **NOT present** — **Proposal** deferred
-- **Types:** `packages/database/src/types.ts` aligned with SQL — **Established**; `types.generated.ts` location documented for future `supabase gen types` — **Current Plan**
+- **Types:** `packages/database/src/types.generated.ts` is generated from Winlerr Staging and contains only the three foundation tables; `types.ts` derives the public aliases — **Established**.
 
 ## 3. RLS Findings
 
@@ -104,11 +104,11 @@ PostgreSQL (Supabase)
 - Admin client: `createAdminClient` — service-role, `bypassRls:true`, throws on `window` — **Established** (server-only)
 
 **Generated types:**
-- Location `packages/database/src/types.generated.ts` documented — **Current Plan**; manual `OrganizationRow` etc. currently **Established** and aligned with migration; will be replaced by `supabase gen types typescript --local` after first real DB
+- Location `packages/database/src/types.generated.ts` is populated from Winlerr Staging — **Established**; regenerate after each reviewed staging migration and keep it free of credentials.
 
 **Migration workflow:**
 - File `20260824120000_domain_persistence_foundation.sql` committed — **Established**
-- Workflow: `supabase db push` locally → test RLS with `auth.uid()` → PR review → `develop` → staging → production — **Current Plan** documented in `docs/architecture/database-architecture.md`
+- Workflow: review migration → apply to non-production staging → generate types → run runtime checks → PR review → `develop`/staging → production — **Current Plan** documented in `docs/architecture/database-architecture.md`
 
 **Local development workflow:**
 - `supabase` CLI + `infrastructure/supabase/config.toml` (api enabled:54321, placeholder) + `.env` + `pnpm install --frozen-lockfile` + `pnpm lint/typecheck/test/build` — **Current Plan** (CLI not pinned, but `config.toml` exists)
@@ -141,7 +141,7 @@ No silent promotion from Proposal to Established.
 ## 7. Remaining Blockers
 
 - RLS role-based refinement blocked on HQ role matrix — document, don't invent
-- Supabase type generation blocked until real DB exists — manual types are Established but will be replaced
+- Supabase type generation is established from Winlerr Staging; regenerate after reviewed migrations. Production type generation remains deferred until a production project exists.
 - `Result` duplication workaround — fix `tsconfig` `rootDir` or centralize `Result` — minor tech debt, not product blocker
 - `turbo.json` test `outputs: coverage/**` warnings (no coverage files) — cosmetic, not failing
 - CI `pnpm` version now fixed (was `ERR_PNPM_BAD_PM_VERSION` on PR #1/#3 before fix, now PASS on PR #2/#4) — **Established** fix

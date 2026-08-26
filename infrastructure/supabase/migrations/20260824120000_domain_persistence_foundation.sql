@@ -29,7 +29,7 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path = public;
 
 drop trigger if exists organizations_updated_at on public.organizations;
 create trigger organizations_updated_at
@@ -87,9 +87,14 @@ alter table public.audit_log enable row level security;
 -- Membership policies must not query public.memberships directly while RLS is
 -- evaluating public.memberships: PostgreSQL otherwise detects policy recursion.
 -- These SECURITY DEFINER helpers are narrowly scoped, use a fixed search_path,
--- and are executable only by authenticated users.
+-- and live in a non-exposed private schema. Authenticated users may execute
+-- them for policy evaluation, but PostgREST must not expose them as RPCs.
 
-create or replace function public.is_org_member(target_org_id uuid)
+create schema if not exists private;
+revoke all on schema private from public, anon;
+grant usage on schema private to authenticated;
+
+create or replace function private.is_org_member(target_org_id uuid)
 returns boolean
 language sql
 stable
@@ -104,7 +109,7 @@ as $$
   );
 $$;
 
-create or replace function public.is_org_admin_or_owner(target_org_id uuid)
+create or replace function private.is_org_admin_or_owner(target_org_id uuid)
 returns boolean
 language sql
 stable
@@ -120,7 +125,7 @@ as $$
   );
 $$;
 
-create or replace function public.is_org_owner(target_org_id uuid)
+create or replace function private.is_org_owner(target_org_id uuid)
 returns boolean
 language sql
 stable
@@ -135,54 +140,58 @@ as $$
   );
 $$;
 
-revoke all on function public.is_org_member(uuid) from public;
-revoke all on function public.is_org_admin_or_owner(uuid) from public;
-revoke all on function public.is_org_owner(uuid) from public;
-grant execute on function public.is_org_member(uuid) to authenticated;
-grant execute on function public.is_org_admin_or_owner(uuid) to authenticated;
-grant execute on function public.is_org_owner(uuid) to authenticated;
+revoke all on function public.handle_updated_at() from public, anon, authenticated;
+revoke all on function private.is_org_member(uuid) from public, anon;
+revoke all on function private.is_org_admin_or_owner(uuid) from public, anon;
+revoke all on function private.is_org_owner(uuid) from public, anon;
+grant execute on function private.is_org_member(uuid) to authenticated;
+grant execute on function private.is_org_admin_or_owner(uuid) to authenticated;
+grant execute on function private.is_org_owner(uuid) to authenticated;
+drop function if exists public.is_org_member(uuid);
+drop function if exists public.is_org_admin_or_owner(uuid);
+drop function if exists public.is_org_owner(uuid);
 
 -- Organizations: members can read their organizations; authenticated callers can create organizations they own
 drop policy if exists "organizations_select_member" on public.organizations;
 create policy "organizations_select_member" on public.organizations
-  for select using (public.is_org_member(id));
+  for select to authenticated using (private.is_org_member(id));
 
 drop policy if exists "organizations_insert_authenticated" on public.organizations;
 create policy "organizations_insert_authenticated" on public.organizations
-  for insert with check (
+  for insert to authenticated with check (
     auth.role() = 'authenticated'
     and owner_user_id = auth.uid()
   );
 
 drop policy if exists "organizations_update_member" on public.organizations;
 create policy "organizations_update_member" on public.organizations
-  for update using (public.is_org_member(id))
-  with check (public.is_org_member(id));
+  for update to authenticated using (private.is_org_member(id))
+  with check (private.is_org_member(id));
 
 -- Memberships: user can read their own memberships; members can read org memberships
 drop policy if exists "memberships_select_own" on public.memberships;
 create policy "memberships_select_own" on public.memberships
-  for select using (
+  for select to authenticated using (
     user_id = auth.uid()
-    or public.is_org_member(organization_id)
+    or private.is_org_member(organization_id)
   );
 
 drop policy if exists "memberships_insert_self" on public.memberships;
 create policy "memberships_insert_self_or_admin" on public.memberships
-  for insert with check (
-    public.is_org_owner(organization_id)
-    or public.is_org_admin_or_owner(organization_id)
+  for insert to authenticated with check (
+    private.is_org_owner(organization_id)
+    or private.is_org_admin_or_owner(organization_id)
   );
 
 -- Audit log: members can read org audit; members can insert audit for their org
 drop policy if exists "audit_log_select_member" on public.audit_log;
 create policy "audit_log_select_member" on public.audit_log
-  for select using (public.is_org_member(organization_id));
+  for select to authenticated using (private.is_org_member(organization_id));
 
 drop policy if exists "audit_log_insert_member" on public.audit_log;
 create policy "audit_log_insert_member" on public.audit_log
-  for insert with check (
-    public.is_org_member(organization_id)
+  for insert to authenticated with check (
+    private.is_org_member(organization_id)
     and (actor_user_id is null or actor_user_id = auth.uid())
   );
 

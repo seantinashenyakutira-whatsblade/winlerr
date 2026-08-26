@@ -43,7 +43,7 @@
 
 - Role-based RLS refinement (blocked on HQ role matrix); current helpers provide membership isolation only.
 - OAuth provider secrets
-- Production Supabase project (no real DB yet)
+- Production Supabase project (staging exists; production remains unconfigured)
 - Deployment secrets (Vercel/Cloudflare)
 
 These are documented as blockers, not claimed as established.
@@ -51,6 +51,7 @@ These are documented as blockers, not claimed as established.
 ## 8. Verification
 
 - `pnpm lint/typecheck/test/build` all pass without credentials.
+- The non-production Winlerr Staging project has the foundation migration applied and contains only `organizations`, `memberships`, and `audit_log`; runtime RLS checks are recorded in the Phase 5 staging report.
 - `git diff` shows no secrets; `git check-ignore .env` passes.
 - Tests verify admin client cannot execute on client context and audit insert requires `organization_id`.
 

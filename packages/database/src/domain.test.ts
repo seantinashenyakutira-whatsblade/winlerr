@@ -110,12 +110,15 @@ describe("database/domain", () => {
       "infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql"
     );
     const sql = fs.readFileSync(fs.existsSync(p) ? p : alt, "utf8");
-    expect(sql).toContain("create or replace function public.is_org_member");
-    expect(sql).toContain("create or replace function public.is_org_owner");
+    expect(sql).toContain("create or replace function private.is_org_member");
+    expect(sql).toContain("create or replace function private.is_org_owner");
     expect(sql).toContain("security definer");
     expect(sql).toContain("set search_path = public");
+    expect(sql).toContain("$$ language plpgsql set search_path = public;");
+    expect(sql).toContain("revoke all on function private.is_org_member(uuid) from public, anon;");
+    expect(sql).toContain("revoke all on function private.is_org_owner(uuid) from public, anon;");
     expect(sql).toContain("owner_user_id = auth.uid()");
-    expect(sql).toContain("public.is_org_admin_or_owner(organization_id)");
+    expect(sql).toContain("private.is_org_admin_or_owner(organization_id)");
     expect(sql).toContain("create policy \"memberships_insert_self_or_admin\"");
     expect(sql).not.toContain(
       "organization_id in (select organization_id from public.memberships where user_id = auth.uid())"
@@ -123,5 +126,35 @@ describe("database/domain", () => {
     expect(sql).not.toContain(
       "create policy \"memberships_insert_self\""
     );
+
+    const hardeningPath = path.resolve(
+      process.cwd(),
+      "../../infrastructure/supabase/migrations/20260826101500_staging_security_hardening.sql"
+    );
+    const hardeningAlt = path.resolve(
+      "infrastructure/supabase/migrations/20260826101500_staging_security_hardening.sql"
+    );
+    const hardening = fs.readFileSync(
+      fs.existsSync(hardeningPath) ? hardeningPath : hardeningAlt,
+      "utf8"
+    );
+    expect(hardening).toContain("create schema if not exists private");
+    expect(hardening).toContain("alter function public.handle_updated_at()");
+    expect(hardening).toContain("revoke all on function private.is_org_member(uuid)");
+    expect(hardening).toContain("drop function if exists public.is_org_member(uuid)");
+
+    const policyScopePath = path.resolve(
+      process.cwd(),
+      "../../infrastructure/supabase/migrations/20260826102000_staging_policy_scope.sql"
+    );
+    const policyScopeAlt = path.resolve(
+      "infrastructure/supabase/migrations/20260826102000_staging_policy_scope.sql"
+    );
+    const policyScope = fs.readFileSync(
+      fs.existsSync(policyScopePath) ? policyScopePath : policyScopeAlt,
+      "utf8"
+    );
+    expect(policyScope).toContain("alter policy organizations_select_member");
+    expect(policyScope).toContain("to authenticated");
   });
 });

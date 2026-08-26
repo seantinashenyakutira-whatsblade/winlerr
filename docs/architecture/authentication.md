@@ -33,7 +33,7 @@ Session { user, organizationId, membership }
 ## 4. Authorization Boundaries
 
 - **Route Handler / Service:** `hasPermission(membership, permission)` before DB call.
-- **Database:** `organization_id` filter + RLS through `is_org_member`/`is_org_admin_or_owner`/`is_org_owner` helpers with `auth.uid()`; membership writes are owner/admin-controlled.
+- **Database:** `organization_id` filter + RLS through private-schema `is_org_member`/`is_org_admin_or_owner`/`is_org_owner` helpers with `auth.uid()`; membership writes are owner/admin-controlled.
 - **Service-role:** `createAdminClient` is server-only, bypasses RLS — never on client.
 
 ## 5. What Is NOT Implemented
@@ -41,7 +41,7 @@ Session { user, organizationId, membership }
 - OAuth providers (Google/Apple/etc.) — HQ decision
 - Final role/permission matrix — HQ decision
 - Signup/login pages, role-management UI
-- Supabase production users or real sessions
+- Supabase production users or real sessions; staging email/password test identities remain owner-controlled
 
 ## 6. Open HQ Decisions (Preserved)
 
