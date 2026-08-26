@@ -14,6 +14,10 @@ ADRs capture significant architectural choices with context, options, decision, 
 | # | Title | Status | Date |
 |---|-------|--------|------|
 | 0001 | [Monorepo](0001-monorepo.md) | Established Decision | 2026-08-21 |
+| 0002 | [Modular Monolith](0002-modular-monolith.md) | Established Decision | 2026-08-21 |
+| 0003 | [Supabase / PostgreSQL](0003-supabase-postgresql.md) | Established Decision | 2026-08-21 |
+| 0004 | [Authentication Model](0004-authentication-model.md) | Current Plan | 2026-08-21 |
+| 0005 | [Environment Strategy](0005-environment-strategy.md) | Established Decision | 2026-08-21 |
 
 ## Adding a Decision
 
