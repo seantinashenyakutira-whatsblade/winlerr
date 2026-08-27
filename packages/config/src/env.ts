@@ -15,9 +15,7 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
 // Server-only variables — must never be bundled to client
@@ -40,13 +38,65 @@ export type ServerConfig = z.infer<typeof serverEnvSchema>;
 
 export type EnvSchema = typeof serverEnvSchema;
 
+export type SupabasePublicConfig = {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+};
+
+export type SupabaseServerConfig = SupabasePublicConfig & {
+  serviceRoleKey: string;
+};
+
+function requireNonEmpty(values: Record<string, string | undefined>, scope: string): void {
+  const missing = Object.entries(values)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+  if (missing.length > 0) {
+    throw new Error(`${scope} configuration missing: ${missing.join(", ")}`);
+  }
+}
+
+/** Require the public Supabase values for an actual browser/server runtime. */
+export function requireSupabasePublicConfig(config: PublicConfig): SupabasePublicConfig {
+  requireNonEmpty(
+    {
+      NEXT_PUBLIC_SUPABASE_URL: config.NEXT_PUBLIC_SUPABASE_URL,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: config.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    },
+    "Supabase public"
+  );
+  return {
+    supabaseUrl: config.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseAnonKey: config.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  };
+}
+
+/** Require the public values plus the server-only service-role key. */
+export function requireSupabaseServerConfig(config: ServerConfig): SupabaseServerConfig {
+  const publicConfig = requireSupabasePublicConfig(config);
+  requireNonEmpty(
+    { SUPABASE_SERVICE_ROLE_KEY: config.SUPABASE_SERVICE_ROLE_KEY },
+    "Supabase server"
+  );
+  return {
+    ...publicConfig,
+    serviceRoleKey: config.SUPABASE_SERVICE_ROLE_KEY!,
+  };
+}
+
+export function loadRequiredSupabasePublicConfig(): SupabasePublicConfig {
+  return requireSupabasePublicConfig(loadPublicConfig());
+}
+
+export function loadRequiredSupabaseServerConfig(): SupabaseServerConfig {
+  return requireSupabaseServerConfig(loadServerConfig());
+}
+
 /**
  * Parse public env — does not require server secrets.
  * Throws ZodError with clear message if validation fails.
  */
-export function parsePublicEnv(
-  env: Record<string, string | undefined>
-): PublicConfig {
+export function parsePublicEnv(env: Record<string, string | undefined>): PublicConfig {
   return publicEnvSchema.parse(env);
 }
 
@@ -55,9 +105,7 @@ export function parsePublicEnv(
  * Throws if required server vars are invalid.
  * All server vars are optional at foundation stage to allow placeholder dev.
  */
-export function parseServerEnv(
-  env: Record<string, string | undefined>
-): ServerConfig {
+export function parseServerEnv(env: Record<string, string | undefined>): ServerConfig {
   return serverEnvSchema.parse(env);
 }
 
@@ -93,14 +141,10 @@ export function loadServerConfig(): ServerConfig {
  * Redact secrets for logging — never log raw values.
  * Any key containing KEY, SECRET, TOKEN, PASSWORD is redacted.
  */
-export function redactConfig(
-  config: Record<string, unknown>
-): Record<string, string> {
+export function redactConfig(config: Record<string, unknown>): Record<string, string> {
   const redacted: Record<string, string> = {};
   for (const [key, value] of Object.entries(config)) {
-    const isSecret =
-      /KEY|SECRET|TOKEN|PASSWORD/i.test(key) ||
-      key === "DATABASE_URL";
+    const isSecret = /KEY|SECRET|TOKEN|PASSWORD/i.test(key) || key === "DATABASE_URL";
     if (isSecret) {
       redacted[key] = value ? "[REDACTED]" : "[EMPTY]";
     } else {

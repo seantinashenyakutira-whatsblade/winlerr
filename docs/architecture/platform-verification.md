@@ -1,45 +1,53 @@
 # Platform Foundation Verification & Supabase Readiness — Winlerr
 
-- **Status:** Verification (Phase 5) — Established vs Current Plan explicitly labeled
-- **Date:** 2026-08-24
-- **Candidate branch:** `chore/foundation-reconciliation` (reconciled from PR #5’s `feature/platform-verification`, originally from `develop` 275d221)
+- **Status:** Verification (Phase 6) — Established vs Current Plan explicitly labeled
+- **Date:** 2026-08-27
+- **Candidate branch:** `feature/staging-auth-runtime` (based on `feature/staging-supabase-foundation` at `57a4c0e`)
 - **Audited branches:** `feature/platform-contracts` (a803b8b) and `feature/domain-persistence-foundation` (553007d)
 - **Related:** `docs/architecture/platform-contracts.md`, `docs/architecture/database-architecture.md`, `packages/*`, `infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql`
 
 ## 1. Verified Platform Contracts
 
 ### @winlerr/config — Established (with minor doc inaccuracy)
+
 - **Implements:** Zod validation, public (`NEXT_PUBLIC_*`) vs server-only split, `loadPublicConfig` safe on client, `loadServerConfig` throws on `window`, `PublicConfig`/`ServerConfig` typed, `redactConfig` redacts `KEY/SECRET/TOKEN/PASSWORD/DATABASE_URL`.
 - **Tests:** `env.test.ts` (8) + `result.test.ts` (7) — PASS, no secrets.
 - **Finding:** Docs in `platform-contracts.md` §3 claim `@winlerr/ai` and `@winlerr/integrations` depend on `@winlerr/config` for `Result` — implementation now uses **local `Result` duplication** to avoid `TS6059 rootDir` error (see §5). This is a **documentation inaccuracy** — not a security violation, but should be corrected to "Result is duplicated locally as workaround; recommend fixing tsconfig `rootDir` or moving Result to shared low-level package."
 
-### @winlerr/database — Established (interface → real tables in Phase 4)
-- **Phase 3:** Placeholder factories `createBrowserClient`/`createServerClient`/`createAdminClient` with `bypassRls` flag, no Supabase SDK — **Established**.
-- **Phase 4 extension:** `types.ts` derives `OrganizationRow`, `MembershipRow`, `AuditLogRow`, and `Database` from `types.generated.ts`, which was generated from the live non-production staging schema — **Established**. `client.ts` adds `domainTables`/`conventions`/`AuditLogInsert` — **Established**.
-- **Tests:** `client.test.ts` (6) + `domain.test.ts` (9) — PASS, migration file existence verified via the existing path-resolution workaround; generated-type aliases typecheck against the repository boundary.
-- **No violation:** Applications still placeholder, no bypass of package, `.env` not tracked.
+### @winlerr/database — Established (real staging runtime in Phase 6)
+
+- **Phase 6:** `createBrowserClient`/`createServerClient`/`createAdminClient` use `@supabase/supabase-js` and `@supabase/ssr` behind the package boundary, with generated `Database` types, request access-token support, SSR cookie bridge, RLS marker, and server-only admin guard — **Established**.
+- **Phase 4 extension:** `types.ts` derives `OrganizationRow`, `MembershipRow`, `AuditLogRow`, and `Database` from `types.generated.ts`, generated from the live non-production staging schema — **Established**. `client.ts` adds `domainTables`/`conventions`/`AuditLogInsert` — **Established**.
+- **Tests:** `client.test.ts` (7) + `domain.test.ts` (9) — PASS, including a real SDK typed query mock, request Authorization header, and client-only admin guard.
+- **No violation:** Applications do not scatter SDK access, `.env` is not tracked, and no production key was used.
 
 ### @winlerr/auth — Established
+
 - **Implements:** `User`, `Organization`, `Membership`, `Role` (`owner|admin|member|viewer`), `Permission`, `Session` + pure guards `hasPermission`/`isMember`/`getMembership`/`hasRoleAtLeast`/`requireOrganizationId` — **Established**.
-- **Tests:** `guards.test.ts` (6) — PASS.
-- **Not implemented (correctly):** OAuth, role-management UI, Supabase users — **Current Plan** deferred, placeholder `ROLE_PERMISSIONS` is illustrative, not frozen — correctly labeled.
+- **Phase 6 runtime:** `resolveAuthContext`, `resolveMembership`, and `requireAuthContext` validate Supabase sessions/users and resolve only an explicitly requested organization membership through the injected database client — **Established for staging review**.
+- **Tests:** `guards.test.ts` (6) + `runtime.test.ts` (6) — PASS.
+- **Not implemented (correctly):** OAuth, role-management UI, production users, product authorization matrix — **Current Plan**; the `ROLE_PERMISSIONS` map remains illustrative.
 
 ### @winlerr/ai — Established
+
 - **Implements:** Provider-agnostic `AiRequest`/`AiResponse`/`ToolDefinition`/`ToolCall`/`TokenUsage`/`AiError`, `AiClient` with `validate` (pure) + placeholder `chat` throwing `not wired` — **Established**.
 - **Tests:** `client.test.ts` (6) — PASS.
 - **Finding:** Docs say depends on `@winlerr/config` for `Result` — actually local `Result` duplicated (see config finding). Same correction needed.
 - **Not built (correct):** Agent orchestration, memory, MCP, vector DB, RAG — **Proposal** deferred, n8n remains R&D.
 
 ### @winlerr/integrations — Established
+
 - **Implements:** `IntegrationProvider`, `IntegrationError`, `IntegrationAdapter`, `WebhookEvent`/`WebhookVerification`, example adapter `createExampleAdapter` (validateConfig, mock execute) — **Established**.
 - **Tests:** `adapter.test.ts` (5) — PASS, no external calls.
 - **Same doc inaccuracy:** Depends on `@winlerr/config` claim vs local `Result`.
 
 ### @winlerr/automation / @winlerr/notifications — Deferred — Proposal
+
 - Both remain placeholders with comments explaining n8n as R&D and no validated channel — correctly **Deferred**, not empty scaffolding — **Proposal**.
 
 ### Dependency Direction — Established
-- Documented: `apps/services → @winlerr/* → @winlerr/config` (lowest). Implementation respects it: `database` has no upward dep, `auth` pure, `config` lowest, `ai`/`integrations` now independent (local Result) but still not circular. No `apps → raw Supabase` bypass — apps are placeholders.
+
+- Documented: `apps/services → @winlerr/* → @winlerr/config` (lowest). Implementation respects it: Supabase SDK construction is confined to `@winlerr/database`; `@winlerr/auth` consumes an injected structural database client and does not construct a second SDK. No `apps → raw Supabase` bypass — apps remain placeholders.
 - **Finding:** Duplicated `Result` abstraction is a minor duplication to avoid TS `rootDir` error — recommend fixing `tsconfig.json` `rootDir` removal or centralizing Result in `@winlerr/config` and fixing `rootDir` to allow cross-package imports.
 
 ## 2. Verified Database Foundation
@@ -81,7 +89,7 @@ No security enforcement is claimed beyond implementation — labels correct.
 
 ## 5. Supabase Readiness Assessment
 
-**Ready for SDK integration (contract-only verification, no prod connection) — Current Plan**
+**Staging SDK and authenticated RLS integration verified; production remains unconfigured — Established for owner review**
 
 Future integration boundary:
 
@@ -94,32 +102,39 @@ PostgreSQL (Supabase)
 ```
 
 **Required env vars (already in `@winlerr/config`):**
-- Browser: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- Server: `SUPABASE_SERVICE_ROLE_KEY` (server-only), `DATABASE_URL` (optional direct)
-- All optional at foundation stage — **Current Plan** to allow placeholder dev; will become required when first product ships
+
+- Browser/server runtime: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Fixture administration only: `SUPABASE_SERVICE_ROLE_KEY` or equivalent approved staging admin channel, server-only
+- `DATABASE_URL` remains optional direct access
+- Foundation parsing remains optional for placeholder tooling; `requireSupabasePublicConfig` and `requireSupabaseServerConfig` fail clearly when actual runtime configuration is incomplete
 
 **Server/client boundaries:**
-- Browser client: `createBrowserClient({ supabaseUrl, supabaseAnonKey })` — anon key, RLS enforced — **Established** (placeholder)
-- Server client: `createServerClient` — anon key + cookies (Supabase Auth), throws on `window` — **Established** (placeholder)
-- Admin client: `createAdminClient` — service-role, `bypassRls:true`, throws on `window` — **Established** (server-only)
+
+- Browser client: `createBrowserClient({ supabaseUrl, supabaseKey })` — publishable/anon key, RLS enforced — **Established**
+- Server client: `createServerClient` — publishable/anon key plus optional request token/cookie bridge, throws on `window` — **Established**
+- Admin client: `createAdminClient` — service-role, `bypassRls:true`, throws on `window`, fixture boundary only in Phase 6 — **Established** (server-only)
 
 **Generated types:**
+
 - Location `packages/database/src/types.generated.ts` is populated from Winlerr Staging — **Established**; regenerate after each reviewed staging migration and keep it free of credentials.
 
 **Migration workflow:**
+
 - File `20260824120000_domain_persistence_foundation.sql` committed — **Established**
 - Workflow: review migration → apply to non-production staging → generate types → run runtime checks → PR review → `develop`/staging → production — **Current Plan** documented in `docs/architecture/database-architecture.md`
 
 **Local development workflow:**
+
 - `supabase` CLI + `infrastructure/supabase/config.toml` (api enabled:54321, placeholder) + `.env` + `pnpm install --frozen-lockfile` + `pnpm lint/typecheck/test/build` — **Current Plan** (CLI not pinned, but `config.toml` exists)
-- Testing strategy: deterministic unit/contract tests without real Supabase (`client.test.ts`, `domain.test.ts`) — **Established**; integration tests requiring credentials explicitly not added — **Proposal** deferred
+- Testing strategy: deterministic unit/contract tests plus `scripts/phase6-staging-auth.integration.test.ts`, which uses disposable real Auth sessions and publishable-key clients to verify tenant isolation, membership writes, audit actor scope, and cleanup — **Established for staging review**
 
 **What is NOT ready / not created:**
-- No `@supabase/supabase-js` installed yet — **Current Plan** (install when first product needs DB)
-- No production Supabase project, no OAuth credentials, no third-party secrets — **Proposal** deferred, never committed
-- No deployment (Vercel/Supabase/Cloudflare) — **Proposal** deferred
 
-**Verdict:** Contracts are hard enough to wire Supabase SDK behind `@winlerr/database` without architectural rework — **READY for SDK integration** once HQ approves role matrix and first product priority.
+- No production Supabase project or production secrets — **Current Plan**, intentionally not touched
+- No OAuth credentials, third-party secrets, deployment, product tables, or product endpoints — **Proposal** deferred
+- Framework-specific route/cookie integration remains deferred until an application framework is introduced
+
+**Verdict:** The non-production staging SDK, Auth session path, membership resolution, RLS isolation, role-bound membership writes, audit actor constraints, and deterministic fixture cleanup were observed passing. The Phase 6 foundation is **READY FOR OWNER REVIEW**; production and product enablement remain blocked on the preserved HQ decisions.
 
 ## 6. Unresolved HQ Decisions (Preserved)
 
@@ -132,6 +147,7 @@ All remain **not Established**:
 5. First product priority — Proposal, no product choice
 
 Also preserved:
+
 - Automation beyond n8n = **Deferred** (Proposal)
 - Notification channel = **Deferred** (Proposal)
 - Product tables = **Deferred** (Current Plan)

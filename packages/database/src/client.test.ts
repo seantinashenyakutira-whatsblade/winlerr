@@ -1,9 +1,5 @@
-import { describe, it, expect } from "vitest";
-import {
-  createBrowserClient,
-  createServerClient,
-  createAdminClient,
-} from "./client.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createAdminClient, createBrowserClient, createServerClient } from "./client.js";
 
 const cfg = {
   supabaseUrl: "https://example.supabase.co",
@@ -15,43 +11,92 @@ const adminCfg = {
   supabaseKey: "service-role-key",
 };
 
+const originalFetch = globalThis.fetch;
+
+afterEach(() => {
+  globalThis.fetch = originalFetch;
+  vi.restoreAllMocks();
+});
+
 describe("database/client", () => {
-  it("creates browser client without bypassing RLS", () => {
+  it("creates a browser client without bypassing RLS", () => {
     const client = createBrowserClient(cfg);
     expect(client.bypassRls).toBe(false);
     expect(typeof client.from).toBe("function");
+    expect(typeof client.auth.getSession).toBe("function");
   });
 
-  it("creates server client on server", () => {
+  it("creates a server client without bypassing RLS", () => {
     const client = createServerClient(cfg);
     expect(client.bypassRls).toBe(false);
   });
 
-  it("creates admin client that bypasses RLS on server", () => {
+  it("creates an admin client that bypasses RLS on the server", () => {
     const client = createAdminClient(adminCfg);
     expect(client.bypassRls).toBe(true);
   });
 
-  it("throws if config missing", () => {
-    expect(() =>
-      createBrowserClient({ supabaseUrl: "", supabaseKey: "" })
-    ).toThrow(/required/);
-    expect(() =>
-      createServerClient({ supabaseUrl: "", supabaseKey: "k" })
-    ).toThrow(/required/);
+  it("rejects missing or malformed configuration", () => {
+    expect(() => createBrowserClient({ supabaseUrl: "", supabaseKey: "" })).toThrow(/required/);
+    expect(() => createServerClient({ supabaseUrl: "not-a-url", supabaseKey: "k" })).toThrow(
+      /valid URL/
+    );
   });
 
-  it("placeholder from() throws when queried (not yet wired)", async () => {
-    const client = createBrowserClient(cfg);
-    await expect(client.from("test").select()).rejects.toThrow(/placeholder/);
+  it("executes a typed foundation query through the real SDK adapter", async () => {
+    const fetchMock = vi.fn<typeof fetch>(
+      async () =>
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        })
+    );
+    globalThis.fetch = fetchMock;
+
+    const client = createServerClient(cfg);
+    const result = await client.from("organizations").select("id");
+
+    expect(result.error).toBeNull();
+    expect(result.data).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain("/rest/v1/organizations");
   });
 
-  it("from returns query builder shape", () => {
-    const client = createBrowserClient(cfg);
-    const builder = client.from("organizations");
-    expect(typeof builder.select).toBe("function");
-    expect(typeof builder.insert).toBe("function");
-    expect(typeof builder.update).toBe("function");
-    expect(typeof builder.delete).toBe("function");
+  it("adds a request access token only to a non-admin server client", async () => {
+    const fetchMock = vi.fn<typeof fetch>(
+      async () =>
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        })
+    );
+    globalThis.fetch = fetchMock;
+
+    const client = createServerClient({ ...cfg, accessToken: "token-in-memory" });
+    await client.from("organizations").select("id");
+
+    const request = fetchMock.mock.calls[0]?.[1] as RequestInit | undefined;
+    const headers = new Headers(request?.headers);
+    expect(headers.get("Authorization")).toBe("Bearer token-in-memory");
+  });
+
+  it("protects the admin factory from client execution", () => {
+    const originalWindow = (globalThis as { window?: unknown }).window;
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {},
+    });
+    try {
+      expect(() => createAdminClient(adminCfg)).toThrow(/must not be called/);
+    } finally {
+      if (originalWindow === undefined) {
+        Reflect.deleteProperty(globalThis, "window");
+      } else {
+        Object.defineProperty(globalThis, "window", {
+          configurable: true,
+          value: originalWindow,
+        });
+      }
+    }
   });
 });

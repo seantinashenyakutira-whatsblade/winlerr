@@ -1,8 +1,8 @@
 # Database Architecture — Winlerr
 
-- **Status:** Current Plan (initial migration shipped as placeholder, RLS minimal, HQ decisions open)
-- **Date:** 2026-08-24
-- **Candidate branch:** `chore/foundation-reconciliation` (reconciled from PR #4’s `feature/domain-persistence-foundation`, originally stacked on `feature/platform-contracts` a803b8b)
+- **Status:** Established for reviewed staging runtime; RLS remains membership-based and HQ decisions remain open
+- **Date:** 2026-08-27
+- **Candidate branch:** `feature/staging-auth-runtime` (based on `feature/staging-supabase-foundation` at `57a4c0e`)
 - **Related:** `packages/database`, `infrastructure/supabase/migrations/20260824120000_domain_persistence_foundation.sql`, `docs/architecture/platform-contracts.md`
 
 ## 1. Platform
@@ -29,18 +29,18 @@ Audit Log  (organization-scoped events)
 
 **Initial tables (migration 20260824120000):**
 
-| Table | Purpose | Key |
-|-------|---------|-----|
-| `organizations` | Tenant | `id uuid pk`, `name`, `slug unique`, `owner_user_id → auth.users`, `created_at`, `updated_at` |
-| `memberships` | Org membership + role | `user_id → auth.users`, `organization_id → organizations`, `role check (owner/admin/member/viewer)`, PK `(user_id, organization_id)` |
-| `audit_log` | Org-scoped events | `id uuid pk`, `organization_id → organizations`, `actor_user_id → auth.users`, `action`, `resource_type`, `resource_id`, `metadata jsonb`, `created_at` |
+| Table           | Purpose               | Key                                                                                                                                                     |
+| --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `organizations` | Tenant                | `id uuid pk`, `name`, `slug unique`, `owner_user_id → auth.users`, `created_at`, `updated_at`                                                           |
+| `memberships`   | Org membership + role | `user_id → auth.users`, `organization_id → organizations`, `role check (owner/admin/member/viewer)`, PK `(user_id, organization_id)`                    |
+| `audit_log`     | Org-scoped events     | `id uuid pk`, `organization_id → organizations`, `actor_user_id → auth.users`, `action`, `resource_type`, `resource_id`, `metadata jsonb`, `created_at` |
 
 **Not created (future product phases):**
 `leads`, `bookings`, `customers`, `conversations`, `messages`, `campaigns`, `products`, `payments`, `subscriptions` — explicitly deferred.
 
 ## 3. Multi-Tenancy
 
-- **Every organization-scoped record has `organization_id uuid not null`** — except `organizations` itself (it *is* the tenant). This is the tenant isolation column.
+- **Every organization-scoped record has `organization_id uuid not null`** — except `organizations` itself (it _is_ the tenant). This is the tenant isolation column.
 - **Application scoping:** All queries must include `organization_id` filter (defense-in-depth via `conventions.tenantColumn`).
 - **RLS is primary:** Row Level Security policies enforce tenant isolation at the DB layer, not just in app code.
 
@@ -61,6 +61,7 @@ RLS is enabled on all three tables. Policies are **membership-based only**, not 
 - `audit_log`: `select/insert` through `is_org_member(organization_id)` with `actor_user_id = auth.uid()` (or null).
 
 **What is NOT implemented as RLS yet (blocked):**
+
 - Role-based write restrictions beyond membership existence (requires final role matrix)
 - Organization creation quotas, slug validation beyond uniqueness
 - Audit log retention / partitioning
@@ -69,10 +70,11 @@ These are documented as blockers, not invented.
 
 ## 5. Server-Side Access & Boundaries
 
-- **Browser:** `createBrowserClient({ supabaseUrl, supabaseAnonKey })` — anon key, RLS enforced.
-- **Server:** `createServerClient(config)` — anon key + cookies, throws on client.
-- **Admin:** `createAdminClient({ supabaseUrl, serviceRoleKey })` — **server-only**, `bypassRls: true`, throws on `window`. Never expose to client bundles.
-- Applications must import via `@winlerr/database`, not scatter `supabase-js` clients.
+- **Browser:** `createBrowserClient({ supabaseUrl, supabaseKey })` uses the publishable/anon key and enforces RLS.
+- **Server:** `createServerClient(config)` uses the publishable/anon key, supports a request access token or framework-neutral cookie bridge, and throws on client execution.
+- **Admin:** `createAdminClient({ supabaseUrl, supabaseKey })` is **server-only**, `bypassRls: true`, and is permitted in Phase 6 only for the approved staging fixture setup/cleanup path. It is never used as the subject of runtime authorization assertions.
+- Applications must import via `@winlerr/database`; only that package imports `@supabase/supabase-js`/`@supabase/ssr`.
+- `@winlerr/auth` resolves the current user with `auth.getUser()` and the explicitly requested membership through the RLS-backed client; it never guesses an organization.
 
 ## 6. Migration Discipline
 
@@ -95,7 +97,8 @@ These are documented as blockers, not invented.
 ## 9. What Remains Future Work
 
 - Production Supabase project wiring; the current cloud project is explicitly non-production staging
-- Staging Supabase project `xvwgumawzoqjduvtnlcs` is live and contains only the foundation migration; generated `Database` types are now checked in
-- Product tables (leads, bookings, etc.)
-- Role-based RLS refinement after HQ approves matrix
+- Product tables (leads, bookings, etc.) and all product endpoints/UI
+- Role-based RLS refinement after HQ approves the final matrix
 - Audit log retention / GDPR handling
+- Framework-specific cookie adapters and application route integration
+- A durable deployment-secret setup for production; Phase 6 used no production credentials

@@ -4,6 +4,8 @@ import {
   parseServerEnv,
   redactConfig,
   isServer,
+  requireSupabasePublicConfig,
+  requireSupabaseServerConfig,
 } from "./env.js";
 
 describe("config/env", () => {
@@ -29,10 +31,43 @@ describe("config/env", () => {
     expect(parsed.OPENAI_API_KEY).toBeUndefined();
   });
 
+  it("requires public Supabase runtime values", () => {
+    expect(() => requireSupabasePublicConfig(parsePublicEnv({}))).toThrow(
+      /NEXT_PUBLIC_SUPABASE_URL.*NEXT_PUBLIC_SUPABASE_ANON_KEY/
+    );
+    expect(
+      requireSupabasePublicConfig(
+        parsePublicEnv({
+          NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "publishable-key",
+        })
+      )
+    ).toEqual({
+      supabaseUrl: "https://example.supabase.co",
+      supabaseAnonKey: "publishable-key",
+    });
+  });
+
+  it("requires server-only service-role configuration separately", () => {
+    const publicConfig = parseServerEnv({
+      NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "publishable-key",
+    });
+    expect(() => requireSupabaseServerConfig(publicConfig)).toThrow(/SUPABASE_SERVICE_ROLE_KEY/);
+    expect(
+      requireSupabaseServerConfig({
+        ...publicConfig,
+        SUPABASE_SERVICE_ROLE_KEY: "service-role-key",
+      })
+    ).toMatchObject({
+      supabaseUrl: "https://example.supabase.co",
+      supabaseAnonKey: "publishable-key",
+      serviceRoleKey: "service-role-key",
+    });
+  });
+
   it("rejects invalid URL", () => {
-    expect(() =>
-      parsePublicEnv({ NEXT_PUBLIC_APP_URL: "not-a-url" })
-    ).toThrow();
+    expect(() => parsePublicEnv({ NEXT_PUBLIC_APP_URL: "not-a-url" })).toThrow();
   });
 
   it("parses server env with secrets", () => {

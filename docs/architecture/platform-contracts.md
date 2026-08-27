@@ -14,16 +14,16 @@ This PR does **not** implement a Winlerr product. It establishes reusable bounda
 
 ## 2. Package Boundaries
 
-| Package | Import | Purpose | Status |
-|---------|--------|---------|--------|
-| `@winlerr/config` | `packages/config` | Runtime env validation + shared Result/Error convention + build presets | **Established** |
-| `@winlerr/database` | `packages/database` | Supabase/PostgreSQL boundary, typed client factories, server/client separation | **Established** (interface only, no real tables) |
-| `@winlerr/auth` | `packages/auth` | AuthN vs AuthZ types + pure guards (User/Org/Membership/Role/Permission) | **Established** |
-| `@winlerr/ai` | `packages/ai` | Provider-agnostic AI interface (request/response/tools/usage) | **Established** |
-| `@winlerr/integrations` | `packages/integrations` | Provider-independent integration adapter convention + webhook concepts | **Established** |
-| `@winlerr/automation` | `packages/automation` | Workflow primitives | **Deferred — Proposal** (n8n remains R&D) |
-| `@winlerr/notifications` | `packages/notifications` | Multi-channel notifications | **Deferred — Proposal** (no validated channel yet) |
-| `@winlerr/ui` | `packages/ui` | Shared UI components | **Placeholder** (not in Phase 3 scope) |
+| Package                  | Import                   | Purpose                                                                        | Status                                             |
+| ------------------------ | ------------------------ | ------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `@winlerr/config`        | `packages/config`        | Runtime env validation + shared Result/Error convention + build presets        | **Established**                                    |
+| `@winlerr/database`      | `packages/database`      | Supabase/PostgreSQL boundary, typed client factories, server/client separation | **Established** (interface only, no real tables)   |
+| `@winlerr/auth`          | `packages/auth`          | AuthN vs AuthZ types + pure guards (User/Org/Membership/Role/Permission)       | **Established**                                    |
+| `@winlerr/ai`            | `packages/ai`            | Provider-agnostic AI interface (request/response/tools/usage)                  | **Established**                                    |
+| `@winlerr/integrations`  | `packages/integrations`  | Provider-independent integration adapter convention + webhook concepts         | **Established**                                    |
+| `@winlerr/automation`    | `packages/automation`    | Workflow primitives                                                            | **Deferred — Proposal** (n8n remains R&D)          |
+| `@winlerr/notifications` | `packages/notifications` | Multi-channel notifications                                                    | **Deferred — Proposal** (no validated channel yet) |
+| `@winlerr/ui`            | `packages/ui`            | Shared UI components                                                           | **Placeholder** (not in Phase 3 scope)             |
 
 ## 3. Dependency Direction
 
@@ -38,6 +38,7 @@ services/* ──→  @winlerr/*
 ```
 
 **Rules:**
+
 - `apps/services` may depend on `packages/*`, never the reverse.
 - `packages/*` must not import from `apps/*` or `services/*`.
 - No circular dependencies.
@@ -72,8 +73,21 @@ Shared convention for application/service results:
 
 ```ts
 type Result<T, E = AppError> = { ok: true; data: T } | { ok: false; error: E };
-interface AppError { code: ErrorCode; message: string; details?: unknown; status?: number; }
-type ErrorCode = "VALIDATION_ERROR" | "AUTHENTICATION_ERROR" | "AUTHORIZATION_ERROR" | "NOT_FOUND" | "CONFLICT" | "RATE_LIMITED" | "EXTERNAL_SERVICE_ERROR" | "INTERNAL_ERROR";
+interface AppError {
+  code: ErrorCode;
+  message: string;
+  details?: unknown;
+  status?: number;
+}
+type ErrorCode =
+  | "VALIDATION_ERROR"
+  | "AUTHENTICATION_ERROR"
+  | "AUTHORIZATION_ERROR"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "RATE_LIMITED"
+  | "EXTERNAL_SERVICE_ERROR"
+  | "INTERNAL_ERROR";
 ```
 
 Helpers: `ok()`, `err()`, `isOk()`, `isErr()`, `toHttpStatus()`, `createError()`, `toAppError()`.
@@ -89,28 +103,28 @@ This replaces ad-hoc `{ error }` shapes with a typed, consistent model for futur
   - `createBrowserClient({ supabaseUrl, supabaseKey })` — browser, anon key, `bypassRls: false`
   - `createServerClient(config)` — server (Route Handler), anon key, throws on client
   - `createAdminClient(config)` — server-only, service-role, `bypassRls: true`, throws on client
-- **No real Supabase SDK imported** at foundation stage — factories return placeholder that throws `Database not wired` when queried. Will be wired to `@supabase/supabase-js` when Supabase project is configured.
+- **Real SDK wiring (Phase 6):** factories use `@supabase/supabase-js` and `@supabase/ssr`, typed against the generated `Database`. Browser/request-scoped server clients use the publishable/anon key and enforce RLS; server requests may pass an access token or cookie store. Admin is server-only and marked `bypassRls: true`.
 - **Phase 4 persistence:** `organizations`, `memberships`, `audit_log` tables are defined in the migration with indexes, RLS, and policies. The live non-production staging schema was applied in Phase 5.
 - **Generated types:** `packages/database/src/types.generated.ts` is generated from the Winlerr Staging project; `types.ts` derives the public domain aliases from it. Regenerate after each reviewed staging migration.
 - **Conventions:** `organization_id` on every product table, RLS as primary tenant isolation, migrations in `infrastructure/supabase/migrations/`. RLS helper functions live in a private schema and are not exposed as public RPCs.
 
-**What is NOT implemented:** No product tables (leads, bookings, etc.), no production Supabase connection, no live application client wiring, and no production deployment. The staging schema exists only as a non-production foundation.
+**What is NOT implemented:** No product tables (leads, bookings, etc.), no production Supabase connection, no production deployment, and no product endpoint/UI. The staging schema and runtime wiring exist only as a non-production foundation.
 
-Tests: `packages/database/src/client.test.ts` (factories, missing config, placeholder query, bypass flag) + `domain.test.ts` (row shapes, `organization_id` convention, migration file exists, RLS conventions) — no credentials required.
+Tests: `packages/database/src/client.test.ts` (real SDK factories, typed foundation query, request token, client-only admin guard) + `domain.test.ts` (row shapes, `organization_id` convention, migration file exists, RLS conventions). Live staging coverage is in `scripts/phase6-staging-auth.integration.test.ts`; it uses publishable-key clients and disposable Auth sessions, never the admin client.
 
 ## 7. Auth Contract — `@winlerr/auth` (Established)
 
-**Files:** `packages/auth/src/types.ts`, `guards.ts`, `index.ts`
+**Files:** `packages/auth/src/types.ts`, `guards.ts`, `runtime.ts`, `index.ts`
 
-- **AuthN (who you are):** `User { id, email }`, `Session { user, organizationId, membership }` — will map to Supabase Auth when wired.
+- **AuthN (who you are):** `User { id, email }`, `Session { user, organizationId, membership }` maps from a request-scoped Supabase Auth session. `resolveAuthContext()` validates the session user through `auth.getUser()`.
 - **AuthZ (what you can do):** `Organization`, `Membership { userId, organizationId, role }`, `Role = owner|admin|member|viewer`, `Permission = "resource:action"`.
 - **Distinction preserved:** Client checks are UX hints; server re-checks via guards + RLS.
 - Pure utilities: `hasPermission(membership, permission)`, `isMember(memberships, userId, orgId)`, `getMembership()`, `hasRoleAtLeast()`, `requireOrganizationId()` — no DB, no side effects.
 - Final role/permission matrix remains **HQ/Product decision** — placeholder map in `guards.ts` is illustrative, not frozen.
 
-Tests: `packages/auth/src/guards.test.ts` (permission checks, membership, role hierarchy, org id validation) — pure, no credentials.
+Tests: `packages/auth/src/guards.test.ts` (pure permission checks, membership, role hierarchy, org id validation) and `runtime.test.ts` (session/membership boundary behavior). The live staging test covers owner/admin/member/viewer identities, tenant isolation, membership-write policy, and audit actor scoping.
 
-**Not implemented:** No OAuth, no login/signup pages, no Supabase users, no role-management UI.
+**Not implemented:** No OAuth, no login/signup pages, no production Supabase users, no role-management UI, and no product authorization matrix. The role set remains a Current Plan/HQ decision.
 
 ## 8. AI Contract — `@winlerr/ai` (Established)
 

@@ -1,7 +1,7 @@
 # Winlerr Staging Supabase Foundation
 
 - **Status:** Established for the non-production staging project; production remains unconfigured.
-- **Date:** 2026-08-26
+- **Date:** 2026-08-27
 - **Project:** `Winlerr Staging`
 - **Project ref:** `xvwgumawzoqjduvtnlcs`
 - **Region:** `eu-west-1`
@@ -18,12 +18,12 @@ The non-secret project reference may be recorded in repository documentation. Pr
 
 The existing `@winlerr/config` package remains the environment contract:
 
-| Variable | Boundary | Phase 5 handling |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Browser-safe | Staging project URL may be supplied at runtime. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe publishable key | Staging publishable/anon key may be supplied at runtime. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only privileged | Must remain in server/deployment secrets only; never commit or expose to browser code. |
-| `DATABASE_URL` | Server-only direct database access | Optional; not required for the repository foundation. |
+| Variable                        | Boundary                           | Phase 5 handling                                                                       |
+| ------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Browser-safe                       | Staging project URL may be supplied at runtime.                                        |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe publishable key       | Staging publishable/anon key may be supplied at runtime.                               |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server-only privileged             | Must remain in server/deployment secrets only; never commit or expose to browser code. |
+| `DATABASE_URL`                  | Server-only direct database access | Optional; not required for the repository foundation.                                  |
 
 `.env.example` contains names and empty placeholders only. A local `.env` is gitignored. No staging secret values were added to Git.
 
@@ -67,34 +67,33 @@ The helpers use `SECURITY DEFINER`, a fixed `search_path = public`, and explicit
 
 Supabase security advisors were rerun after hardening and returned zero lints. The verified live privilege query returned `anon_execute = false`, `authenticated_execute = true` for all three private helpers, and `anon_execute = false`, `authenticated_execute = false` for the public trigger function.
 
-## 5. Authentication setup
+## 5. Authentication setup and Phase 6 fixture strategy
 
-Supabase Auth is available in the staging project. The currently established mechanism is email/password authentication. Phase 5 does not introduce OAuth providers. No staging test user was created because no owner-approved test identity and password were supplied.
+Supabase Auth is available in the staging project. The established mechanism remains email/password authentication; OAuth providers are not introduced. The repository now wires the official Supabase SDK behind `@winlerr/database` and resolves sessions, validated users, and explicitly selected memberships through `@winlerr/auth`.
 
-Consequently, the following authenticated-user scenarios remain owner/test-environment actions rather than claims made by this repository change:
+For live testing, owner approval authorizes a staging-only administrative fixture procedure. `scripts/phase6-staging-fixture.mjs` fails closed unless the exact project ref is `xvwgumawzoqjduvtnlcs`. It generates five random identities in memory: owner, admin, member, and viewer in tenant A, plus an owner in tenant B. The administrative SQL input is used only to provision/reset the disposable fixture; all assertions use publishable-key clients and real Supabase Auth sessions, never the service-role client. Passwords are derived only in the test process and are never written to Git, logs, reports, or documentation.
 
-- an authenticated user creating an organization with `owner_user_id = auth.uid()`;
-- an organization owner or owner/admin member creating a membership;
-- rejection of unauthorized membership insertion;
-- non-member isolation against a populated organization;
-- authenticated audit-log insertion with the correct actor.
-
-The live schema, policy definitions, helper privileges, empty initial state, and anonymous boundary were verified without creating user data.
+Cleanup deletes every fixture organization, membership, audit row, Auth identity, and Auth user by exact generated identifiers. A separate verification query checks that the `phase6-%` Auth users, `phase6-%` organizations, `phase6_%` audit rows, and related memberships are absent. The final observed verification returned `cleanup_verified = true` and aggregate counts of zero.
 
 ## 6. Runtime verification record
 
-| Check | Result | Evidence or limitation |
-|---|---|---|
-| Project health | PASS | Project status `ACTIVE_HEALTHY`. |
-| Migration history | PASS | Foundation and security-hardening migrations recorded. |
-| Foundation table inventory | PASS | Exactly three public tables; all empty at verification. |
-| RLS enabled | PASS | `organizations`, `memberships`, and `audit_log` report RLS enabled. |
-| Policy definitions | PASS | Live `pg_policies` query shows organization, membership, and audit policies. |
-| Anonymous table reads | PASS with empty-state limitation | REST reads returned HTTP 200 for empty tables; no rows were exposed. Authenticated row-level behavior needs a test user and populated fixtures. |
-| Helper privileges | PASS | Anonymous execution denied; authenticated execution allowed; fixed search paths verified. |
-| Security advisors | PASS | Zero security lints after hardening. |
-| Owner/admin positive and unauthorized negative flows | BLOCKED | Requires an approved staging test identity and authenticated session. |
-| Service-role behavior | PARTIAL | Repository code keeps the service-role key server-only; no service-role runtime test was performed because no secret was introduced. |
+| Check                                  | Result                             | Evidence or limitation                                                                                                                         |
+| -------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project health                         | PASS                               | Project status `ACTIVE_HEALTHY`.                                                                                                               |
+| Migration history                      | PASS                               | Foundation and security-hardening migrations recorded.                                                                                         |
+| Foundation table inventory             | PASS                               | Exactly three public tables; all empty at verification.                                                                                        |
+| RLS enabled                            | PASS                               | `organizations`, `memberships`, and `audit_log` report RLS enabled.                                                                            |
+| Policy definitions                     | PASS                               | Live `pg_policies` query shows organization, membership, and audit policies.                                                                   |
+| Anonymous table reads                  | PASS with empty-state limitation   | REST reads returned HTTP 200 for empty tables; no rows were exposed.                                                                           |
+| SDK client boundary                    | PASS                               | Real browser/server/admin factories use the generated `Database` type; only admin is marked `bypassRls: true` and is server-only.              |
+| Auth session and membership resolution | PASS                               | Live suite resolved owner/admin/member/viewer in tenant A and tenant-B owner through real password sessions and RLS-backed membership queries. |
+| Organization isolation                 | PASS                               | Tenant A and tenant B clients each saw only their own organization; tenant B could not read or update tenant A.                                |
+| Membership-write policy                | PASS                               | Member/viewer insertion attempts were rejected; admin insertion was accepted by live RLS policy.                                               |
+| Audit actor and organization scoping   | PASS                               | Member’s own audit insertion succeeded; cross-tenant and cross-actor inserts were rejected.                                                    |
+| Helper privileges                      | PASS                               | Anonymous execution denied; authenticated execution allowed; fixed search paths verified.                                                      |
+| Security advisors                      | PASS                               | Zero security lints after hardening.                                                                                                           |
+| Service-role behavior                  | PASS for approved fixture boundary | Admin capability was used only for staging fixture setup/cleanup; no authorization assertion used the admin client.                            |
+| Fixture cleanup                        | PASS                               | Final verification returned `cleanup_verified = true`; zero disposable Auth users, organizations, memberships, and audit rows remained.        |
 
 ## 7. Generated database types
 
@@ -110,8 +109,8 @@ supabase gen types typescript --project-id <STAGING_PROJECT_REF> --schema public
 
 Then run `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, and `git diff --check`. Never generate against production during development and never commit credential values.
 
-## 8. Phase 5 blockers and deferrals
+## 8. Remaining blockers and deferrals
 
-Production remains blocked by the final role/permission matrix, OAuth decisions, product priority, deployment configuration, production secret provisioning, and owner approval of any first product schema. The current staging project is a safe schema foundation, not a production-ready product environment.
+Production remains blocked by the final role/permission matrix, OAuth decisions, product priority, deployment configuration, production secret provisioning, and owner approval of any first product schema. The current staging project is a verified authentication/runtime foundation, not a production-ready product environment.
 
-Runtime authenticated RLS testing is deferred until an owner-approved staging test identity and fixture plan exist. Product-specific tables remain prohibited until the product scope is deliberately approved. No Phase 6 or product implementation was started in this phase.
+The staging Auth fixture path is established for review but intentionally depends on the approved administrative staging channel for setup and cleanup. Product-specific tables remain prohibited until the product scope is deliberately approved. Lead Response, CRM, booking, WhatsApp, agent, dashboard, webhook, and production deployment work were not started.
