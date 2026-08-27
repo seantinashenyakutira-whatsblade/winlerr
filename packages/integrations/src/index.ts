@@ -1,9 +1,9 @@
 /**
- * @winlerr/integrations — external API integrations
+ * @winlerr/integrations — provider-independent integration boundaries
  *
- * Add WhatsApp Business API, Stripe, etc. clients here.
- * Each integration must validate inputs (Zod), verify signatures,
- * and handle idempotent retries.
+ * Application → Integration interface → Provider adapter → External API
+ * No real integrations, no credentials, no external calls.
  */
 
-export const placeholder = "integrations" as const;
+export * from "./types.js";
+export * from "./adapter.js";
