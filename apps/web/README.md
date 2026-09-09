@@ -16,6 +16,10 @@ The staging Supabase authentication and RLS foundation is established in `@winle
 
 The request form is intentionally a mailto handoff until an approved production notification and product-request persistence path is configured. The Lead Response demo uses local data and never claims to send an external message.
 
+## Deployment
+
+The linked Vercel project uses `apps/web` as its monorepo root. The current Vercel production branch is intentionally still `main`; the MVP launch branch is review-only until its PR dependencies and owner approval are complete.
+
 ## Commands
 
 ```bash
