@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Winlerr — Business systems that move work forward",
   description:
-    "Winlerr designs and builds practical business systems, automation, and client operating tools for growing teams.",
+    "Winlerr builds practical business systems for growing teams: lead response, client operations, and focused product rollouts.",
 };
 
 export default function RootLayout({
