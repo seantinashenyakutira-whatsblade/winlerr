@@ -1,14 +1,15 @@
 # Lead Response Application
 
-The Lead Response application is the first commercial product in the Winlerr MVP. It provides a focused lead operating system for teams that need every enquiry triaged, answered, and moved toward a next step.
+The Lead Response application is the first commercial product in the Winlerr MVP. It provides a complete lead management system with AI-powered response generation, qualification workflow, and approval processes.
 
 ## Overview
 
-Lead Response is a complete lead management system with:
+Lead Response is a focused lead operating system designed to help teams efficiently triage, qualify, and respond to every customer inquiry. The system captures all tenant-scoped records with organization_id for proper isolation and includes:
+
 - Lead lifecycle management (new → qualified → responded → closed)
-- AI-powered response generation and proposal creation
-- Lead qualification scoring and workflow management
-- Event tracking for audit and analytics
+- AI response proposal generation
+- Review and approval workflow
+- Event tracking
 - Full tenant isolation and security
 
 ## Key Features
@@ -36,6 +37,7 @@ Lead Response is a complete lead management system with:
 - **leads** - Core lead records with tenant isolation
 - **lead_events** - Timeline of all lead interactions
 - **lead_responses** - Generated and approved responses
+- **organizations** - Tenant root (from foundation tables)
 
 ### Security Model
 - All tables are tenant-scoped with organization_id
