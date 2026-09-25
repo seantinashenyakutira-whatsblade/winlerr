@@ -10,7 +10,6 @@
   },
   "files": ["eslint-preset.mjs", "typescript.json"],
   "scripts": {
-    "lint": "eslint . || exit 0",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist"
   },

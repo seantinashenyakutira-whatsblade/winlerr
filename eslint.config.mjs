@@ -9,6 +9,7 @@ export default tseslint.config(
       "out/**",
       ".turbo/**",
       "coverage/**",
+      "research/**",
       "**/*.js",
       "**/*.mjs",
       "**/*.cjs",

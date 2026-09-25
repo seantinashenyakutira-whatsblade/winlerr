@@ -10,7 +10,6 @@
     "build": "tsc --noEmit",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests yet\" && exit 0",
     "clean": "rimraf dist"
   },
   "dependencies": {
