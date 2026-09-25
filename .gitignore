@@ -60,6 +60,7 @@ next-env.d.ts
 
 # Supabase
 .supabase
+supabase/.temp
 
 # Testing
 .jest
@@ -82,3 +83,6 @@ temp
 # Cloudflare
 .wrangler
 .dev.vars
+
+# Research (open-source assessment pulls, never commit)
+research/
