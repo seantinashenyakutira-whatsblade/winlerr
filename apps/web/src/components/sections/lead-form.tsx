@@ -118,7 +118,7 @@ export function LeadForm() {
           |
         </span>
         <a
-          href="https://wa.me/"
+          href="https://wa.me/260776950796"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-2 rounded-pill border border-border px-5 py-2 text-sm font-medium hover:bg-surface-tint"

@@ -11,7 +11,7 @@ const SOCIALS = [
   { icon: Globe, label: "Website", href: "#" },
   { icon: AtSign, label: "Social", href: "#" },
   { icon: Send, label: "Share", href: "#" },
-  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/" },
+  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/260776950796" },
 ];
 
 export function Footer() {
