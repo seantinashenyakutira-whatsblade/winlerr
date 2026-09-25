@@ -1,12 +1,12 @@
 import { Clock, MessageCircle } from "lucide-react";
 
-const TILES = ["[SERVICE 1]", "[SERVICE 2]", "[SERVICE 3]"];
+const TILES = ["Wedding catering", "Corporate lunches", "Event planning"];
 
 export function WebsiteShowcase() {
   return (
     <section aria-label="Free website showcase" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
-        [SHOWCASE HEADLINE PLACEHOLDER]
+        A free professional website for every Winlerr business.
       </h2>
       <div className="mx-auto mt-10 max-w-3xl rounded-card border border-border bg-surface shadow-card">
         <div className="flex items-center gap-2 border-b border-border px-4 py-3">
@@ -21,7 +21,7 @@ export function WebsiteShowcase() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-tint font-mono text-xs text-ink-muted">
             logo
           </div>
-          <p className="mt-3 font-display text-xl font-bold">[BUSINESS NAME PLACEHOLDER]</p>
+          <p className="mt-3 font-display text-xl font-bold">Mwansa Catering</p>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {TILES.map((tile) => (
               <div key={tile} className="rounded-card border border-border bg-surface-tint p-4 text-sm text-ink-muted">
@@ -34,7 +34,7 @@ export function WebsiteShowcase() {
               <MessageCircle className="h-4 w-4" /> WhatsApp us
             </span>
             <span className="inline-flex items-center gap-2 text-sm text-ink-muted">
-              <Clock className="h-4 w-4" /> [OPENING HOURS PLACEHOLDER]
+              <Clock className="h-4 w-4" /> Mon–Sat · 8am–6pm
             </span>
           </div>
         </div>

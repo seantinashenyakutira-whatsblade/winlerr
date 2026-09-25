@@ -4,22 +4,22 @@ const ITEMS = [
   {
     icon: Users,
     title: "More leads",
-    description: "[PLACEHOLDER] Every enquiry captured in one place.",
+    description: "Every enquiry captured — calls, forms, WhatsApp, DMs.",
   },
   {
     icon: Zap,
     title: "Faster replies",
-    description: "[PLACEHOLDER] First response in seconds, not hours.",
+    description: "First response in seconds, not hours.",
   },
   {
     icon: FileMinus2,
     title: "Less admin",
-    description: "[PLACEHOLDER] Follow-ups handled without spreadsheets.",
+    description: "Follow-ups, reminders, and records — handled automatically.",
   },
   {
     icon: Clock,
     title: "Always on",
-    description: "[PLACEHOLDER] Nights, weekends, and holidays covered.",
+    description: "Nights, weekends, holidays. Your business never sleeps.",
   },
 ];
 

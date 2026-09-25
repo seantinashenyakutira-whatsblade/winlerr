@@ -5,42 +5,42 @@ const SYSTEMS = [
   {
     icon: Zap,
     title: "Lead Response",
-    description: "[PLACEHOLDER] Every enquiry triaged and answered in seconds.",
+    description: "Every enquiry triaged and answered in seconds.",
     featured: true,
     span: "sm:col-span-2",
   },
   {
     icon: MessageCircle,
     title: "WhatsApp AI Agent",
-    description: "[PLACEHOLDER] Customer conversations on autopilot.",
+    description: "Customer conversations on autopilot, 24/7.",
     featured: false,
     span: "",
   },
   {
     icon: AtSign,
     title: "Social DM Agent",
-    description: "[PLACEHOLDER] Facebook and Instagram messages handled.",
+    description: "Facebook and Instagram messages handled, qualified, and routed.",
     featured: false,
     span: "",
   },
   {
     icon: CalendarCheck,
     title: "Booking System",
-    description: "[PLACEHOLDER] Appointments without the back-and-forth.",
+    description: "Appointments without the back-and-forth.",
     featured: false,
     span: "",
   },
   {
     icon: BellRing,
     title: "Customer Follow-up",
-    description: "[PLACEHOLDER] Quotes chased and reviews requested.",
+    description: "Quotes chased. Reviews requested. Nobody forgotten.",
     featured: false,
     span: "",
   },
   {
     icon: Bot,
     title: "AI Receptionist",
-    description: "[PLACEHOLDER] A front desk that never sleeps.",
+    description: "A front desk that never sleeps.",
     featured: false,
     span: "sm:col-span-2",
   },
@@ -50,10 +50,10 @@ export function SystemsBento() {
   return (
     <section id="systems" aria-label="Winlerr systems" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
-        [SYSTEMS HEADLINE PLACEHOLDER]
+        Six systems. One platform. Pick what your business needs.
       </h2>
       <p className="mx-auto mt-3 max-w-xl text-center text-ink-muted">
-        [SYSTEMS INTRO PLACEHOLDER — start with one system, connect more over time.]
+        Start with one system, configure it to your business, and add more as you grow.
       </p>
       <div className="relative mt-10 grid gap-4 sm:grid-cols-3">
         <div

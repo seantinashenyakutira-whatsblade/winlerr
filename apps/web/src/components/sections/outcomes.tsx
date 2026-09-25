@@ -8,8 +8,8 @@ const STATS = [
     span: "sm:col-span-2",
   },
   { value: "24/7 coverage", note: "Nights, weekends, holidays.", accent: false, span: "" },
-  { value: "Hours saved weekly", note: "[PLACEHOLDER] Time back for selling.", accent: false, span: "" },
-  { value: "More qualified leads", note: "[PLACEHOLDER] Scored before you call.", accent: false, span: "" },
+  { value: "Hours saved weekly", note: "Time back for selling.", accent: false, span: "" },
+  { value: "More qualified leads", note: "Scored before you call.", accent: false, span: "" },
 ];
 
 export function Outcomes() {
@@ -17,7 +17,7 @@ export function Outcomes() {
     <section aria-label="Outcomes" className="bg-surface-tint">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
         <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          [OUTCOMES HEADLINE PLACEHOLDER]
+          What running on Winlerr looks like.
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-sm text-ink-muted">
           Targets and value propositions — not customer claims. Figures to be replaced with measured results.

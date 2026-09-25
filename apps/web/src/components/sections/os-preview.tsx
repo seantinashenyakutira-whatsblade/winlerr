@@ -3,9 +3,9 @@ export function OsPreview() {
     <section aria-label="Winlerr OS preview" className="bg-surface-tint">
       <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          [OS HEADLINE PLACEHOLDER]
+          Winlerr OS — your business, in one place.
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-ink-muted">[OS DESCRIPTION PLACEHOLDER — one line.]</p>
+        <p className="mx-auto mt-3 max-w-xl text-ink-muted">Leads, conversations, follow-ups, and reports — in a single dashboard that works on any device.</p>
         <div className="relative mx-auto mt-12 max-w-3xl">
           <div
             aria-hidden="true"

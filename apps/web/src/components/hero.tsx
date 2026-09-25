@@ -31,16 +31,16 @@ export function Hero() {
         </div>
 
         <h1 className="mx-auto max-w-3xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
-          [HEADLINE PLACEHOLDER] with{" "}
+          Win more customers with{" "}
           <span className="bg-gradient-to-r from-brand-600 via-brand-500 to-brand-400 bg-clip-text text-transparent">
             winlerr
           </span>
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-base text-ink-muted sm:text-lg">
-          [SUBHEADLINE PLACEHOLDER — line one: who Winlerr serves.]
+          A free professional website for your business, live in days.
           <br />
-          [SUBHEADLINE PLACEHOLDER — line two: the outcome in one breath.]
+          Then the AI systems that answer, qualify, and follow up — WhatsApp-first, always on.
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -62,7 +62,7 @@ export function Hero() {
               <span className="h-3 w-3 rounded-full bg-accent-400" />
               <span className="h-3 w-3 rounded-full bg-accent-500" />
               <span className="h-3 w-3 rounded-full bg-brand-400" />
-              <span className="ml-2 font-mono text-xs text-ink-muted">[DASHBOARD PREVIEW PLACEHOLDER]</span>
+              <span className="ml-2 font-mono text-xs text-ink-muted">Live dashboard preview</span>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               {[0, 1, 2].map((card) => (
@@ -103,7 +103,7 @@ export function Hero() {
 
         <p className="mt-8 flex items-center justify-center gap-2 text-xs text-ink-muted">
           <Sparkles className="h-3.5 w-3.5" />
-          [TRUST NOTE PLACEHOLDER — no statistics or testimonials until approved.]
+          Built in Zambia, for Zambian businesses. No upfront cost for your website.
         </p>
       </div>
     </section>
