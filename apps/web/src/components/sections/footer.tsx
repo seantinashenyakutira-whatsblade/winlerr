@@ -1,16 +1,39 @@
 import { AtSign, Globe, MessageCircle, Send } from "lucide-react";
+import { VoiceNoteReplay } from "@/components/VoiceNote";
 
-const COLUMNS = [
-  { title: "Product", links: ["Lead Response", "WhatsApp AI", "Booking", "Follow-up"] },
-  { title: "Systems", links: ["Social DM Agent", "AI Receptionist", "Winlerr OS", "Free website"] },
-  { title: "Company", links: ["About", "How it works", "Pricing", "Contact"] },
+interface FooterLink {
+  label: string;
+  href?: string;
+}
+
+const COLUMNS: { title: string; links: FooterLink[] }[] = [
+  { title: "Product", links: [
+    { label: "Systems", href: "/systems" },
+    { label: "Lead Response" },
+    { label: "WhatsApp AI" },
+    { label: "Booking" },
+    { label: "Follow-up" },
+  ] },
+  { title: "Systems", links: [
+    { label: "Social DM Agent" },
+    { label: "AI Receptionist" },
+    { label: "Winlerr OS" },
+    { label: "Free website" },
+  ] },
+  { title: "Company", links: [
+    { label: "About", href: "/about" },
+    { label: "How it works", href: "/#how" },
+    { label: "Docs", href: "/docs" },
+    { label: "Pricing" },
+    { label: "Contact", href: "/get-started" },
+  ] },
   {
     title: "Legal",
     links: [
       // TODO: replace with real legal page before public outreach.
-      "Privacy",
+      { label: "Privacy" },
       // TODO: replace with real legal page before public outreach.
-      "Terms",
+      { label: "Terms" },
     ],
   },
 ];
@@ -37,6 +60,9 @@ export function Footer() {
               winlerr
             </p>
             <p className="mt-3 text-sm text-ink-muted">Digital growth systems for Zambian businesses.</p>
+            <div className="mt-4">
+              <VoiceNoteReplay />
+            </div>
             <p className="mt-2 font-mono text-xs text-ink-muted">winlerr.vip</p>
             <div className="mt-4 flex gap-2">
               {SOCIALS.map((social) => (
@@ -58,9 +84,15 @@ export function Footer() {
               <h3 className="text-sm font-semibold">{column.title}</h3>
               <ul className="mt-3 space-y-2">
                 {column.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-ink-muted hover:text-ink">
-                      {link}
+                  <li key={link.label}>
+                    <a
+                      href={link.href ?? "#"}
+                      className="text-sm text-ink-muted hover:text-ink"
+                      {...(link.href?.startsWith("http")
+                        ? { target: "_blank", rel: "noreferrer" }
+                        : {})}
+                    >
+                      {link.label}
                     </a>
                   </li>
                 ))}

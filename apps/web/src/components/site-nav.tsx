@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const LINKS = [
-  { label: "Home", href: "#top" },
-  { label: "How it works", href: "#how" },
-  { label: "Systems", href: "#systems" },
-  { label: "Contact", href: "#get-started" },
-  { label: "About", href: "#about" },
+  { label: "Home", href: "/" },
+  { label: "Systems", href: "/systems" },
+  { label: "Docs", href: "/docs" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/get-started" },
 ];
 
 export function SiteNav() {
@@ -32,7 +32,7 @@ export function SiteNav() {
       )}
     >
       <nav aria-label="Primary" className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="#top" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight">
+        <a href="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight">
           <span className="flex h-8 w-8 items-center justify-center rounded-card bg-ink font-mono text-sm text-white">
             W/
           </span>
@@ -52,7 +52,7 @@ export function SiteNav() {
         </div>
 
         <div className="hidden md:block">
-          <Button href="#get-started" variant="dark" size="sm" className="rounded-pill">
+          <Button href="/get-started" variant="dark" size="sm" className="rounded-pill">
             Get started
           </Button>
         </div>
@@ -80,7 +80,7 @@ export function SiteNav() {
               {link.label}
             </a>
           ))}
-          <Button href="#get-started" variant="dark" size="lg" className="mt-4" onClick={() => setOpen(false)}>
+          <Button href="/get-started" variant="dark" size="lg" className="mt-4" onClick={() => setOpen(false)}>
             Get started
           </Button>
         </div>
