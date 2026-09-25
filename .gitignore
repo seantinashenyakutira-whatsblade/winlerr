@@ -86,3 +86,6 @@ temp
 
 # Research (open-source assessment pulls, never commit)
 research/
+
+.vercel
+.env*

@@ -1,0 +1,9 @@
+# Keep Vercel uploads lean: deploy needs only the monorepo source.
+research/
+tmp/
+node_modules/
+.next/
+supabase/.temp/
+*.log
+.env.local
+.env*.local
