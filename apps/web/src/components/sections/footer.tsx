@@ -4,7 +4,15 @@ const COLUMNS = [
   { title: "Product", links: ["Lead Response", "WhatsApp AI", "Booking", "Follow-up"] },
   { title: "Systems", links: ["Social DM Agent", "AI Receptionist", "Winlerr OS", "Free website"] },
   { title: "Company", links: ["About", "How it works", "Pricing", "Contact"] },
-  { title: "Legal", links: ["Privacy", "Terms"] },
+  {
+    title: "Legal",
+    links: [
+      // TODO: replace with real legal page before public outreach.
+      "Privacy",
+      // TODO: replace with real legal page before public outreach.
+      "Terms",
+    ],
+  },
 ];
 
 const SOCIALS = [
@@ -28,7 +36,7 @@ export function Footer() {
               </span>
               winlerr
             </p>
-            <p className="mt-3 text-sm text-ink-muted">[FOOTER TAGLINE PLACEHOLDER]</p>
+            <p className="mt-3 text-sm text-ink-muted">Digital growth systems for Zambian businesses.</p>
             <p className="mt-2 font-mono text-xs text-ink-muted">winlerr.vip</p>
             <div className="mt-4 flex gap-2">
               {SOCIALS.map((social) => (
@@ -62,7 +70,7 @@ export function Footer() {
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-border pt-6 text-xs text-ink-muted sm:flex-row">
           <span>© {year} Winlerr. All rights reserved.</span>
-          <span className="font-mono">[FOOTER NOTE PLACEHOLDER]</span>
+          <span className="font-mono">Built in Zambia 🇿🇲</span>
         </div>
       </div>
     </footer>

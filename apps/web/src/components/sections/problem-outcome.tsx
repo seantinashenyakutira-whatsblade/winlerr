@@ -4,10 +4,10 @@ import { motion, useReducedMotion } from "framer-motion";
 import { CalendarClock, MessagesSquare, Trophy, UserPlus } from "lucide-react";
 
 const CARDS = [
-  { icon: UserPlus, title: "New leads", note: "[PLACEHOLDER] 3 waiting" },
-  { icon: MessagesSquare, title: "Conversations", note: "[PLACEHOLDER] 12 open" },
-  { icon: CalendarClock, title: "Follow-ups due", note: "[PLACEHOLDER] 5 today" },
-  { icon: Trophy, title: "Won", note: "[PLACEHOLDER] this week" },
+  { icon: UserPlus, title: "New leads", note: "New requests" },
+  { icon: MessagesSquare, title: "Conversations", note: "Active chats" },
+  { icon: CalendarClock, title: "Follow-ups due", note: "Due today" },
+  { icon: Trophy, title: "Won", note: "Recently won" },
 ];
 
 export function ProblemOutcome() {
@@ -18,11 +18,13 @@ export function ProblemOutcome() {
       <div className="grid items-center gap-10 lg:grid-cols-2">
         <div>
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            [PROBLEM HEADLINE PLACEHOLDER — leads slipping through] with{" "}
+            Stop losing customers to slow replies —{" "}
             <span className="text-brand-600">every enquiry answered</span>.
           </h2>
           <p className="mt-4 text-base text-ink-muted sm:text-lg">
-            [PROBLEM COPY PLACEHOLDER — missed calls, slow replies, lost notebooks, and the revenue they cost.]
+            Missed calls, forgotten follow-ups, and messages lost in WhatsApp — that&apos;s revenue
+            walking out the door. Winlerr closes the gap. Every enquiry is captured, answered, and
+            followed up — automatically, around the clock.
           </p>
         </div>
         <div className="relative space-y-3">

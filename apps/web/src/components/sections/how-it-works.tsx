@@ -4,25 +4,25 @@ const STEPS = [
   {
     icon: Globe,
     title: "1) Get your free website",
-    description: "[PLACEHOLDER] A professional page for your business, live in days.",
+    description: "A professional page for your business, live in days — not weeks.",
     mock: "url-bar",
   },
   {
     icon: MessageCircle,
     title: "2) Connect WhatsApp & social",
-    description: "[PLACEHOLDER] Link the channels your customers already use.",
+    description: "Link the channels your customers already use. Facebook, Instagram, WhatsApp.",
     mock: "chat",
   },
   {
     icon: Sparkles,
     title: "3) AI responds & qualifies",
-    description: "[PLACEHOLDER] Every enquiry answered and scored, around the clock.",
+    description: "Every enquiry answered in seconds and scored, so you know who's ready to buy.",
     mock: "score",
   },
   {
     icon: Handshake,
     title: "4) You close more deals",
-    description: "[PLACEHOLDER] Spend time selling, not chasing.",
+    description: "Spend your time selling, not chasing spreadsheets.",
     mock: "won",
   },
 ];
@@ -71,7 +71,7 @@ export function HowItWorks() {
     <section id="how" aria-label="How it works" className="bg-surface-tint">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
         <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          [HOW-IT-WORKS HEADLINE PLACEHOLDER]
+          From first contact to closed deal in four steps.
         </h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {STEPS.map((step) => (

@@ -51,9 +51,9 @@ export function LeadForm() {
     <section id="get-started" aria-label="Get started" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          [FINAL CTA HEADLINE PLACEHOLDER]
+          Ready to win more customers?
         </h2>
-        <p className="mt-3 text-ink-muted">[FINAL CTA COPY PLACEHOLDER — one line.]</p>
+        <p className="mt-3 text-ink-muted">Tell us about your business. We&apos;ll get your free website live and set up your first system.</p>
       </div>
 
       <form
@@ -111,7 +111,12 @@ export function LeadForm() {
       </form>
 
       <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <a href="#" className="text-sm font-medium text-ink-muted underline-offset-4 hover:underline">
+        <a
+          href="https://wa.me/260776950796?text=Hi%20Winlerr%2C%20I'd%20like%20a%20demo"
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm font-medium text-ink-muted underline-offset-4 hover:underline"
+        >
           Book a demo
         </a>
         <span aria-hidden="true" className="hidden text-border sm:inline">

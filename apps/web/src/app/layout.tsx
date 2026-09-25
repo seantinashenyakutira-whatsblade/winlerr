@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s — Winlerr",
   },
   description:
-    "[META DESCRIPTION PLACEHOLDER] Winlerr builds lead response, WhatsApp automation, and booking systems for growing businesses.",
+    "Winlerr gives Zambian businesses a free professional website, then the AI systems that answer, qualify, and follow up with every lead — WhatsApp-first, always on.",
   alternates: {
     canonical: SITE_URL,
   },
@@ -39,7 +39,15 @@ export const metadata: Metadata = {
     siteName: "Winlerr",
     title: "Winlerr — Digital growth systems for Zambian businesses",
     description:
-      "[OG DESCRIPTION PLACEHOLDER] Lead response, WhatsApp automation, and booking systems that move work forward.",
+      "Free website. AI-powered lead response, WhatsApp automation, and booking — built for Zambian SMEs.",
+    images: ["/og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Winlerr — Digital growth systems for Zambian businesses",
+    description:
+      "Free website. AI-powered lead response, WhatsApp automation, and booking — built for Zambian SMEs.",
+    images: ["/og.png"],
   },
 };
 
