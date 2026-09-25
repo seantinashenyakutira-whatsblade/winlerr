@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { VoiceNote } from "@/components/VoiceNote";
 import "./globals.css";
 
 const SITE_URL = "https://winlerr.vip";
@@ -54,7 +55,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${display.variable} ${mono.variable}`}>
-      <body className="bg-surface font-sans text-ink">{children}</body>
+      <body className="bg-surface font-sans text-ink">
+        {children}
+        <VoiceNote />
+      </body>
     </html>
   );
 }
