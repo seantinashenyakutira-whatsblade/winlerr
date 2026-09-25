@@ -1,38 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "jsx": "preserve",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "@winlerr/ui": ["packages/ui/src"],
-      "@winlerr/ui/*": ["packages/ui/src/*"],
-      "@winlerr/auth": ["packages/auth/src"],
-      "@winlerr/auth/*": ["packages/auth/src/*"],
-      "@winlerr/database": ["packages/database/src"],
-      "@winlerr/database/*": ["packages/database/src/*"],
-      "@winlerr/ai": ["packages/ai/src"],
-      "@winlerr/ai/*": ["packages/ai/src/*"],
-      "@winlerr/integrations": ["packages/integrations/src"],
-      "@winlerr/integrations/*": ["packages/integrations/src/*"],
-      "@winlerr/automation": ["packages/automation/src"],
-      "@winlerr/automation/*": ["packages/automation/src/*"],
-      "@winlerr/notifications": ["packages/notifications/src"],
-      "@winlerr/notifications/*": ["packages/notifications/src/*"],
-      "@winlerr/config": ["packages/config/src"],
-      "@winlerr/config/*": ["packages/config/src/*"]
-    }
-  },
-  "exclude": ["node_modules", "dist", ".next", "out", ".turbo", "coverage"]
+  "extends": "./tsconfig.base.json",
+  "exclude": ["node_modules", "dist", ".next", "out", ".turbo", "coverage", "research"]
 }

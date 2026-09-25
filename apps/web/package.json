@@ -6,11 +6,10 @@
     "type":  "module",
     "scripts":  {
                     "dev":  "next dev --port 3000",
-                    "build":  "echo \"No build yet — placeholder for web\" \u0026\u0026 exit 0",
+                    "build":  "tsc --noEmit",
                     "start":  "next start",
                     "lint":  "eslint .",
                     "typecheck":  "tsc --noEmit",
-                    "test":  "echo \"No tests yet\" \u0026\u0026 exit 0",
                     "clean":  "rimraf .next dist"
                 },
     "dependencies":  {
