@@ -107,8 +107,10 @@ export function HeroVideo({ className }: { className?: string }) {
         />
       ) : null}
 
-      {/* White wash between video and hero copy, so text contrast holds. */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/30" />
+      {/* White wash between video and hero copy, so text contrast holds.
+          Strongest at the top where the headline sits, clearing toward the
+          bottom so the video still reads behind the dashboard mock. */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/30 to-white/0" />
     </div>
   );
 }
