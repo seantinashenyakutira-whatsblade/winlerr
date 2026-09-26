@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { BellRing, CalendarCheck, MessageCircle, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HeroVideo } from "@/components/HeroVideo";
 
 const CHIPS = [
   { label: "Lead Response", icon: Zap, className: "left-[2%] top-[8%]" },
@@ -20,7 +21,11 @@ export function Hero() {
 
   return (
     <section id="top" className="relative overflow-hidden pb-16 pt-28 sm:pt-32">
-      <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
+      {/* Background video layer. Sits behind the hero copy, the dashboard mock
+          and the floating chips, which are lifted above it with z-10. */}
+      <HeroVideo className="pointer-events-none absolute inset-0 -z-10 h-full w-full opacity-40 sm:opacity-60" />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 text-center sm:px-6">
         <div className="mb-6 flex items-center justify-center gap-3">
           <span className="rounded-pill border border-border bg-surface px-4 py-1.5 text-xs font-medium text-ink-muted">
             Free website
@@ -57,7 +62,7 @@ export function Hero() {
             aria-hidden="true"
             className="absolute left-1/2 top-1/2 -z-10 h-[420px] w-[720px] max-w-none -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/20 blur-3xl"
           />
-          <div className="rounded-card border border-border bg-surface p-4 text-left shadow-card sm:p-6">
+          <div className="relative z-10 rounded-card border border-border bg-surface p-4 text-left shadow-card sm:p-6">
             <div className="mb-4 flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-accent-400" />
               <span className="h-3 w-3 rounded-full bg-accent-500" />
@@ -87,7 +92,7 @@ export function Hero() {
           {CHIPS.map((chip, index) => (
             <motion.div
               key={chip.label}
-              className={`absolute ${chip.className} hidden items-center gap-2 rounded-pill border border-border bg-surface px-4 py-2 text-sm font-medium shadow-card sm:flex`}
+              className={`absolute z-10 ${chip.className} hidden items-center gap-2 rounded-pill border border-border bg-surface px-4 py-2 text-sm font-medium shadow-card sm:flex`}
               animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
               transition={
                 reduceMotion
