@@ -1,0 +1,8 @@
+{
+  "name": "Winlerr",
+  "description": "Winlerr gives Zambian businesses a free professional website, then the AI systems that answer, qualify, and follow up with every lead — WhatsApp-first, always on.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

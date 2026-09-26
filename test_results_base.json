@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "query": "Hi",
+    "reply": "Hello! Welcome to Winlerr.",
+    "length": 26
+  },
+  {
+    "id": 2,
+    "query": "How much does it cost?",
+    "reply": "The professional website is completely free with",
+    "length": 48
+  },
+  {
+    "id": 3,
+    "query": "What does Winlerr do?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 4,
+    "query": "Do you offer WhatsApp automation?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 5,
+    "query": "I run a salon in Lusaka. Can you help?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 6,
+    "query": "Can you build me a website for free?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 7,
+    "query": "How long does the website take?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 8,
+    "query": "I want to book a demo",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 9,
+    "query": "Can you set up an appointment for me tomorrow?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 10,
+    "query": "Who is your biggest client?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 11,
+    "query": "Can you call my customer for me?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 12,
+    "query": "Do you do Facebook ads?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 13,
+    "query": "What's the difference between Lead Response and WhatsApp AI Agent?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 14,
+    "query": "I don't have a website yet. Where do I start?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 15,
+    "query": "Is this free forever?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 16,
+    "query": "What if I don't like the website you build?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 17,
+    "query": "Can you write my business a jingle?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 18,
+    "query": "Do you work with restaurants?",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 19,
+    "query": "Send me an invoice",
+    "reply": "",
+    "length": 0
+  },
+  {
+    "id": 20,
+    "query": "ok",
+    "reply": "",
+    "length": 0
+  }
+]
