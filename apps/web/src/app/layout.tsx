@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { AiConcierge } from "@/components/AiConcierge";
 import { VoiceNote } from "@/components/VoiceNote";
 import "./globals.css";
 
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-surface font-sans text-ink">
         {children}
         <VoiceNote />
+        <AiConcierge />
       </body>
     </html>
   );

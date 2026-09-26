@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { BellRing, CalendarCheck, MessageCircle, Sparkles, Zap } from "lucide-react";
+import { ClaimGift } from "@/components/ClaimGift";
 import { Button } from "@/components/ui/button";
 import { HeroVideo } from "@/components/HeroVideo";
 
@@ -50,9 +51,7 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button href="#get-started" size="lg">
-            Get your free website
-          </Button>
+          <ClaimGift />
           <Button href="#how" variant="secondary" size="lg">
             See how it works
           </Button>
