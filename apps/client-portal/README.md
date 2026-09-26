@@ -1,4 +1,4 @@
-﻿# client-portal — Winlerr
+# client-portal — Winlerr
 
 Placeholder for the **client-portal** application.
 

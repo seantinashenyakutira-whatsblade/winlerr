@@ -1,4 +1,4 @@
-﻿# lead-response — Winlerr
+# lead-response — Winlerr
 
 Placeholder for the **lead-response** application.
 

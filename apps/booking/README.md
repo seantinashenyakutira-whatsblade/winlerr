@@ -1,4 +1,4 @@
-﻿# booking — Winlerr
+# booking — Winlerr
 
 Placeholder for the **booking** application.
 

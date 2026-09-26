@@ -1,4 +1,4 @@
-﻿# webhooks — Winlerr Service
+# webhooks — Winlerr Service
 
 Placeholder for the **webhooks** service.
 

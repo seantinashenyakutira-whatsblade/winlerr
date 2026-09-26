@@ -1,4 +1,4 @@
-﻿# Environments — Winlerr
+# Environments — Winlerr
 
 Non-secret per-environment config.
 

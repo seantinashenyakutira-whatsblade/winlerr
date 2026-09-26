@@ -1,4 +1,4 @@
-﻿# workers — Winlerr Service
+# workers — Winlerr Service
 
 Placeholder for the **workers** service.
 

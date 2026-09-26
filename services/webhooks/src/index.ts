@@ -1,4 +1,4 @@
-﻿// webhooks service — placeholder
+// webhooks service — placeholder
 export const placeholder = "webhooks" as const;
 
 export function handlerPlaceholder() {

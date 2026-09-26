@@ -1,4 +1,4 @@
-﻿# web — Winlerr
+# web — Winlerr
 
 Placeholder for the **web** application.
 

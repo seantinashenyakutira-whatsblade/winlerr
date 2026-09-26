@@ -1,4 +1,4 @@
-﻿# whatsapp-agent — Winlerr
+# whatsapp-agent — Winlerr
 
 Placeholder for the **whatsapp-agent** application.
 
