@@ -3,10 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "description": "Winlerr — modular business automation, AI, CRM, and client systems platform.",
-  "packageManager": "pnpm@10.22.0",
+  "packageManager": "npm@10.8.2",
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "node": ">=20.0.0"
   },
   "workspaces": [
     "apps/*",
@@ -14,8 +13,8 @@
     "services/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
+    "build": "npm run build --workspace=web",
+    "dev": "npm run dev --workspace=web",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "typecheck": "turbo run typecheck",
