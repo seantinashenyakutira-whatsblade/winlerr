@@ -1,4 +1,4 @@
-﻿# dashboard — Winlerr
+# dashboard — Winlerr
 
 Placeholder for the **dashboard** application.
 

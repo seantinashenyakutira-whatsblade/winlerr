@@ -1,4 +1,4 @@
-﻿# Supabase — Winlerr
+# Supabase — Winlerr
 
 Migrations live in migrations/ as <timestamp>_<name>.sql.
 

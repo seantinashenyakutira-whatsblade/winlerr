@@ -1,4 +1,4 @@
-﻿# api — Winlerr Service
+# api — Winlerr Service
 
 Placeholder for the **api** service.
 

@@ -1,4 +1,4 @@
-﻿# crm — Winlerr
+# crm — Winlerr
 
 Placeholder for the **crm** application.
 

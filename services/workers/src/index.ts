@@ -1,4 +1,4 @@
-﻿// workers service — placeholder
+// workers service — placeholder
 export const placeholder = "workers" as const;
 
 export function handlerPlaceholder() {

@@ -1,4 +1,4 @@
-﻿# agents — Winlerr Service
+# agents — Winlerr Service
 
 Placeholder for the **agents** service.
 

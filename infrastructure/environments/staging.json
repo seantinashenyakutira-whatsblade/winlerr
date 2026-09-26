@@ -1,4 +1,4 @@
-﻿{
+{
   "env": "staging",
   "branch": "develop",
   "logLevel": "debug"
