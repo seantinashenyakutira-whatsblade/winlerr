@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero";
+import { AiDemo } from "@/components/sections/AiDemo";
 import { Footer } from "@/components/sections/footer";
 import { HowItWorks } from "@/components/sections/how-it-works";
 import { LeadForm } from "@/components/sections/lead-form";
@@ -19,6 +20,7 @@ export default function HomePage() {
       <ValueStrip />
       <ProblemOutcome />
       <HowItWorks />
+      <AiDemo />
       <SystemsBento />
       <OsPreview />
       <WebsiteShowcase />

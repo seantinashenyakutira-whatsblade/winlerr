@@ -145,6 +145,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.117.1
         version: 2.117.1
+      '@winlerr/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       autoprefixer:
         specifier: ^10.6.1
         version: 10.6.1(postcss@8.5.28)

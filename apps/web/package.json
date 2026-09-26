@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.1",
+    "@winlerr/ai": "workspace:*",
     "autoprefixer": "^10.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
