@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AtSign, BellRing, Bot, CalendarCheck, MessageCircle, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -5,6 +6,7 @@ const SYSTEMS = [
   {
     icon: Zap,
     title: "Lead Response",
+    slug: "lead-response",
     description: "Every enquiry triaged and answered in seconds.",
     featured: true,
     span: "sm:col-span-2",
@@ -12,6 +14,7 @@ const SYSTEMS = [
   {
     icon: MessageCircle,
     title: "WhatsApp AI Agent",
+    slug: "whatsapp-ai-agent",
     description: "Customer conversations on autopilot, 24/7.",
     featured: false,
     span: "",
@@ -19,6 +22,7 @@ const SYSTEMS = [
   {
     icon: AtSign,
     title: "Social DM Agent",
+    slug: "social-dm-agent",
     description: "Facebook and Instagram messages handled, qualified, and routed.",
     featured: false,
     span: "",
@@ -26,6 +30,7 @@ const SYSTEMS = [
   {
     icon: CalendarCheck,
     title: "Booking System",
+    slug: "booking-system",
     description: "Appointments without the back-and-forth.",
     featured: false,
     span: "",
@@ -33,6 +38,7 @@ const SYSTEMS = [
   {
     icon: BellRing,
     title: "Customer Follow-up",
+    slug: "customer-follow-up",
     description: "Quotes chased. Reviews requested. Nobody forgotten.",
     featured: false,
     span: "",
@@ -40,6 +46,7 @@ const SYSTEMS = [
   {
     icon: Bot,
     title: "AI Receptionist",
+    slug: "ai-receptionist",
     description: "A front desk that never sleeps.",
     featured: false,
     span: "sm:col-span-2",
@@ -61,10 +68,11 @@ export function SystemsBento() {
           className="absolute -right-10 -top-10 -z-10 h-56 w-56 rounded-full bg-brand-500/10 blur-3xl"
         />
         {SYSTEMS.map((system) => (
-          <div
+          <Link
             key={system.title}
+            href={`/systems/${system.slug}`}
             className={cn(
-              "rounded-card border p-6 transition-transform hover:-translate-y-1",
+              "rounded-card border p-6 transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
               system.span,
               system.featured
                 ? "border-transparent bg-ink text-white shadow-card"
@@ -83,7 +91,7 @@ export function SystemsBento() {
             <p className={cn("mt-1 text-sm", system.featured ? "text-white/70" : "text-ink-muted")}>
               {system.description}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
@@ -36,7 +37,13 @@ export default async function DocsArticlePage({ params }: Params) {
       <SiteNav />
 
       <article className="mx-auto max-w-3xl px-4 pt-28 sm:px-6 sm:pt-32">
-        <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Docs</p>
+        <Link
+          href="/docs"
+          className="font-mono text-xs uppercase tracking-wide text-ink-muted transition-colors hover:text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        >
+          &larr; All docs
+        </Link>
+        <p className="mt-6 font-mono text-xs uppercase tracking-wide text-ink-muted">Docs</p>
         <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
           {article.title}
         </h1>

@@ -14,143 +14,124 @@ export interface DocsArticle {
 
 /**
  * Editorial copy for the public /docs section.
- *
- * Figures here are stated as targets or ranges, never as measured customer
- * results, until measured numbers exist and are approved for public claims.
  */
 export const ARTICLES: DocsArticle[] = [
   {
     slug: "what-is-winlerr",
     title: "What is Winlerr?",
-    description:
-      "Winlerr is a free professional website for Zambian businesses, plus the AI systems that answer, qualify, and follow up every enquiry.",
-    intro:
-      "Winlerr is two things in one platform: a professional website for your business at no upfront cost, and the systems that make sure every enquiry that arrives gets answered, qualified, and followed up.",
+    description: "A short introduction for business owners.",
+    intro: "A short introduction for business owners.",
     sections: [
       {
-        heading: "Why the website comes first",
+        heading: "What Winlerr is",
         paragraphs: [
-          "Most small businesses lose enquiries before any software could help, because they have no credible online presence. So that is where we start: a professional page for your business, live in days.",
-          "There is no upfront cost for the website. Once it is live, we connect the first system that closes the gap between an enquiry and a reply.",
+          "Winlerr is a digital growth company built specifically for small and medium businesses in Zambia. We help local business owners establish a credible presence online and manage customer communications reliably. Running a business often means balancing daily operations while answering phone calls, responding to WhatsApp texts, and chasing quotes. Winlerr gives you the tools to handle incoming demand without having to hire extra administrative staff.",
         ],
       },
       {
-        heading: "What the systems do",
+        heading: "What we offer",
         paragraphs: [
-          "The systems are deliberately practical. They sit where your customers already are — WhatsApp, Facebook, Instagram, and your phone — and they do the work that currently falls on whoever picks up first.",
+          "We offer two connected solutions: a free professional website and intelligent automation systems. The website gives your business a clean, trustworthy home on the internet. The AI systems connect directly to that presence to answer enquiries, qualify potential buyers, take bookings, and follow up with leads across WhatsApp and social media.",
         ],
-        items: [
-          "Answer every enquiry in seconds instead of hours.",
-          "Qualify each enquiry so you know who is ready to buy before you call.",
-          "Track and chase the follow-ups you promised.",
-          "Keep working at night, over weekends, and on holidays.",
+      },
+      {
+        heading: "The order matters",
+        paragraphs: [
+          "Every business starts with the free website before adding any automation systems. We do this because automation needs a solid foundation to work properly. When a potential customer hears about your business, they want to verify who you are, see your services, and know how to reach you. Once your website is live and establishing trust, we can plug in the systems that capture and convert those visitors.",
         ],
       },
       {
         heading: "Who it is for",
         paragraphs: [
-          "Winlerr is built in Zambia, for Zambian businesses. That means WhatsApp-first by default, mobile-money aware, and priced for growing businesses rather than adapted from a market where customers behave differently.",
+          "Winlerr is designed for Zambian service providers, retail shops, restaurants, salons, and contractors who want to grow their customer base. If you are losing enquiries because you are busy on a job, serving clients, or away from your phone after hours, Winlerr is built for you. You get a reliable digital presence that works around the clock.",
         ],
       },
       {
-        heading: "How we charge",
+        heading: "How to get started",
         paragraphs: [
-          "The website has no upfront cost. Systems are scoped as fixed-price builds with clear timelines, and you start with one — adding more only when the first is earning its place.",
+          "Getting started is simple and straightforward. Visit winlerr.vip/get-started and share a few basic details about your business. Our team will review your information, start building your website, and contact you directly on WhatsApp to guide you through each step.",
         ],
       },
     ],
   },
   {
     slug: "free-website",
-    title: "The free website",
-    description:
-      "What is included in the Winlerr free professional website, how long it takes to go live, and what you need to provide.",
-    intro:
-      "Every Winlerr business starts with a professional website at no upfront cost. This page sets out what is included, how long it takes, and what we need from you.",
+    title: "How the free website works",
+    description: "What's included, what it costs, how long it takes.",
+    intro: "What's included, what it costs, how long it takes.",
     sections: [
+      {
+        heading: "What the free website costs",
+        paragraphs: [
+          "The Winlerr website is completely free. There are no design fees, no setup charges, and zero upfront costs. We build the site and provide the hosting on our platform at no charge to your business. There are no hidden fees or surprise invoices.",
+        ],
+      },
+      {
+        heading: "Where your website lives",
+        paragraphs: [
+          "Your website goes live on your own dedicated subdomain at yourbusiness.winlerr.vip. This gives you an immediate web address that you can share on business cards, post on Facebook and Instagram, or send directly to customers over WhatsApp.",
+        ],
+      },
       {
         heading: "What is included",
         paragraphs: [
-          "A clean, mobile-first page that loads fast on the mobile connections your customers actually use, with the information a new customer needs to decide to enquire.",
-        ],
-        items: [
-          "Your business name, what you do, and the services you offer.",
-          "Opening hours and the ways to reach you — WhatsApp first.",
-          "A direct WhatsApp button, so an enquiry is one tap away.",
-          "A link to your live enquiry form.",
+          "Your free website is designed specifically for your trade. It includes a modern, mobile-friendly design that loads quickly on standard mobile connections across Zambia. It clearly displays your business name, what you do, and your full list of services. It also includes an interactive contact form, your operating hours, photos of your work (you provide them, or we use what you have on hand), and a direct WhatsApp button so new visitors can message you with one tap.",
         ],
       },
       {
         heading: "How long it takes",
         paragraphs: [
-          "Live in days, not weeks. The constraint is usually how quickly we can get your service list, opening hours, and a logo or photo you are happy with — everything else we handle.",
+          "We build and launch your website in days, not weeks. We do not promise instant creation because our team prepares a clean layout tailored to your actual business. As soon as you share your basic information, we begin assembling your pages and preparing them for launch.",
         ],
       },
       {
         heading: "What we need from you",
-        items: [
-          "The name of the business and what it does.",
-          "The services you want listed.",
-          "Your opening hours.",
-          "A logo or photo, if you have one. Not required.",
+        paragraphs: [
+          "To build your site, we only need a few essentials: your registered or trading business name, your WhatsApp phone number, your physical location or service area, a list of your services, and any photos you have of your work. If you have an existing logo, we will include it; if not, we will create a clean, simple text header for you.",
         ],
       },
       {
-        heading: "What happens after it is live",
+        heading: "Edits after launch",
         paragraphs: [
-          "The website is the foundation, not the product. Once it is live we connect your first system — usually lead response and WhatsApp — so the enquiries it starts generating are actually answered.",
+          "Your website is not locked once it goes live. If your phone number changes, your operating hours adjust, or you want to update your service offerings, you can request text and image updates directly through our team.",
         ],
       },
     ],
   },
   {
     slug: "systems-overview",
-    title: "Systems overview",
-    description:
-      "How the six Winlerr systems fit together: lead response, WhatsApp AI agent, social DM agent, booking, customer follow-up, and AI receptionist.",
-    intro:
-      "The six systems are independent and composable. Most businesses start with one, configure it properly, and add the next when the first is doing its job.",
+    title: "The systems Winlerr offers",
+    description: "What each system does and who it's for.",
+    intro: "What each system does and who it's for.",
     sections: [
       {
-        heading: "Lead response",
+        heading: "The foundation",
         paragraphs: [
-          "Every enquiry triaged and answered in seconds. Calls, forms, WhatsApp messages, and DMs land in one queue, get a first response, and are scored so you know who is ready to buy.",
+          "Every Winlerr client starts with our free professional website. Once your website is live and welcoming visitors, you can add specialized AI systems to manage your customer communications.",
         ],
       },
       {
-        heading: "WhatsApp AI agent",
+        heading: "The six systems",
         paragraphs: [
-          "Customer conversations on autopilot, 24/7. It answers questions, captures the details you need, and hands off to a human at the right moment.",
+          "Winlerr offers six distinct systems tailored to how Zambian businesses operate.",
+          "Lead Response: Immediately captures and acknowledges every incoming enquiry across your website, WhatsApp, and social inboxes, making sure no customer is ignored. Fits contractors, consultants, and trade businesses.",
+          "WhatsApp AI Agent: Lives inside your official WhatsApp number to answer common customer questions, share details, and hand over complex chats to your team 24/7. Fits restaurants, clinics, and salons.",
+          "Social DM Agent: Manages incoming messages on Facebook and Instagram, answering product and pricing questions and guiding buyers to complete their order. Fits fashion boutiques and retail shops.",
+          "Booking System: Allows customers to view open dates and book appointments directly on your website without endless back-and-forth messages. Fits salons, repair shops, and studios.",
+          "Customer Follow-up: Automatically checks in on sent quotes and reminds past customers when it is time to reorder or rebook services. Fits trade contractors and wholesale suppliers.",
+          "AI Receptionist: Covers your business during evenings, weekends, and holidays by answering common questions and recording structured callback requests. Fits legal firms, transport providers, and clinics.",
         ],
       },
       {
-        heading: "Social DM agent",
+        heading: "How the systems are delivered",
         paragraphs: [
-          "Facebook and Instagram messages handled, qualified, and routed — from the same dashboard as everything else, so nothing lives in a separate inbox.",
+          "Unlike the free website, these automation systems are paid add-ons. Each system is tailored specifically to your business operations, pricing structure, and preferred conversation style. You do not need to purchase all six systems at once. Most businesses start with one system, such as Lead Response or the WhatsApp AI Agent, and only add more systems as their customer volume grows.",
         ],
       },
       {
-        heading: "Booking system",
+        heading: "Learn more",
         paragraphs: [
-          "Appointments without the back-and-forth. Customers pick a time that suits them; confirmations and reminders go out automatically.",
-        ],
-      },
-      {
-        heading: "Customer follow-up",
-        paragraphs: [
-          "Quotes chased, reviews requested, nobody forgotten. Open quotes and promised follow-ups are tracked so enquiries do not go quiet between first message and sale.",
-        ],
-      },
-      {
-        heading: "AI receptionist",
-        paragraphs: [
-          "A front desk that never sleeps. It answers after hours, on weekends, and on holidays, captures the enquiry, and leaves you a warm pipeline in the morning.",
-        ],
-      },
-      {
-        heading: "Winlerr OS",
-        paragraphs: [
-          "Leads, conversations, follow-ups, and reports in a single dashboard that works on any device. Every system above writes into it, so you get one place to see the business.",
+          "You can explore the full technical capabilities and workflows of each individual tool by visiting winlerr.vip/systems.",
         ],
       },
     ],
@@ -158,45 +139,67 @@ export const ARTICLES: DocsArticle[] = [
   {
     slug: "faq",
     title: "Frequently asked questions",
-    description:
-      "Answers to common questions about the Winlerr free website, pricing, the AI systems, WhatsApp, and what happens after you get started.",
-    intro:
-      "The questions we are asked most often, answered plainly. If yours is not here, ask us directly and we will answer it.",
+    description: "Straight answers to common questions.",
+    intro: "Straight answers to common questions.",
     sections: [
       {
         heading: "Is the website really free?",
         paragraphs: [
-          "There is no upfront cost for your website. It is ours to build and ours to host, and it is the first step rather than a sales tactic — a business with no credible online presence cannot benefit from lead automation yet.",
+          "Yes. There is zero upfront cost, no design fee, and no hosting fee for your website on yourbusiness.winlerr.vip. It is our way of giving your business a solid digital foundation before discussing optional automation tools.",
         ],
       },
       {
-        heading: "What does it cost to add systems?",
+        heading: "Do I need a website before I can get a system?",
         paragraphs: [
-          "Systems are fixed-scope builds with a clear price agreed before work starts, not open-ended projects. You start with one system and add more as the business grows.",
+          "Yes. We require your website to be live first so your business has an official presence to capture customer details and anchor your automation. If you already have an existing website, our team will confirm during onboarding how we can connect.",
         ],
       },
       {
-        heading: "How fast do you respond?",
+        heading: "How long does the website take?",
         paragraphs: [
-          "The systems are built to a target of a first response in under 60 seconds, around the clock. That is a service level we design for and measure internally, not a claim about any customer's results.",
+          "Your website goes live in days, not weeks. The exact turnaround depends on how quickly you provide your business details, list of services, and photos.",
         ],
       },
       {
-        heading: "Do I need to change how my customers contact me?",
+        heading: "Can I change my website after it goes live?",
         paragraphs: [
-          "No. We work on the channels you already use — WhatsApp, Facebook, Instagram, and your phone. The goal is that your customers notice no change, and you stop losing the conversations you were already having.",
+          "Yes. You can request updates to your services, operating hours, contact numbers, or photos whenever your business changes. Simply send your requested edits to our team on WhatsApp.",
         ],
       },
       {
-        heading: "Will the AI talk to my customers on its own?",
+        heading: "Do I need a business email or domain?",
         paragraphs: [
-          "It does, under your control. You decide what it can answer, what it must escalate, and when it hands off to a person. Anything it is not confident about goes to a human rather than being guessed at.",
+          "No. You do not need a custom domain or business email to get started. Your website runs on your dedicated yourbusiness.winlerr.vip address, and all customer messages route directly to your active WhatsApp number.",
         ],
       },
       {
-        heading: "How long does implementation take?",
+        heading: "How do the AI systems handle my customers?",
         paragraphs: [
-          "The website goes live in days. A first system takes longer, because it has to be configured to your business — your services, your hours, your tone, and your escalation rules.",
+          "The AI systems respond directly to your customer enquiries in natural, professional language. They answer frequent questions, provide service details, take booking information, and pass complex enquiries directly to you.",
+        ],
+      },
+      {
+        heading: "What if the AI doesn't know an answer?",
+        paragraphs: [
+          "If a customer asks a question outside its knowledge or requests custom terms, the AI politely explains that it will check with the business owner and immediately routes the conversation to you.",
+        ],
+      },
+      {
+        heading: "Can I cancel a system later?",
+        paragraphs: [
+          "Yes. Our systems are delivered as tailored packages without long lock-in contracts. If your operational needs change, you can pause or cancel a system by notifying our team.",
+        ],
+      },
+      {
+        heading: "Do you work with businesses outside Lusaka?",
+        paragraphs: [
+          "Yes. We support businesses throughout Zambia. Because our onboarding, setup, and support happen digitally over WhatsApp and phone, your location in Zambia does not limit our service.",
+        ],
+      },
+      {
+        heading: "How do I get started?",
+        paragraphs: [
+          "To get started, visit winlerr.vip/get-started and submit your business details. Our team will review your submission and contact you on WhatsApp to begin creating your website.",
         ],
       },
     ],

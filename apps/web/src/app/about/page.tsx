@@ -21,15 +21,41 @@ export default function AboutPage() {
         <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
           Built in Zambia, for Zambian businesses.
         </h1>
-        <p className="mt-6 text-base text-ink-muted">
-          Winlerr exists because most Zambian businesses do not lose customers to a bad product. They
-          lose them to a missed call, a reply that comes tomorrow, and a follow-up nobody sends.
-        </p>
-        <p className="mt-4 text-base text-ink-muted">
-          So we start with the part that should never have been a barrier: a professional website,
-          free, live in days. Then we add the systems that answer, qualify, and follow up — on
-          WhatsApp first, because that is where the conversations already are.
-        </p>
+        <div className="mt-6 space-y-4">
+          <p className="text-base leading-relaxed text-ink-muted">
+            I started Winlerr after watching business owners in Lusaka lose sales simply because
+            they could not reach their phones in time. A customer asks for prices on WhatsApp,
+            waits hours for a reply, and buys elsewhere. Good local businesses were not losing on
+            quality, but on response speed.
+          </p>
+          <p className="text-base leading-relaxed text-ink-muted">
+            Most owners here run everything from one device while managing staff, stock, and
+            customers. When enquiries arrive during busy rushes or late at night, messages sit
+            unread and quotes go forgotten. Building a standard website usually brings high upfront
+            fees and unnecessary delays.
+          </p>
+          <p className="text-base leading-relaxed text-ink-muted">
+            I believe practical technology should match how Zambians already communicate. Small
+            businesses should not need complicated software or costly retainers to answer customer
+            questions. Helpful tools should work quietly where buyers already spend their time,
+            especially on WhatsApp.
+          </p>
+          <p className="text-base leading-relaxed text-ink-muted">
+            That is why we build your professional website for free first. It gives your business a
+            credible presence without costing a single Kwacha upfront. Once that foundation is
+            live, we connect the AI systems that answer, qualify, and follow up with leads 24/7.
+          </p>
+          <p className="text-base leading-relaxed text-ink-muted">
+            We are early-stage and working closely with our first client cohort, so every business
+            matters to us. You will work directly with real people who configure your setup
+            carefully and speak plainly. We will never sell you systems you do not need.
+          </p>
+          <p className="text-base leading-relaxed text-ink-muted">
+            If you are ready to stop losing enquiries, message me directly on WhatsApp. I will get
+            your free website live and help your business grow.
+          </p>
+          <p className="text-sm font-semibold text-ink">— Sean, Founder, Winlerr</p>
+        </div>
       </section>
 
       <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
