@@ -25,6 +25,62 @@ export const dynamic = "force-dynamic";
 const BUSINESS_TYPES = ["Restaurant", "Salon", "Contractor", "Retail", "Other"] as const;
 type BusinessType = (typeof BUSINESS_TYPES)[number];
 
+/**
+ * Fixed fictional business profiles for the homepage demo.
+ *
+ * These exist so the model has a closed set of facts to answer from. The
+ * sandbox businesses are invented; the model is instructed to answer only from
+ * the injected profile and to confirm anything outside it.
+ *
+ * Keys are a superset of `BUSINESS_TYPES`: a request whose business type has
+ * no profile (for example "Retail") falls back to "Other".
+ */
+export const SANDBOX_PROFILES = {
+  Restaurant: {
+    name: "Mwansa Kitchen",
+    city: "Lusaka",
+    hours: "Mon-Sat 11:00-21:00, Sun closed",
+    delivery: "Kabulonga, Woodlands, Roma, Chelston. 30-45 min.",
+    menu: "grilled tilapia K140, beef stew K120, chicken curry K110, vegetarian platter K95",
+    payment: "Airtel Money, MTN MoMo, cash",
+  },
+  Salon: {
+    name: "Glow Beauty Studio",
+    city: "Kabulonga",
+    services: "braids (from K250), haircut K80, manicure K60, pedicure K80, makeup K150+",
+    hours: "Tue-Sat 09:00-18:00. Walk-ins welcome, bookings preferred.",
+    payment: "cash, Airtel Money",
+  },
+  Contractor: {
+    name: "Kabwe Construction",
+    city: "Lusaka",
+    services: "roofing (IBR, Harvey, tiles), timber framing, leak repairs, renovations",
+    area: "Lusaka + 50km",
+    notes: "Free site assessment offered. Quotes depend on dimensions and materials.",
+  },
+  Boutique: {
+    name: "Chiluba Fashion",
+    city: "Lusaka",
+    categories: "dresses, blouses, shoes, bags, accessories",
+    sizes: "XS-XL",
+    shipping: "Lusaka same-day; Kitwe/Ndola 24h via bus; other areas via courier",
+    payment: "Airtel Money, MTN MoMo, cash on delivery (Lusaka only)",
+  },
+  "Professional services": {
+    name: "Banda & Associates",
+    city: "Lusaka",
+    services: "PACRA company registration, ZRA tax advisory, compliance, bookkeeping",
+    engagement: "fixed-fee packages, no hourly billing",
+    pacra_timeline: "typically 7-14 business days",
+    notes: "Free 15-minute consultation offered",
+  },
+  Other: {
+    name: "Winlerr Sandbox Client",
+    city: "Lusaka",
+    notes: "General enquiry — reply warmly and ask how you can help.",
+  },
+} as const;
+
 const ENQUIRY_MAX = 300;
 
 const CANNED: Record<BusinessType, string> = {
@@ -40,8 +96,25 @@ const CANNED: Record<BusinessType, string> = {
     "Hi, thanks for reaching out. I'd be glad to help you with that. Could you tell me a little more about what you need? I'll check with the owner and come back to you shortly.",
 };
 
+/** The sandbox profile for a business type, falling back to "Other". */
+function profileFor(businessType: BusinessType): Record<string, unknown> {
+  const profiles: Record<string, Record<string, unknown>> = SANDBOX_PROFILES;
+  return profiles[businessType] ?? profiles["Other"];
+}
+
 function systemPrompt(businessType: BusinessType): string {
-  return `You are the AI assistant for a small ${businessType} business in Lusaka, Zambia. You reply to customer WhatsApp enquiries on behalf of the owner. Your tone is warm, brief, and helpful — like a friendly receptionist. Ask one qualifying question at most. Reference Zambian context when natural (Kwacha, Lusaka neighborhoods, mobile money). Reply in 2–3 short sentences. Never invent prices, inventory, or availability — if asked, say you'll check with the owner and come back shortly. Sign nothing. Do not use emojis. Output only the reply text, nothing else.`;
+  return `You are the Winlerr demo reply assistant. A visitor to winlerr.vip submitted a business enquiry, and you are drafting the reply the business would send back — in real time — to demonstrate Winlerr's Lead Response system.
+
+CRITICAL RULE: You are demonstrating how a REAL business replies. You must NEVER invent prices, stock, availability, hours, menu items, or any specific fact. You may only use facts from the SANDBOX PROFILE below. For anything not in the profile, respond warmly and say you will confirm and get back to them.
+
+SANDBOX PROFILE for this enquiry:
+${JSON.stringify(profileFor(businessType), null, 2)}
+
+Tone: Warm, human, WhatsApp-native Zambian business. 2-4 sentences. No emojis. No markdown. Always end with a qualifying question (except final confirmations).
+
+Length: under 300 characters.
+
+Reply only with the drafted message. No preamble, no quotes, no explanation.`;
 }
 
 /** Coerce to a canonical BusinessType, case-insensitively. */

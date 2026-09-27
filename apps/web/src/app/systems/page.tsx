@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
@@ -13,36 +14,42 @@ export const metadata: Metadata = {
 const SYSTEMS = [
   {
     name: "Lead Response",
+    slug: "lead-response",
     summary: "Every enquiry triaged and answered in seconds.",
     detail:
       "Calls, form submissions, WhatsApp messages, and DMs land in one queue, get a qualified first response, and are scored so you know who is ready to buy before you call.",
   },
   {
     name: "WhatsApp AI Agent",
+    slug: "whatsapp-ai-agent",
     summary: "Customer conversations on autopilot, 24/7.",
     detail:
       "The channel Zambian customers already use, handled continuously. Your agent answers questions, captures the details you need, and hands off to a human at the right moment.",
   },
   {
     name: "Social DM Agent",
+    slug: "social-dm-agent",
     summary: "Facebook and Instagram messages handled, qualified, and routed.",
     detail:
       "DMs from your Facebook and Instagram pages are answered from the same dashboard as everything else, then qualified and routed to the right person or system.",
   },
   {
     name: "Booking System",
+    slug: "booking-system",
     summary: "Appointments without the back-and-forth.",
     detail:
       "Let customers book the time that suits them instead of negotiating over messages. Confirmations and reminders go out automatically.",
   },
   {
     name: "Customer Follow-up",
+    slug: "customer-follow-up",
     summary: "Quotes chased. Reviews requested. Nobody forgotten.",
     detail:
       "Every open quote and promised follow-up is tracked and chased for you, so enquiries do not go quiet between the first message and the sale.",
   },
   {
     name: "AI Receptionist",
+    slug: "ai-receptionist",
     summary: "A front desk that never sleeps.",
     detail:
       "Answers after hours, on weekends, and on holidays. It captures the enquiry, books or qualifies it, and lets you get to work in the morning to a warm pipeline.",
@@ -56,24 +63,29 @@ export default function SystemsPage() {
       <section className="mx-auto max-w-6xl px-4 pt-28 sm:px-6 sm:pt-32">
         <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Systems</p>
         <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
-          Six systems. One platform. Pick what your business needs.
+          Practical AI systems built for Zambian businesses.
         </h1>
         <p className="mt-4 max-w-2xl text-base text-ink-muted">
-          Start with one system, configure it to your business, and add more as you grow.
+          Start with a free professional website, then connect the systems that answer customer
+          enquiries, take bookings, and close sales around the clock.
+        </p>
+        <p className="mt-3 max-w-2xl text-sm text-ink-muted">
+          No long contracts or hidden setup fees. Add only the systems your business actually needs.
         </p>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
         <div className="grid gap-4 md:grid-cols-2">
           {SYSTEMS.map((system) => (
-            <article
+            <Link
               key={system.name}
-              className="rounded-card border border-border bg-surface p-6 shadow-card"
+              href={`/systems/${system.slug}`}
+              className="block rounded-card border border-border bg-surface p-6 shadow-card transition-colors hover:bg-surface-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
               <h2 className="font-display text-lg font-bold">{system.name}</h2>
               <p className="mt-2 text-sm font-medium text-brand-600">{system.summary}</p>
               <p className="mt-3 text-sm text-ink-muted">{system.detail}</p>
-            </article>
+            </Link>
           ))}
         </div>
       </section>
