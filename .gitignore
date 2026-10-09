@@ -89,3 +89,5 @@ research/
 
 .vercel
 .env*
+# ...but the placeholder template itself must be committable (AGENTS.md: commit only .env.example)
+!.env.example
