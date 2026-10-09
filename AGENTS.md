@@ -52,9 +52,9 @@ This document governs all contributors — humans and AI agents (including OpenC
 
 Before declaring meaningful work complete, the author must:
 
-- [ ] Run **type checking** — `pnpm typecheck`
-- [ ] Run **linting** — `pnpm lint`
-- [ ] Run **applicable tests** — `pnpm test` (or `--filter` for affected workspaces)
+- [ ] Run **type checking** — `npm run typecheck`
+- [ ] Run **linting** — `npm run lint`
+- [ ] Run **applicable tests** — `npm run test` (or `--workspace` for affected workspaces)
 - [ ] Verify **affected functionality** manually or via automated checks
 
 **Never claim successful verification unless it was actually performed.** Include command outputs in PRs when claiming verification.
@@ -72,7 +72,7 @@ Before declaring meaningful work complete, the author must:
 - Apps live in `apps/<name>/`.
 - Services live in `services/<name>/`.
 - Shared build tooling lives in `packages/config/`.
-- Use `pnpm --filter <name>` to target workspaces; use `turbo run <task>` for cross-workspace tasks.
+- Use `npm run <script> --workspace=<name>` to target workspaces; use `turbo run <task>` for cross-workspace tasks.
 
 ## 9. Environment & Secrets
 

@@ -61,14 +61,14 @@ winlerr/
 ├── .gitignore
 ├── AGENTS.md
 ├── package.json
-├── pnpm-workspace.yaml
+├── package-lock.json
 └── turbo.json
 ```
 
 ## Prerequisites
 
-- **Node.js** >= 20 (see `.nvmrc`)
-- **pnpm** >= 9 (`npm install -g pnpm` or `corepack enable`)
+- **Node.js** >= 20 (CI uses 22 LTS)
+- **npm** >= 10 (repo pins `npm@10.8.2` via `packageManager`; `package-lock.json` is the lockfile)
 - **Git** >= 2.40
 - **Supabase CLI** (optional, for local DB) — https://supabase.com/docs/guides/local-development/cli/getting-started
 - **Vercel CLI** (optional, for deployment preview) — `npm i -g vercel`
@@ -77,7 +77,7 @@ Verify:
 
 ```bash
 node --version
-pnpm --version
+npm --version
 git --version
 ```
 
@@ -91,26 +91,26 @@ cd winlerr
 # 2. Use correct Node version
 nvm use  # or fnm use, volta pin, etc.
 
-# 3. Install dependencies
-pnpm install
+# 3. Install dependencies (clean, reproducible — matches CI)
+npm ci
 
 # 4. Environment
 cp .env.example .env
 # Edit .env with real values — never commit .env
 
 # 5. Run (once apps are implemented)
-pnpm dev      # all apps in dev mode via Turborepo
-pnpm build    # production build
-pnpm lint     # lint all workspaces
-pnpm typecheck
-pnpm test
+npm run dev      # all apps in dev mode via Turborepo
+npm run build    # production build
+npm run lint     # lint all workspaces
+npm run typecheck
+npm run test
 ```
 
 Individual apps/packages (when implemented):
 
 ```bash
-pnpm --filter @winlerr/ui build
-pnpm --filter web dev
+npm run build --workspace=@winlerr/ui
+npm run dev --workspace=web
 ```
 
 ## Environment Variables
@@ -129,14 +129,14 @@ See `.env.example` for the full list. Categories:
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Run all apps in watch mode |
-| `pnpm build` | Build all apps/packages |
-| `pnpm lint` | ESLint across monorepo |
-| `pnpm lint:fix` | ESLint auto-fix |
-| `pnpm typecheck` | `tsc --noEmit` per workspace |
-| `pnpm test` | Run tests |
-| `pnpm format` | Prettier write |
-| `pnpm format:check` | Prettier check |
+| `npm run dev` | Run all apps in watch mode |
+| `npm run build` | Build all apps/packages |
+| `npm run lint` | ESLint across monorepo |
+| `npm run lint:fix` | ESLint auto-fix |
+| `npm run typecheck` | `tsc --noEmit` per workspace |
+| `npm run test` | Run tests |
+| `npm run format` | Prettier write |
+| `npm run format:check` | Prettier check |
 | `turbo run <task> --filter=<name>` | Target a single workspace |
 
 ## Branch Strategy
@@ -179,7 +179,7 @@ No production deployment is wired automatically at bootstrap. Deployment is enab
 
 1. Read `AGENTS.md`.
 2. Create a branch from `develop`: `git checkout -b feature/my-feature`.
-3. Make changes, run `pnpm lint && pnpm typecheck && pnpm test`.
+3. Make changes, run `npm run lint && npm run typecheck && npm run test`.
 4. Open a PR using the template at `.github/pull_request_template.md`.
 
 ## License

@@ -29,9 +29,7 @@
       "@winlerr/automation": ["packages/automation/src"],
       "@winlerr/automation/*": ["packages/automation/src/*"],
       "@winlerr/notifications": ["packages/notifications/src"],
-      "@winlerr/notifications/*": ["packages/notifications/src/*"],
-      "@winlerr/config": ["packages/config/src"],
-      "@winlerr/config/*": ["packages/config/src/*"]
+      "@winlerr/notifications/*": ["packages/notifications/src/*"]
     }
   },
   "exclude": ["node_modules", "dist", ".next", "out", ".turbo", "coverage", "research"]

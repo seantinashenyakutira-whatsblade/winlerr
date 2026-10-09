@@ -19,28 +19,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: npm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Lint
-        run: pnpm lint
+        run: npm run lint
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: npm run typecheck
 
+      # Tests currently exist only in packages/ai (vitest).
+      # `turbo run test` executes every workspace that defines a `test`
+      # script and skips the rest — it does not fake results for the others.
       - name: Test
-        run: pnpm test
+        run: npm run test
 
       - name: Build
-        run: pnpm build
+        run: npm run build
