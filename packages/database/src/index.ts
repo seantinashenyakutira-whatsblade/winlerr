@@ -1,9 +1,21 @@
 /**
- * @winlerr/database — Supabase / PostgreSQL helpers
+ * @winlerr/database — typed Supabase access for Winlerr.
  *
- * Expose typed clients (browser / server / admin) and query helpers here.
- * All data access should be scoped by tenant/org ID; RLS is the primary
- * enforcement layer.
+ * Entry points:
+ * - `@winlerr/database/server` — anon + service-role factories (SERVER ONLY)
+ * - `@winlerr/database/browser` — anon-key factory for client components
+ * - `@winlerr/database` (this file) — shared table types only
+ *
+ * All data access is scoped by RLS; the service-role client bypasses RLS
+ * and must never cross into client bundles (AGENTS.md §2).
  */
-
-export const placeholder = "database" as const;
+export type {
+  AdminProfileInsert,
+  AdminProfileRow,
+  AdminRole,
+  ClaimInsert,
+  ClaimRow,
+  Database,
+  LeadInsert,
+  LeadRow,
+} from "./types.js";
