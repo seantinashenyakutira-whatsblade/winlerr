@@ -16,7 +16,17 @@ const modules = [
   { title: "Team & workspace", description: "Bring your people into one shared system.", icon: Users, tag: "Setup" },
 ];
 
-export function DashboardShell({ preview = false }: { preview?: boolean }) {
+export function DashboardShell({
+  preview = false,
+  accountEmail,
+  onSignOut,
+}: {
+  preview?: boolean;
+  /** Live session account. Absent = preview mode (existing placeholder UI). */
+  accountEmail?: string | null;
+  /** Server action invoked on sign-out. Absent = sign-out stays disabled. */
+  onSignOut?: () => Promise<void>;
+}) {
   const [menu, setMenu] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   return (
@@ -36,7 +46,7 @@ export function DashboardShell({ preview = false }: { preview?: boolean }) {
         <main className="min-w-0 flex-1">
           <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between border-b border-[#e6e4dc] bg-[#f8f7f2]/95 px-4 backdrop-blur sm:px-8">
             <div className="flex items-center gap-3"><button aria-label="Open navigation" onClick={() => setMenu(true)} className="rounded-lg p-2 hover:bg-[#eceae2] lg:hidden"><Menu size={19}/></button><span className="text-sm text-[#768078]">Workspace <span className="mx-1.5">/</span><strong className="font-medium text-[#243d32]">Overview</strong></span></div>
-            <div className="flex items-center gap-2 sm:gap-4"><button aria-label="Help" className="hidden rounded-xl p-2.5 text-[#607168] hover:bg-[#eceae2] sm:block"><CircleHelp size={18}/></button><button aria-label="Notifications" className="rounded-xl p-2.5 text-[#607168] hover:bg-[#eceae2]"><Bell size={18}/></button><div className="relative"><button aria-label="Open account menu" aria-expanded={profileOpen} onClick={()=>setProfileOpen(!profileOpen)} className="flex items-center gap-2 rounded-full border border-[#e4e2da] bg-white p-1 pr-2.5"><span className="grid h-8 w-8 place-items-center rounded-full bg-[#e8d6c5] text-xs font-semibold text-[#6f4938]">U</span><span className="hidden text-xs font-medium sm:block">Your account</span><ChevronDown className="hidden sm:block" size={14}/></button>{profileOpen&&<div role="menu" aria-label="Account menu" className="absolute right-0 top-12 z-30 w-56 rounded-2xl border border-[#e5e2d8] bg-white p-2 shadow-[0_12px_32px_rgba(28,52,41,.12)]"><p className="px-3 py-2 text-xs text-[#758078]">Account session unavailable in preview</p><Link role="menuitem" href="/login" className="block rounded-lg px-3 py-2.5 text-sm hover:bg-[#f5f4ef]">Sign in</Link><button role="menuitem" disabled title="Sign out becomes available with the auth integration" className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-[#9ba39b]">Sign out · backend pending</button></div>}</div></div>
+            <div className="flex items-center gap-2 sm:gap-4"><button aria-label="Help" className="hidden rounded-xl p-2.5 text-[#607168] hover:bg-[#eceae2] sm:block"><CircleHelp size={18}/></button><button aria-label="Notifications" className="rounded-xl p-2.5 text-[#607168] hover:bg-[#eceae2]"><Bell size={18}/></button><div className="relative"><button aria-label="Open account menu" aria-expanded={profileOpen} onClick={()=>setProfileOpen(!profileOpen)} className="flex items-center gap-2 rounded-full border border-[#e4e2da] bg-white p-1 pr-2.5"><span className="grid h-8 w-8 place-items-center rounded-full bg-[#e8d6c5] text-xs font-semibold text-[#6f4938]">U</span><span className="hidden max-w-40 truncate text-xs font-medium sm:block">{accountEmail ?? "Your account"}</span><ChevronDown className="hidden sm:block" size={14}/></button>{profileOpen&&<div role="menu" aria-label="Account menu" className="absolute right-0 top-12 z-30 w-56 rounded-2xl border border-[#e5e2d8] bg-white p-2 shadow-[0_12px_32px_rgba(28,52,41,.12)]">{onSignOut ? (<><p className="px-3 py-2 text-xs text-[#758078]">{accountEmail ?? "Signed in"}</p><button role="menuitem" onClick={() => void onSignOut()} className="w-full rounded-lg px-3 py-2.5 text-left text-sm hover:bg-[#f5f4ef]">Sign out</button></>) : (<><p className="px-3 py-2 text-xs text-[#758078]">Account session unavailable in preview</p><Link role="menuitem" href="/login" className="block rounded-lg px-3 py-2.5 text-sm hover:bg-[#f5f4ef]">Sign in</Link><button role="menuitem" disabled title="Sign out becomes available with the auth integration" className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-[#9ba39b]">Sign out · backend pending</button></>)}</div>}</div></div>
           </header>
           <div className="mx-auto max-w-[1440px] px-4 py-7 sm:px-8 sm:py-10">
             <section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p className="winla-eyebrow">Tuesday · Your business at a glance</p><h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-[38px]">A good morning starts here.</h1><p className="mt-2 text-sm text-[#68766c]">Your workspace is ready for its first details.</p></div><Link href="/dashboard/setup" className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#173b32] px-5 text-sm font-semibold text-white transition hover:bg-[#244f41]"><Plus size={17}/> Set up workspace</Link></section>

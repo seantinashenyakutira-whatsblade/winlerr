@@ -37,7 +37,15 @@ export default function GetStartedPage() {
         </h1>
         <p className="mt-4 text-base text-ink-muted">
           Tell us about your business. We&apos;ll get your free website live and set up your first
-          system.
+          system. Already have an account?{" "}
+          <a className="underline" href="/login">
+            Sign in
+          </a>{" "}
+          — or{" "}
+          <a className="underline" href="/signup">
+            create one
+          </a>
+          .
         </p>
       </section>
 
