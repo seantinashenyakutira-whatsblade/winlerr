@@ -42,3 +42,72 @@ body {
     transition: none !important;
   }
 }
+
+/* WinlaOS product surfaces are intentionally scoped so the marketing site
+   keeps its existing palette and component behavior. */
+.winla-page {
+  --winla-forest: #173b32;
+  --winla-forest-soft: #315c42;
+  --winla-copper: #a65435;
+  --winla-paper: #faf9f5;
+  --winla-border: #e6e3d9;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  color: var(--winla-forest);
+  -webkit-font-smoothing: antialiased;
+}
+
+.winla-page :focus-visible {
+  outline: 3px solid #ba7753;
+  outline-offset: 3px;
+}
+
+.winla-eyebrow {
+  color: var(--winla-copper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.winla-input {
+  display: block;
+  min-height: 46px;
+  width: 100%;
+  border: 1px solid #dedfd5;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.7rem 0.9rem;
+  color: #243d32;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.winla-input::placeholder {
+  color: #9ba39b;
+}
+
+.winla-input:focus-visible {
+  border-color: #6d9273;
+  box-shadow: 0 0 0 3px rgb(109 146 115 / 18%);
+  outline: none;
+}
+
+.winla-input:disabled {
+  cursor: not-allowed;
+  background: #f7f6f1;
+  color: #89938b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winla-page *,
+  .winla-page *::before,
+  .winla-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
