@@ -124,10 +124,10 @@ UNVERIFIED — read-only dashboard pack saved at
 
 ## 7. Blocked / needs owner action
 
-1. Paste the `supabase-live-checks.sql` result grids (Q1–Q8) → closes
-   column/policy/grant/trigger/function verification.
-2. Confirm no external consumer of `admin_profiles` public policies
-   (any dashboard, script, or third-party integration reading it?).
+1. Paste the `supabase-live-checks.sql` result grids (Q1–Q9) → closes
+   column/policy/grant/trigger/function/dependency verification.
+2. External-consumer sweep COMPLETE (see §8) — owner to review the
+   classification, especially the five dependent tables and the unknowns.
 3. Approve staging option (fresh vs reactivate) + create it.
 4. Decide adopt-vs-rename for the identity table (after 1–2).
 5. Approve S2/S3 remediation (after function definition reviewed).
@@ -135,3 +135,75 @@ UNVERIFIED — read-only dashboard pack saved at
 Exact next executable step (me, no approval needed): open the PR for
 `fix/supabase-schema-reconciliation` once gates pass, so CI + Preview
 validate the branch.
+
+## 8. External consumer investigation (2026-10-10)
+
+Question: does anything outside the Winlerr repo read/write production
+`admin_profiles` (or depend on its permissive public policies)?
+
+### Sources checked
+
+- **GitHub code search (exact ref `uqdeuiaymoolyroppwhy`, VERIFIED):** matches
+  only winlerr docs + two private backup repos (`VPS-CREDITDENTIALS` →
+  `WINLERR-RECOVERY-MANIFEST.md`, `dev-env-snapshot` → `RESTORE.md`).
+  Contents NOT fetched (expected secrets adjacent) — recorded as
+  documentation mentions, not consumers.
+- **GitHub code search (`admin_profiles`, VERIFIED):** exactly one external
+  hit — `pinkman-X` (`src/lib/AuthContext.tsx` queries
+  `admin_profiles.select('id').eq('id', own_id)` for an `isAdmin` flag; plus
+  its own `supabase/admin_portal.sql` table design). This file is the likely
+  template the Winlerr table was adapted from (shared `full_name` shape).
+- **pinkman-X deployed bundle (`www.pinkmanx.vip` JS, VERIFIED):** does NOT
+  contain the Winlerr prod ref (one other Supabase host present, identity
+  deliberately not recorded). pinkman-X points at its own backend —
+  **not a consumer of Winlerr prod.**
+- **whatsblade-leads deployed JS (VERIFIED):** no Winlerr prod ref.
+  tonyckleads homepage (VERIFIED): no ref in served HTML (stub page).
+  Remaining Vercel projects: bundles not exhaustively scraped — see limits.
+- **Vercel env inspection:** CLI `env ls` shows names + ciphertext only;
+  `env pull` (the only decrypt path) is forbidden by task rules, so
+  per-project URL comparison via CLI is BLOCKED. Server-side-only usage
+  would not appear in public bundles regardless.
+- **DB-internal dependents (OWNER-OBSERVED, pending Q4/Q9 re-confirmation):**
+  RLS policies on five additional live tables reference `admin_profiles`:
+  `failed_submissions`, `feature_suggestions`, `newsletter_campaigns`,
+  `prototype_requests`, `waitlist_leads`. None of these tables exist in
+  tracked migrations — the live DB is substantially larger than the repo
+  represents. Q9a/b/c in `supabase-live-checks.sql` will confirm/extend
+  this list (views, functions, FKs).
+- **Logs:** PostgREST request logs (dashboard Log Explorer) could show
+  anon-key queries against `admin_profiles`, but the CLI has no logs
+  surface and retention windows are short — an empty search proves nothing.
+  Method documented; not executed (needs owner dashboard session).
+
+### Classification
+
+- **CONFIRMED INTERNAL DEPENDENCIES:** RLS policies on five live tables
+  (`failed_submissions`, `feature_suggestions`, `newsletter_campaigns`,
+  `prototype_requests`, `waitlist_leads`) reference `admin_profiles`
+  (owner-observed; pending Q4/Q9 re-confirmation). These MUST be preserved —
+  dropping or tightening `admin_profiles` access without accounting for them
+  risks breaking those tables' policies.
+- **CONFIRMED EXTERNAL CONSUMERS:** none. pinkman-X (the sole code hit) is
+  affirmatively cleared — it queries its own backend.
+- **EXTERNAL CONSUMERS NOT FOUND IN SOURCES CHECKED:** GitHub exact-ref
+  search, accessible repo code search, three deployed bundles checked.
+- **STILL UNKNOWN:** (a) server-side-only consumers (invisible to bundle
+  inspection; Vercel env values unreadable without `env pull`), (b) full
+  DB-internal dependency list (needs Q9 grids), (c) historical PostgREST
+  traffic (needs dashboard logs), (d) contents/roles of the two private
+  backup repos (deliberately unopened).
+
+### Justified direction
+
+The findings support **adoption over renaming, but NOT on the current
+proposal**: the table is load-bearing for five live tables' policies, so a
+separate identity table would leave the permissive policies — and the S1
+exposure — in place while adding a second source of truth. The safe path is:
+keep the table, keep every existing policy untouched until Q4/Q9 + consumer
+confirmation land, then replace the permissive policies explicitly with
+least-privilege equivalents in one reviewed migration (staging first).
+No urgent containment is indicated: no active consumer reads it for
+authorization decisions (in-repo: VERIFIED none; external: none found), so
+the exposure is latent, not actively exploited, to the best of verifiable
+evidence. Do NOT merge PR #14 until the owner reviews this section.

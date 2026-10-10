@@ -70,3 +70,26 @@ from pg_constraint
 where connamespace = 'public'::regnamespace
   and conrelid::regclass::text in ('leads', 'claims', 'admin_profiles')
 order by table_name, constraint_name;
+
+-- Q9a. Views that read admin_profiles (would break or leak if it changes)
+select table_schema, table_name as view_name
+from information_schema.view_table_usage
+where table_schema = 'public'
+  and table_name = 'admin_profiles';
+
+-- Q9b. Functions/triggers whose body references admin_profiles
+select n.nspname as schema_name, p.proname as function_name
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and p.prosrc ilike '%admin_profiles%';
+
+-- Q9c. Foreign keys in OTHER tables pointing at admin_profiles
+select tc.table_name as child_table, kcu.column_name as child_column
+from information_schema.table_constraints tc
+join information_schema.key_column_usage kcu
+  on tc.constraint_name = kcu.constraint_name
+join information_schema.constraint_column_usage ccu
+  on ccu.constraint_name = tc.constraint_name
+where tc.constraint_type = 'FOREIGN KEY'
+  and ccu.table_name = 'admin_profiles';
