@@ -63,13 +63,40 @@ UNVERIFIED — read-only dashboard pack saved at
 
 ## 4. Security findings, ordered by severity
 
-- **S1 — HIGH (latent) / MEDIUM (active): public read+insert on
-  `admin_profiles` with `role` default `'admin'`.** Anyone can enumerate rows
-  and insert themselves as admin. Active impact is bounded ONLY because no
-  code (in-repo VERIFIED; external UNVERIFIED) currently trusts this table
-  for authorization. The moment any auth check reads it, this becomes a
-  full privilege-escalation primitive. Owner action required: confirm no
-  external consumer, then approve policy replacement.
+- **S1 — HIGH (credible public-read exposure; exploitation not
+  demonstrated): permissive access on `admin_profiles`.** Owner-verified
+  live facts: `anon` holds a SELECT table grant; the SELECT policy is
+  `USING (true)` TO PUBLIC; an INSERT policy TO PUBLIC exists; the table
+  currently holds **one row** (an earlier listing reported zero — discrepancy
+  recorded, row content never read). What this means, precisely:
+  (a) any unauthenticated caller can READ that row's columns — public read
+  exposure is credible, not hypothetical;
+  (b) anonymous callers CANNOT insert: the INSERT `WITH CHECK` is
+  `EXISTS (SELECT 1 FROM admin_profiles WHERE id = auth.uid())`, and
+  `auth.uid()` is NULL for anon, so the predicate never holds — the
+  earlier suggestion that arbitrary unauthenticated users could
+  self-promote was wrong and is retracted;
+  (c) the policy does NOT enforce `id = auth.uid()` on the inserted row —
+  it only checks whether the caller ALREADY has a profile row. A user
+  with no existing profile cannot bootstrap one through this policy
+  (the earlier "insert exactly one self-row" claim is corrected).
+  Owner-verified Auth settings (dashboard, 2026-10-10, unchanged by us):
+  new-user signup ENABLED, email confirmation ENABLED, anonymous
+  sign-ins DISABLED. Signup being enabled does NOT open a bootstrap
+  path — a brand-new account has no profile row, so the EXISTS check
+  fails for it. What remains is a narrower hypothesis: a caller who
+  already holds a profile row may potentially insert a row for another
+  existing Auth user, because the policy constrains neither the
+  inserted row's ID nor the existing row's role — and the live `role`
+  default is `'admin'`. Practical behavior and impact UNTESTED (never
+  executed; the single existing row's owner is unknown, content never
+  read). This stays a risk hypothesis until exercised against staging —
+  no exploit demonstrated, none claimed;
+  (d) most importantly, the five dependent tables' RLS policies query
+  `admin_profiles` with `id = auth.uid()` — live authorization decisions
+  DO read this table today, so the prior "no active consumer" claim is
+  retracted. Owner action required: confirm no external consumer beyond
+  these policies, then approve least-privilege replacement (staging first).
 - **S2 — MEDIUM: `rls_auto_enable()` SECURITY DEFINER executable by anon.**
   Definition UNVERIFIED (needs dashboard Q7). If it is an event-trigger
   helper, anon cannot fire DDL so exploitability is likely low — but public
@@ -132,9 +159,11 @@ UNVERIFIED — read-only dashboard pack saved at
 4. Decide adopt-vs-rename for the identity table (after 1–2).
 5. Approve S2/S3 remediation (after function definition reviewed).
 
-Exact next executable step (me, no approval needed): open the PR for
-`fix/supabase-schema-reconciliation` once gates pass, so CI + Preview
-validate the branch.
+Exact next executable step: PR #15 (`fix/supabase-schema-reconciliation`,
+draft) is open — required gates before any merge are owner review of §8,
+green CI on the branch, and an explicit containment decision. CI passing
+validates code correctness only; it says nothing about production database
+security, which must be established through the dashboard evidence above.
 
 ## 8. External consumer investigation (2026-10-10)
 
@@ -164,13 +193,15 @@ Question: does anything outside the Winlerr repo read/write production
   `env pull` (the only decrypt path) is forbidden by task rules, so
   per-project URL comparison via CLI is BLOCKED. Server-side-only usage
   would not appear in public bundles regardless.
-- **DB-internal dependents (OWNER-OBSERVED, pending Q4/Q9 re-confirmation):**
-  RLS policies on five additional live tables reference `admin_profiles`:
+- **DB-internal dependents (OWNER-VERIFIED pattern, Q4/Q9 grids pending):**
+  RLS policies on five additional live tables reference `admin_profiles`
+  with `id = auth.uid()`:
   `failed_submissions`, `feature_suggestions`, `newsletter_campaigns`,
   `prototype_requests`, `waitlist_leads`. None of these tables exist in
   tracked migrations — the live DB is substantially larger than the repo
-  represents. Q9a/b/c in `supabase-live-checks.sql` will confirm/extend
-  this list (views, functions, FKs).
+  represents. Read-only dependency queries found no views or foreign keys
+  referencing the table and no ordinary function source beyond the
+  already-known unrelated RLS helper.
 - **Logs:** PostgREST request logs (dashboard Log Explorer) could show
   anon-key queries against `admin_profiles`, but the CLI has no logs
   surface and retention windows are short — an empty search proves nothing.
@@ -180,19 +211,36 @@ Question: does anything outside the Winlerr repo read/write production
 
 - **CONFIRMED INTERNAL DEPENDENCIES:** RLS policies on five live tables
   (`failed_submissions`, `feature_suggestions`, `newsletter_campaigns`,
-  `prototype_requests`, `waitlist_leads`) reference `admin_profiles`
-  (owner-observed; pending Q4/Q9 re-confirmation). These MUST be preserved —
-  dropping or tightening `admin_profiles` access without accounting for them
-  risks breaking those tables' policies.
-- **CONFIRMED EXTERNAL CONSUMERS:** none. pinkman-X (the sole code hit) is
-  affirmatively cleared — it queries its own backend.
+  `prototype_requests`, `waitlist_leads`) query `admin_profiles` with
+  `id = auth.uid()` (owner-verified pattern). These are LIVE authorization
+  decisions reading the table — the earlier "no active consumer" statement
+  is retracted. They MUST be preserved: dropping or tightening
+  `admin_profiles` access without accounting for them risks breaking those
+  tables' policies. Read-only dependency queries found no views or foreign
+  keys referencing the table and no ordinary function source beyond the
+  already-known unrelated RLS helper — the five policy dependencies stand
+  as the complete known list, pending Q4/Q9 grid re-confirmation.
+- **CONFIRMED FACTS (owner-verified, content never read):** the table holds
+  one row (an earlier listing reported zero — discrepancy recorded, cause
+  unknown: later insert, transient read, or listing error; no conclusion
+  drawn); `anon` has a SELECT grant; SELECT policy `USING (true)` TO PUBLIC.
+- **EXTERNAL CONSUMERS:** no external consumer was found in the sources
+  examined. pinkman-X (the sole code hit) queries its own backend, not
+  Winlerr prod. This is a scoped negative finding, not a clean bill of
+  health: server-side-only consumers and the unknowns below remain
+  unresolved, so absence of evidence here must not be read as evidence of
+  absence.
 - **EXTERNAL CONSUMERS NOT FOUND IN SOURCES CHECKED:** GitHub exact-ref
   search, accessible repo code search, three deployed bundles checked.
 - **STILL UNKNOWN:** (a) server-side-only consumers (invisible to bundle
   inspection; Vercel env values unreadable without `env pull`), (b) full
-  DB-internal dependency list (needs Q9 grids), (c) historical PostgREST
-  traffic (needs dashboard logs), (d) contents/roles of the two private
-  backup repos (deliberately unopened).
+  DB-internal dependency confirmation (needs Q9 grids), (c) historical
+  PostgREST traffic (needs dashboard logs), (d) contents/roles of the two
+  private backup repos (deliberately unopened), (e) who owns the single
+  existing profile row (content never read). Auth signup posture is now
+  RESOLVED (dashboard 2026-10-10: signup on, email confirm on, anon
+  sign-ins off) — it narrows but does not close the S1(c) hypothesis,
+  which still awaits a staging test.
 
 ### Justified direction
 
@@ -200,10 +248,15 @@ The findings support **adoption over renaming, but NOT on the current
 proposal**: the table is load-bearing for five live tables' policies, so a
 separate identity table would leave the permissive policies — and the S1
 exposure — in place while adding a second source of truth. The safe path is:
-keep the table, keep every existing policy untouched until Q4/Q9 + consumer
+keep the table and every existing policy untouched until Q4/Q9 + consumer
 confirmation land, then replace the permissive policies explicitly with
 least-privilege equivalents in one reviewed migration (staging first).
-No urgent containment is indicated: no active consumer reads it for
-authorization decisions (in-repo: VERIFIED none; external: none found), so
-the exposure is latent, not actively exploited, to the best of verifiable
-evidence. Do NOT merge PR #14 until the owner reviews this section.
+Containment posture: public READ exposure is credible (one row, world-
+readable grant + policy); exploitation has NOT been demonstrated — no
+evidence of unauthorized reads beyond the policies' existence, and the
+remaining insert path requires a caller that already holds a profile row
+(a capability never exercised by us, and the existing row's owner is
+unknown). No emergency action is claimed; the decision on containment
+timing sits with the owner. PR #14 (prior reconciliation) has merged; this
+report now gates PR #15, which must stay unmerged until owner review,
+green CI, and an explicit containment decision are all recorded.
