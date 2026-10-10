@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
-import { AiConcierge } from "@/components/AiConcierge";
-import { VoiceNote } from "@/components/VoiceNote";
+import { RouteAssistants } from "@/components/route-assistants";
 import "./globals.css";
 
 const SITE_URL = "https://winlerr.vip";
@@ -58,8 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${sans.variable} ${display.variable} ${mono.variable}`}>
       <body className="bg-surface font-sans text-ink">
         {children}
-        <VoiceNote />
-        <AiConcierge />
+        <RouteAssistants />
       </body>
     </html>
   );
