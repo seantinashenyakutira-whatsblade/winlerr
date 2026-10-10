@@ -70,9 +70,13 @@ describe("least-privilege hardening proposal", () => {
     expect(code).not.toMatch(/for insert to (public|anon|authenticated)\b/i);
   });
 
-  it("gates dependent admin policies on role = admin (viewer gains nothing)", () => {
+  it("gates dependent admin policies on owner/admin roles (viewer gains nothing)", () => {
     // Doubled quotes: the predicate lives inside a plpgsql string literal.
-    expect(code).toMatch(/role\s*=\s*'{1,2}admin'{1,2}/i);
+    // Owner directive: IN ('owner','admin'); viewer must never appear as
+    // a privileged value.
+    expect(code).toMatch(/role\s+IN\s*\(\s*'{1,2}owner'{1,2}\s*,\s*'{1,2}admin'{1,2}\s*\)/i);
+    expect(code).not.toMatch(/role\s*=\s*'{1,2}viewer'{1,2}/i);
+    expect(code).not.toMatch(/IN\s*\([^)]*'{1,2}viewer'{1,2}/i);
     for (const table of DEPENDENT_TABLES) {
       expect(code).toContain(table);
     }
@@ -100,6 +104,23 @@ describe("least-privilege hardening proposal", () => {
 
   it("leaves the event trigger helper alone", () => {
     expect(code).not.toMatch(/rls_auto_enable|ensure_rls/i);
+  });
+
+  it("preserves public INSERT surfaces: no INSERT revocation outside admin_profiles", () => {
+    for (const table of [
+      ...DEPENDENT_TABLES,
+      "leads",
+      "claims",
+    ]) {
+      expect(code).not.toMatch(
+        new RegExp(`revoke[^;]*\\binsert\\b[^;]*on public\\.${table}`, "i"),
+      );
+    }
+  });
+
+  it("invents no PUBLIC grant and revokes from named roles only", () => {
+    expect(code).not.toMatch(/grant\s[^;]*\bto public\b/i);
+    expect(code).not.toMatch(/revoke[^;]*\bfrom public\b/i);
   });
 
   it("carries the do-not-apply header and a non-routine rollback note", () => {

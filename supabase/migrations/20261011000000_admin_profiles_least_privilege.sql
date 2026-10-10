@@ -79,13 +79,14 @@ create policy "admin_profiles_owner_select"
 
 -- §4. Dependent tables: replace existence-only "Admins can..." policies with
 -- role-gated admin-manage policies. Design decisions (see report §8):
---   * Gate: role = 'admin', strict. 'owner' is NOT included — no hierarchy
---     is defined anywhere in the repo, and silently equating owner/admin
---     would be guessing. PRE-APPLY CHECK (owner): confirm the existing
---     profile row's role is 'admin'; if the operator account uses 'owner',
---     extend the predicate to IN ('owner','admin') in review BEFORE apply.
---   * One FOR ALL policy per table (admin-manage semantics: admins read +
---     moderate). A viewer profile — or any non-admin row — matches nothing.
+--   * Gate: role IN ('owner','admin') — explicit owner directive
+--     (2026-10-10): owner accounts retain administrator capabilities;
+--     'viewer' is excluded and gains nothing from merely holding a row.
+--     The pre-apply check stands: confirm the existing profile row's
+--     role is 'owner' or 'admin' before apply.
+--   * One FOR ALL policy per table (admin-manage semantics: privileged
+--     roles read + moderate). A viewer profile — or any other role value —
+--     matches nothing.
 --   * Nested read is safe: the subquery sees only the caller's own row
 --     through §3 (no recursion — admin_profiles policies read no other
 --     tables), and the SELECT grant on admin_profiles is retained (§6), so
@@ -98,7 +99,7 @@ declare
   t text;
   r record;
   v_leftover int;
-  v_pred text := 'EXISTS (SELECT 1 FROM public.admin_profiles WHERE id = auth.uid() AND role = ''admin'')';
+  v_pred text := 'EXISTS (SELECT 1 FROM public.admin_profiles WHERE id = auth.uid() AND role IN (''owner'',''admin''))';
 begin
   foreach t in array array[
     'failed_submissions', 'feature_suggestions', 'newsletter_campaigns',
@@ -138,7 +139,13 @@ $$;
 -- path omitting role would silently mint admins.
 alter table public.admin_profiles alter column role set default 'viewer';
 
--- §6. Tighten table grants. Rationale per grantee/privilege:
+-- §6. Tighten table grants. Rationale per grantee/privilege.
+-- ACL note (Q5-verified): reported table grants cover anon, authenticated
+-- and service_role — NO grant to PUBLIC exists in the inspected ACL, so
+-- this file revokes from named roles only and invents no PUBLIC grant.
+-- Policy removal (§2/§4, which targets policies granted TO PUBLIC) and
+-- privilege revocation (below) are distinct operations; both are needed
+-- because either layer alone would leave access intact.
 --   * admin_profiles: REVOKE INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES/
 --     TRIGGER/MAINTAIN from anon + authenticated; REVOKE SELECT from anon
 --     ONLY. Authenticated SELECT is RETAINED (required for owner reads
