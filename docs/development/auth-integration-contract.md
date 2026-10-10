@@ -24,7 +24,7 @@
 - `getViewer() → AuthUser | null` (fail-closed; null on missing env).
 - All failures use `AuthErrorCode` + `AUTH_ERROR_COPY` copy — never raw provider text.
 
-## Shared contract (`@winlerr/auth`, framework-free)
+## Shared contract (`@winlerr/auth`, framework-free))
 
 - `AuthUser {id, email, emailConfirmed}`, `AuthState {user, loading}`, `AuthResult<T>`.
 - `safeNextPath()` — only same-origin `/…` paths survive; everything else → `/dashboard`. `loginUrl(next)`, `callbackUrl(appUrl, next)`.
@@ -42,6 +42,25 @@
 
 - `getAdminProfile()` in `@winlerr/auth/next` **throws by design** — organization/role reads are blocked until the `admin_profiles` security migration lands (ADR 0002). Dashboard shows account identity only; no roles, no org switching.
 - Session cookies (`winlerr-sb-access`, 7-day refresh) are httpOnly; no token in JS, no localStorage.
+
+## Codex interface additions (backend-proposed, additive only)
+
+- `AuthExperience` accepts optional `form?: ReactNode`, rendered in place
+  of the disabled preview block when provided; when absent the preview
+  renders exactly as before. Pages pass the real `LoginForm`/`SignupForm`.
+- `DashboardShell` accepts optional `accountEmail?: string | null` and
+  `onSignOut?: () => Promise<void>` (a Server Action). When absent, the
+  account menu keeps its preview content byte-for-byte. `/dashboard`
+  passes the live session email + `signOutAction`.
+
+## Naming and routes
+
+- User-facing strings added by the backend use **WinlerrOS**. Pre-existing
+  "WinlaOS" visuals under `components/winlaos/**` and `/winlaos/*` are
+  Codex-owned and untouched here.
+- `/login`, `/signup`, `/dashboard` remain as aliases. Canonical
+  `/winlerros` paths + compatibility redirects need Codex coordination —
+  not created unilaterally in this slice.
 
 ## Verification
 

@@ -1,11 +1,14 @@
-import { safeNextPath } from "@winlerr/auth";
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { safeNextPath } from "@winlerr/auth";
 import { getViewer } from "@/lib/auth-actions";
+import { AuthExperience } from "@/components/winlaos/auth-experience";
 import { SignupForm } from "@/components/auth/signup-form";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Create account",
-  description: "Create your WinlaOS account to access your dashboard.",
+  description: "Create your WinlerrOS account to access your dashboard.",
   robots: { index: false, follow: false },
 };
 
@@ -15,22 +18,12 @@ export default async function SignupPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
+  const target = safeNextPath(next);
   const user = await getViewer();
-  if (user) redirect(safeNextPath(next));
+  if (user) redirect(target);
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-16">
-      <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">WinlaOS</p>
-      <h1 className="mt-3 font-display text-3xl font-bold tracking-tight">Create your account</h1>
-      <p className="mt-2 text-sm text-ink-muted">
-        One account for your dashboard and systems. Already have one?{" "}
-        <a className="underline" href="/login">
-          Sign in
-        </a>
-        .
-      </p>
-      <div className="mt-8">
-        <SignupForm next={safeNextPath(next)} />
-      </div>
-    </main>
+    <Suspense>
+      <AuthExperience mode="signup" form={<SignupForm next={target} />} />
+    </Suspense>
   );
 }
