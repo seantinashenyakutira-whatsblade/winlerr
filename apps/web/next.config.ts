@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
-  // @winlerr/ai ships raw TypeScript source (main: ./src/index.ts), so Next
-  // must compile it rather than treat it as prebuilt output.
-  transpilePackages: ["@winlerr/ai"],
+  // @winlerr/ai and @winlerr/auth ship raw TypeScript source
+  // (main: ./src/index.ts), so Next must compile them rather than treat
+  // them as prebuilt output.
+  transpilePackages: ["@winlerr/ai", "@winlerr/auth"],
   webpack: (config) => {
     // packages/ai is authored for NodeNext resolution, so its relative
     // imports carry explicit `.js` extensions that actually point at `.ts`
