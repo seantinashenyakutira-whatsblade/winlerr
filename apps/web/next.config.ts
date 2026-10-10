@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
+  async redirects() {
+    return [
+      { source: "/winlaos", destination: "/winlerros", permanent: true },
+      { source: "/winlaos/:path*", destination: "/winlerros/:path*", permanent: true },
+    ];
+  },
   // @winlerr/ai ships raw TypeScript source (main: ./src/index.ts), so Next
   // must compile it rather than treat it as prebuilt output.
   transpilePackages: ["@winlerr/ai"],

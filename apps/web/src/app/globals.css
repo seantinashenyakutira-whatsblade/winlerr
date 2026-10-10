@@ -3,16 +3,25 @@
 @tailwind utilities;
 
 :root {
-  --bg: #ffffff;
-  --bg-tint: #f8fafc;
-  --ink: #0f172a;
-  --ink-muted: #64748b;
-  --blue-600: #2563eb;
-  --blue-500: #3b82f6;
+  --brand-navy: #111827;
+  --brand-blue: #2563eb;
+  --brand-orange: #f97316;
+  --brand-off-white: #f8fafc;
+  --brand-white: #ffffff;
+  --brand-blue-tint: #eff6ff;
+  --brand-orange-tint: #fff7ed;
+  --brand-neutral-tint: #f1f5f9;
+  --brand-border: #e2e8f0;
+  --bg: var(--brand-white);
+  --bg-tint: var(--brand-off-white);
+  --ink: var(--brand-navy);
+  --ink-muted: #475569;
+  --blue-600: var(--brand-blue);
+  --blue-500: var(--brand-blue);
   --blue-400: #60a5fa;
-  --orange-500: #f97316;
+  --orange-500: var(--brand-orange);
   --orange-400: #fb923c;
-  --border: rgba(15, 23, 42, 0.08);
+  --border: rgba(17, 24, 39, 0.1);
   --shadow-card:
     0 1px 2px rgba(15, 23, 42, 0.04),
     0 12px 32px rgba(15, 23, 42, 0.06);
@@ -43,26 +52,24 @@ body {
   }
 }
 
-/* WinlaOS product surfaces are intentionally scoped so the marketing site
-   keeps its existing palette and component behavior. */
-.winla-page {
-  --winla-forest: #173b32;
-  --winla-forest-soft: #315c42;
-  --winla-copper: #a65435;
-  --winla-paper: #faf9f5;
-  --winla-border: #e6e3d9;
+.winlerros-page {
+  --product-navy: var(--brand-navy);
+  --product-blue: var(--brand-blue);
+  --product-orange: var(--brand-orange);
+  --product-paper: var(--brand-off-white);
+  --product-border: var(--brand-border);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  color: var(--winla-forest);
+  color: var(--product-navy);
   -webkit-font-smoothing: antialiased;
 }
 
-.winla-page :focus-visible {
-  outline: 3px solid #ba7753;
+.winlerros-page :focus-visible {
+  outline: 3px solid var(--product-blue);
   outline-offset: 3px;
 }
 
-.winla-eyebrow {
-  color: var(--winla-copper);
+.winlerros-eyebrow {
+  color: #1d4ed8;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.66rem;
   font-weight: 600;
@@ -71,40 +78,40 @@ body {
   text-transform: uppercase;
 }
 
-.winla-input {
+.winlerros-input {
   display: block;
   min-height: 46px;
   width: 100%;
-  border: 1px solid #dedfd5;
+  border: 1px solid var(--product-border);
   border-radius: 0.75rem;
   background: #fff;
   padding: 0.7rem 0.9rem;
-  color: #243d32;
+  color: var(--product-navy);
   font-size: 0.875rem;
   outline: none;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.winla-input::placeholder {
-  color: #9ba39b;
+.winlerros-input::placeholder {
+  color: #64748b;
 }
 
-.winla-input:focus-visible {
-  border-color: #6d9273;
-  box-shadow: 0 0 0 3px rgb(109 146 115 / 18%);
+.winlerros-input:focus-visible {
+  border-color: var(--product-blue);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 18%);
   outline: none;
 }
 
-.winla-input:disabled {
+.winlerros-input:disabled {
   cursor: not-allowed;
-  background: #f7f6f1;
-  color: #89938b;
+  background: var(--brand-neutral-tint);
+  color: #64748b;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .winla-page *,
-  .winla-page *::before,
-  .winla-page *::after {
+  .winlerros-page *,
+  .winlerros-page *::before,
+  .winlerros-page *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;

@@ -4,6 +4,7 @@ import * as React from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { WinlerrLogo } from "@/components/winlerr-logo";
 
 const LINKS = [
   { label: "Home", href: "/" },
@@ -32,12 +33,7 @@ export function SiteNav() {
       )}
     >
       <nav aria-label="Primary" className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight">
-          <span className="flex h-8 w-8 items-center justify-center rounded-card bg-ink font-mono text-sm text-white">
-            W/
-          </span>
-          winlerr
-        </a>
+        <WinlerrLogo />
 
         <div className="hidden items-center gap-1 rounded-pill border border-border bg-surface/70 px-2 py-1.5 backdrop-blur-md md:flex">
           {LINKS.map((link) => (
