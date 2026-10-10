@@ -71,14 +71,19 @@ UNVERIFIED — read-only dashboard pack saved at
   recorded, row content never read). What this means, precisely:
   (a) any unauthenticated caller can READ that row's columns — public read
   exposure is credible, not hypothetical;
-  (b) anonymous callers CANNOT insert: the INSERT `WITH CHECK` requires
-  `id = auth.uid()`, and `auth.uid()` is NULL for anon, which never
-  satisfies the equality — the earlier suggestion that arbitrary
-  unauthenticated users could self-promote was wrong and is retracted;
-  (c) any AUTHENTICATED user can insert exactly one self-row
-  (`id` = own uid), and the observed `role` default is `'admin'` — a
-  self-promotion mechanism that is credible but NOT demonstrated (it was
-  not executed, and whether open signup exists is UNVERIFIED);
+  (b) anonymous callers CANNOT insert: the INSERT `WITH CHECK` is
+  `EXISTS (SELECT 1 FROM admin_profiles WHERE id = auth.uid())`, and
+  `auth.uid()` is NULL for anon, so the predicate never holds — the
+  earlier suggestion that arbitrary unauthenticated users could
+  self-promote was wrong and is retracted;
+  (c) the policy does NOT enforce `id = auth.uid()` on the inserted row —
+  it only checks whether the caller ALREADY has a profile row. A user
+  with no existing profile cannot bootstrap one through this policy
+  (the earlier "insert exactly one self-row" claim is corrected). A
+  caller who already has a profile may potentially insert a row for
+  another existing Auth user, with `role` defaulting to `'admin'` —
+  practical behavior and impact UNTESTED (never executed; the single
+  existing row's owner is unknown, content never read);
   (d) most importantly, the five dependent tables' RLS policies query
   `admin_profiles` with `id = auth.uid()` — live authorization decisions
   DO read this table today, so the prior "no active consumer" claim is
@@ -223,9 +228,9 @@ Question: does anything outside the Winlerr repo read/write production
   inspection; Vercel env values unreadable without `env pull`), (b) full
   DB-internal dependency confirmation (needs Q9 grids), (c) historical
   PostgREST traffic (needs dashboard logs), (d) contents/roles of the two
-  private backup repos (deliberately unopened), (e) whether Auth allows
-  open signup (determines whether the authenticated self-insert path in S1
-  is reachable by strangers).
+  private backup repos (deliberately unopened), (e) who owns the single
+  existing profile row and whether Auth allows open signup — together
+  these determine who can actually exercise the INSERT path in S1.
 
 ### Justified direction
 
@@ -239,8 +244,9 @@ least-privilege equivalents in one reviewed migration (staging first).
 Containment posture: public READ exposure is credible (one row, world-
 readable grant + policy); exploitation has NOT been demonstrated — no
 evidence of unauthorized reads beyond the policies' existence, and the
-self-promotion path requires an authenticated account that was never
-created by us. No emergency action is claimed; the decision on containment
+remaining insert path requires a caller that already holds a profile row
+(a capability never exercised by us, and the existing row's owner is
+unknown). No emergency action is claimed; the decision on containment
 timing sits with the owner. PR #14 (prior reconciliation) has merged; this
 report now gates PR #15, which must stay unmerged until owner review,
 green CI, and an explicit containment decision are all recorded.
