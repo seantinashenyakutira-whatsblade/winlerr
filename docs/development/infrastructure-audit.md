@@ -49,14 +49,17 @@ No credentials, tokens, secret values, customer data, or env dumps are recorded 
 - Housekeeping: `vercel link` created `.env.local` + `.vercel/` as a side effect — both **deleted** immediately without reading values; tree verified clean; `.env.local` confirmed git-ignored.
 - Commands: `vercel whoami`, `vercel project ls`, `vercel ls winlerr`, `vercel inspect <prod-url>`, `vercel domains ls`, `vercel link`, `vercel env ls`.
 
-## 5. Supabase audit (PARTIAL — link BLOCKED)
+## 5. Supabase audit (LINK RECOVERED 2026-10-10 — see below)
 
 - VERIFIED via `supabase projects list`: **`Winlerr` (`uqdeuiaymoolyroppwhy`) matches the known reference** — ACTIVE_HEALTHY, eu-central-1, Postgres 17, org `oviwmrjvackukndbxiujt`, created 2026-06-26.
 - VERIFIED: a **`Winlerr Staging` project (`xvwgumawzoqjduvtnlcs`) exists but is INACTIVE**, in a *different* org (`byngxjdnnivjmxdwncsm`), eu-west-1. All other visible projects INACTIVE.
-- Local migration state (code, VERIFIED): `supabase/migrations/` holds `leads`, `claims` (both applied to prod per prior history — INFERRED from working forms, not re-verified live) + new `admin_profiles` (unapplied, review-only).
-- UNVERIFIED (live): migration history vs tracked files, live tables/columns/indexes, RLS policies, Auth providers/config, Edge Functions, storage buckets, extensions, any code↔cloud schema drift.
-- BLOCKED BY: incomplete `supabase link` (needs owner DB-password action in their terminal; exact CLI output requested for diagnosis).
-- Commands used: `supabase projects list` only. **Never run**: `db push`, `db reset`, policy changes, data changes.
+- VERIFIED via `supabase migration list` (2026-10-10, Management API — no DB password needed):
+  `20260925064611` (leads) applied 2026-09-25 ✅ · `20260926000000` (claims) applied 2026-09-26 ✅ ·
+  `20261010000000` (admin_profiles) local-only, **not applied** ✅ (as designed).
+- INFERRED (high confidence): live `leads`/`claims` tables + anon INSERT-only policies match tracked files — production forms insert successfully, which is only possible if those objects exist. `admin_profiles` absent (never in any applied migration).
+- UNVERIFIED (live): column-level schema, indexes, grants, Auth providers/config, Edge Functions, storage buckets, extensions — `supabase db dump`/`pull` require Docker (not installed, correctly so); dashboard SQL editor queries provided to owner (see staging plan report).
+- Link mechanics (diagnosed 2026-10-10): CLI v2 stores link state in git-ignored `supabase/.temp/linked-project.json`, **not** `supabase/config.toml` — the earlier "blocked" verdict was a wrong file expectation plus an interactive password prompt stalling in a non-TTY shell. `supabase link --project-ref` completes on the Management-API token alone; no DB password was entered, requested in chat, or stored.
+- Commands used: `supabase projects list`, `supabase link`, `supabase migration list`. **Never run**: `db push`, `db reset`, `migration repair`, policy/data changes.
 
 ## 6. Cloudflare audit (PARTIAL)
 
@@ -78,7 +81,7 @@ No credentials, tokens, secret values, customer data, or env dumps are recorded 
 | # | Difference | Label |
 |---|---|---|
 | 1 | Repo has no `vercel.json`; all Vercel config lives in dashboard | VERIFIED (both sides observed) |
-| 2 | Repo `supabase/migrations/` = leads + claims (+ new unapplied admin_profiles); live DB state | UNVERIFIED (link blocked) |
+| 2 | Repo `supabase/migrations/` = leads + claims (both confirmed applied live 2026-09-25/26) + unapplied admin_profiles; column-level live schema still needs dashboard SQL confirm | VERIFIED (history) / UNVERIFIED (columns) |
 | 3 | Code reads `RESEND_API_KEY`/`OWNER_EMAIL`; Vercel env lacks both → mail path dead in prod | VERIFIED |
 | 4 | Code reads `OPENROUTER_API_KEY`; present on Production only → Preview AI always falls back to canned replies | VERIFIED (acceptable by design, note it) |
 | 5 | `os.winlerr.vip` referenced as future target; absent from DNS | VERIFIED |
@@ -97,7 +100,7 @@ No credentials, tokens, secret values, customer data, or env dumps are recorded 
 
 ## 10. Remediation, ordered by risk/dependency/value
 
-1. **Complete `supabase link`** (owner action in their terminal; paste back exact output on failure). Unblocks all DB verification. No prod change involved.
+1. ~~Complete `supabase link`~~ ✅ RESOLVED 2026-10-10 (link state in git-ignored `supabase/.temp/`; migration history verified live). Remaining: owner runs 3 read-only dashboard SQL checks (tables/policies/admin_profiles absence) — queries in mission report.
 2. **Add `RESEND_API_KEY` + `OWNER_EMAIL` to Vercel Production** (and decide Preview) — requires explicit owner approval (production env change). Then send one real claim-flow test to an owner-controlled address.
 3. **Finish Resend verification**: add the pending SPF `send` CNAME in DNS → full `verified` status.
 4. **Unify GitHub write access**: owner invites `drizzlysean` as collaborator, or keep owner-login for pushes. Needed before the WinlaOS PR can be opened from the CLI identity.
