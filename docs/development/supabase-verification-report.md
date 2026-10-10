@@ -146,9 +146,11 @@ UNVERIFIED — read-only dashboard pack saved at
 4. Decide adopt-vs-rename for the identity table (after 1–2).
 5. Approve S2/S3 remediation (after function definition reviewed).
 
-Exact next executable step (me, no approval needed): open the PR for
-`fix/supabase-schema-reconciliation` once gates pass, so CI + Preview
-validate the branch.
+Exact next executable step: PR #15 (`fix/supabase-schema-reconciliation`,
+draft) is open — required gates before any merge are owner review of §8,
+green CI on the branch, and an explicit containment decision. CI passing
+validates code correctness only; it says nothing about production database
+security, which must be established through the dashboard evidence above.
 
 ## 8. External consumer investigation (2026-10-10)
 
@@ -209,8 +211,12 @@ Question: does anything outside the Winlerr repo read/write production
   one row (an earlier listing reported zero — discrepancy recorded, cause
   unknown: later insert, transient read, or listing error; no conclusion
   drawn); `anon` has a SELECT grant; SELECT policy `USING (true)` TO PUBLIC.
-- **CONFIRMED EXTERNAL CONSUMERS:** none. pinkman-X (the sole code hit) is
-  affirmatively cleared — it queries its own backend.
+- **EXTERNAL CONSUMERS:** no external consumer was found in the sources
+  examined. pinkman-X (the sole code hit) queries its own backend, not
+  Winlerr prod. This is a scoped negative finding, not a clean bill of
+  health: server-side-only consumers and the unknowns below remain
+  unresolved, so absence of evidence here must not be read as evidence of
+  absence.
 - **EXTERNAL CONSUMERS NOT FOUND IN SOURCES CHECKED:** GitHub exact-ref
   search, accessible repo code search, three deployed bundles checked.
 - **STILL UNKNOWN:** (a) server-side-only consumers (invisible to bundle
@@ -235,5 +241,6 @@ readable grant + policy); exploitation has NOT been demonstrated — no
 evidence of unauthorized reads beyond the policies' existence, and the
 self-promotion path requires an authenticated account that was never
 created by us. No emergency action is claimed; the decision on containment
-timing sits with the owner. Do NOT merge PR #14 until the owner reviews
-this section and issues the containment decision.
+timing sits with the owner. PR #14 (prior reconciliation) has merged; this
+report now gates PR #15, which must stay unmerged until owner review,
+green CI, and an explicit containment decision are all recorded.
