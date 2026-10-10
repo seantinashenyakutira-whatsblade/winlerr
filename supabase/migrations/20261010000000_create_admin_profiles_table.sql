@@ -1,13 +1,23 @@
--- WinlaOS core: admin_profiles
+-- WinlaOS core: admin_profiles — PROPOSAL UNDER REVIEW, DO NOT APPLY.
 --
--- One row per authenticated user. Rows are created service-role-only
--- (signup sync); authenticated users can read/update ONLY their own row;
--- anonymous callers have no access at all. The `role` column is immutable
--- to non-service-role callers via the trigger below, so the update policy
--- cannot be used for privilege escalation.
---
--- Design review: docs/decisions/0002-winlaos-core-auth-data.md (Proposed).
--- DO NOT apply to production without explicit authorization.
+-- ⚠️ 2026-10-10 reconciliation finding: public.admin_profiles ALREADY EXISTS
+-- in production with a DIFFERENT shape (observed via authorized inspection:
+-- columns id, full_name, role, created_at; role default 'admin'; permissive
+-- SELECT USING (true) + INSERT policies TO PUBLIC; no triggers). It was
+-- created out-of-band — no tracked migration ever created it (verified via
+-- git history). Consequences for this proposal:
+--   1. The CREATE TABLE IF NOT EXISTS below is a NO-OP against that table;
+--      it does NOT add an `email` column and does NOT change the default.
+--   2. The owner-only policies below would OR-combine (Postgres permissive
+--      policies use OR logic) with the existing public policies, leaving
+--      public read/insert FULLY INTACT. This file as written does NOT
+--      restrict access. Restriction requires explicitly dropping the
+--      permissive policies — allowed ONLY after proving no existing
+--      functionality depends on them + explicit owner approval.
+--   3. Design decision pending (ADR 0002 review note): adopt-and-evolve the
+--      existing table vs a new WinlaOS identity table. Do not guess.
+-- See docs/development/supabase-verification-report.md. DO NOT apply to
+-- production without explicit authorization.
 
 create table if not exists public.admin_profiles (
   id uuid primary key references auth.users (id) on delete cascade,
