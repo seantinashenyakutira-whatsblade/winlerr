@@ -58,14 +58,21 @@ export interface ClaimInsert {
 export interface AdminProfileRow {
   id: string;
   created_at: string;
-  email: string | null;
-  role: AdminRole;
+  /**
+   * Observed live production shape (2026-10-10, authorized inspection):
+   * the table has full_name, NOT email. This type mirrors production, not
+   * the unapplied migration proposal. Do not use for auth decisions until
+   * the RLS review in supabase-verification-report.md is resolved.
+   */
+  full_name: string | null;
+  role: string;
 }
 
 export interface AdminProfileInsert {
   id: string;
-  email?: string | null;
-  role?: AdminRole;
+  full_name?: string | null;
+  /** Live default is 'admin' — callers must pass role explicitly. */
+  role: string;
 }
 
 export interface Database {
@@ -92,8 +99,7 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
-    Enums: {
-      admin_role: AdminRole;
-    };
+    // Live DB has no enums; role is free text (see AdminProfileRow note).
+    Enums: Record<string, never>;
   };
 }

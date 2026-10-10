@@ -89,3 +89,29 @@ staging database. No tenant claims are made until those tests exist.
   turns every handler bug into a data-leak bug; anon-key + policies instead.
 - **Putting role in `auth.users` metadata**: rejected — user-editable metadata
   is the wrong place for an authorization signal; a locked table is auditable.
+
+## 2026-10-10 reconciliation review note (status stays Proposed)
+
+Live production inspection (authorized, read-only; see
+`docs/development/supabase-verification-report.md`) found that
+`public.admin_profiles` **already exists** with a different shape
+(`id`, `full_name`, `role`, `created_at`; role default `'admin'`;
+permissive SELECT `USING (true)` + INSERT policies `TO PUBLIC`; no
+triggers), created out-of-band — no tracked migration ever created it.
+
+Consequences accepted in this review:
+
+1. The `20261010000000` proposal's `CREATE TABLE IF NOT EXISTS` is a no-op
+   against that table; it adds no `email` column and changes no default.
+2. Owner-only policies do NOT restrict access while permissive public
+   policies exist (Postgres permissive policies combine with OR). The
+   proposal file now carries this warning in its header.
+3. `packages/database` table types were corrected to the observed live
+   shape, marked as observation-sourced until independently re-verified.
+4. Open product decision (do not guess): adopt-and-evolve the existing
+   table (requires proving nothing depends on the public policies, then
+   explicit approval to drop them) vs a new WinlaOS identity table.
+   The `prevent_admin_role_change()` trigger design stands for either path
+   once a target table is settled; note it relies on the JWT role claim,
+   so direct `postgres`-role SQL edits without JWT context would also be
+   blocked (fail-closed; service-role-via-API, the designed path, is fine).
