@@ -79,11 +79,19 @@ UNVERIFIED — read-only dashboard pack saved at
   (c) the policy does NOT enforce `id = auth.uid()` on the inserted row —
   it only checks whether the caller ALREADY has a profile row. A user
   with no existing profile cannot bootstrap one through this policy
-  (the earlier "insert exactly one self-row" claim is corrected). A
-  caller who already has a profile may potentially insert a row for
-  another existing Auth user, with `role` defaulting to `'admin'` —
-  practical behavior and impact UNTESTED (never executed; the single
-  existing row's owner is unknown, content never read);
+  (the earlier "insert exactly one self-row" claim is corrected).
+  Owner-verified Auth settings (dashboard, 2026-10-10, unchanged by us):
+  new-user signup ENABLED, email confirmation ENABLED, anonymous
+  sign-ins DISABLED. Signup being enabled does NOT open a bootstrap
+  path — a brand-new account has no profile row, so the EXISTS check
+  fails for it. What remains is a narrower hypothesis: a caller who
+  already holds a profile row may potentially insert a row for another
+  existing Auth user, because the policy constrains neither the
+  inserted row's ID nor the existing row's role — and the live `role`
+  default is `'admin'`. Practical behavior and impact UNTESTED (never
+  executed; the single existing row's owner is unknown, content never
+  read). This stays a risk hypothesis until exercised against staging —
+  no exploit demonstrated, none claimed;
   (d) most importantly, the five dependent tables' RLS policies query
   `admin_profiles` with `id = auth.uid()` — live authorization decisions
   DO read this table today, so the prior "no active consumer" claim is
@@ -229,8 +237,10 @@ Question: does anything outside the Winlerr repo read/write production
   DB-internal dependency confirmation (needs Q9 grids), (c) historical
   PostgREST traffic (needs dashboard logs), (d) contents/roles of the two
   private backup repos (deliberately unopened), (e) who owns the single
-  existing profile row and whether Auth allows open signup — together
-  these determine who can actually exercise the INSERT path in S1.
+  existing profile row (content never read). Auth signup posture is now
+  RESOLVED (dashboard 2026-10-10: signup on, email confirm on, anon
+  sign-ins off) — it narrows but does not close the S1(c) hypothesis,
+  which still awaits a staging test.
 
 ### Justified direction
 
