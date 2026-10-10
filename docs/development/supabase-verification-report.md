@@ -21,19 +21,25 @@
 
 ## 2. Actual remote schema vs tracked files
 
-| Object | Tracked | Live (CLI-verified) | Live (owner-observed) |
-|---|---|---|---|
-| `leads` migration | ✅ `20260925…` | ✅ applied | — |
-| `claims` migration | ✅ `20260926…` | ✅ applied | — |
-| `admin_profiles` migration | ✅ `20261010…` (proposal) | ❌ not applied | table EXISTS, other shape |
-| `admin_profiles` columns | proposal: id, created_at, email, role | UNVERIFIED (needs dashboard SQL) | id, full_name, role, created_at; role default `'admin'` |
-| RLS/policies on `admin_profiles` | proposal: owner-only | UNVERIFIED | SELECT `USING (true)` TO PUBLIC + INSERT TO PUBLIC, RLS on, no triggers |
-| `rls_auto_enable()` | absent from repo (VERIFIED: zero matches in history or tree) | UNVERIFIED | SECURITY DEFINER, executable by anon + authenticated |
-| Leaked-password protection | n/a (code) | UNVERIFIED | disabled |
+Source for the "Live (read-only checks 2026-10-10)" column: authorized
+read-only queries Q1–Q9 (saved at `docs/development/supabase-live-checks.sql`).
+No writes, no row contents read.
 
-Column-level live state (types, nullability, defaults, grants, indexes) is
-UNVERIFIED — read-only dashboard pack saved at
-`docs/development/supabase-live-checks.sql` (SELECT-only, inert under `docs/`).
+| Object | Tracked | Live (read-only checks 2026-10-10) |
+|---|---|---|
+| Public tables (Q1) | leads, claims (+6 proposed/expected, uncreated) | 8 tables, no extras: `admin_profiles`, `claims`, `failed_submissions`, `feature_suggestions`, `leads`, `newsletter_campaigns`, `prototype_requests`, `waitlist_leads` |
+| `leads` / `claims` migrations | ✅ `20260925…` / `20260926…` | ✅ both applied (ledger) |
+| `admin_profiles` migration | ✅ `20261010…` (proposal) | ❌ not applied |
+| `admin_profiles` columns (Q2) | proposal: id, created_at, email, role | `id uuid NOT NULL` (PK → `auth.users(id)` ON DELETE CASCADE), `full_name text` nullable, `role text` nullable DEFAULT `'admin'`, `created_at timestamptz` nullable DEFAULT `now()` — **no `email` column** |
+| RLS flags (Q3) | proposal: enable RLS | RLS **enabled, not forced** on `admin_profiles`, `leads`, `claims` |
+| Policies (Q4) | proposal: owner-only | `admin_profiles`: SELECT `USING (true)` TO PUBLIC + INSERT EXISTS-check TO PUBLIC, both confirmed; `leads`/`claims`: anon INSERT confirmed; five dependent tables' predicates queried |
+| Table grants (Q5) | n/a (code) | Broad grants reported for `anon`, `authenticated`, `service_role` on all three tables (SELECT/INSERT/UPDATE/DELETE/TRUNCATE/TRIGGER/REFERENCES) — recorded as a **privilege-review finding** (see S1). Grants alone do not demonstrate API exploitability: RLS policies and the exposed PostgREST surface gate actual access separately |
+| Triggers on `admin_profiles` (Q6) | proposal: new trigger (unapplied) | **none** |
+| `rls_auto_enable()` (Q7) | absent from repo (VERIFIED: zero matches in history or tree) | SECURITY DEFINER **event-trigger** function; enabled event trigger `ensure_rls` fires it on `ddl_command_end` for `CREATE TABLE`, `CREATE TABLE AS`, `SELECT INTO`; EXECUTE granted to PUBLIC, anon, authenticated, postgres, service_role |
+| Constraints (Q8) | — | PK/FK/unique confirmed as tracked |
+| Views / FKs / function refs (Q9) | — | **none** referencing `admin_profiles` |
+| Request logs | n/a | Zero `admin_profiles` events in the queried 24h window — limited evidence; does not rule out historical or out-of-window access |
+| Leaked-password protection | n/a (code) | UNVERIFIED (still needs dashboard Auth page check) |
 
 ## 3. Answers to the reconciliation questions
 
@@ -47,9 +53,9 @@ UNVERIFIED — read-only dashboard pack saved at
    combine with OR — owner-only SELECT alongside `USING (true)`-to-public
    leaves public read (and public insert) fully intact. The proposal as
    written creates a false sense of restriction.
-4. **TS role vs SQL?** MISMATCHED (before this sprint's fix): TS assumed
-   `email` + default `'viewer'`; observed live has `full_name` + default
-   `'admin'` + no check constraint. Fixed locally (see §5).
+4. **TS role vs SQL?** RESOLVED and fixed: live verified as `full_name`
+   (nullable), free-text `role` DEFAULT `'admin'`, no `email`, no check
+   constraint. `types.ts` on this branch mirrors exactly that.
 5. **Adopt or rename?** UNRESOLVED product decision — documented options in
    §6. Nothing in-repo consumes the table (VERIFIED: zero code references),
    but external dependents are unknown, so neither evolving nor replacing it
@@ -64,11 +70,12 @@ UNVERIFIED — read-only dashboard pack saved at
 ## 4. Security findings, ordered by severity
 
 - **S1 — HIGH (credible public-read exposure; exploitation not
-  demonstrated): permissive access on `admin_profiles`.** Owner-verified
-  live facts: `anon` holds a SELECT table grant; the SELECT policy is
-  `USING (true)` TO PUBLIC; an INSERT policy TO PUBLIC exists; the table
-  currently holds **one row** (an earlier listing reported zero — discrepancy
-  recorded, row content never read). What this means, precisely:
+  demonstrated): permissive access on `admin_profiles`.** Read-only
+  checks 2026-10-10 confirm: `anon` holds a SELECT table grant; the
+  SELECT policy is `USING (true)` TO PUBLIC; an INSERT policy TO PUBLIC
+  exists; RLS is enabled but not forced; no triggers exist on the table;
+  the table holds **one row** (an earlier listing reported zero —
+  discrepancy recorded, row content never read). What this means:
   (a) any unauthenticated caller can READ that row's columns — public read
   exposure is credible, not hypothetical;
   (b) anonymous callers CANNOT insert: the INSERT `WITH CHECK` is
@@ -92,20 +99,32 @@ UNVERIFIED — read-only dashboard pack saved at
   executed; the single existing row's owner is unknown, content never
   read). This stays a risk hypothesis until exercised against staging —
   no exploit demonstrated, none claimed;
-  (d) most importantly, the five dependent tables' RLS policies query
+  (d) the five dependent tables' RLS policies query
   `admin_profiles` with `id = auth.uid()` — live authorization decisions
-  DO read this table today, so the prior "no active consumer" claim is
-  retracted. Owner action required: confirm no external consumer beyond
-  these policies, then approve least-privilege replacement (staging first).
+  DO read this table today.
+  Separate privilege-review finding (Q5): `anon`/`authenticated` hold
+  broad table-level grants (including UPDATE/DELETE/TRUNCATE) on all
+  three tables. These grants do NOT by themselves demonstrate a REST API
+  exploit — with no UPDATE/DELETE policies on these tables, RLS still
+  denies such operations through PostgREST — but they are excess
+  privilege to tighten in the staged remediation (grants should mirror
+  the policy surface). Staged, reviewed, never applied speculatively.
+  Owner action required: confirm no external consumer beyond these
+  policies, then approve least-privilege replacement (staging first).
 - **S2 — MEDIUM: `rls_auto_enable()` SECURITY DEFINER executable by anon.**
-  Definition UNVERIFIED (needs dashboard Q7). If it is an event-trigger
-  helper, anon cannot fire DDL so exploitability is likely low — but public
-  EXECUTE on a definer function violates least privilege regardless.
-  Remediation needs the definition first; do not revoke blindly (could break
-  its event trigger).
-- **S3 — MEDIUM (hardening): leaked-password protection disabled.**
-  Dashboard toggle (Auth → Password protection). No code impact. Approve +
-  toggle in the same session as the policy fix.
+  Read-only checks 2026-10-10 confirm it is an **event-trigger** function,
+  invoked by the enabled event trigger `ensure_rls` on `ddl_command_end`
+  for `CREATE TABLE`, `CREATE TABLE AS`, and `SELECT INTO`; EXECUTE is
+  granted to PUBLIC, anon, authenticated, postgres, and service_role.
+  Exploitability via anon looks low (anon cannot issue DDL, so the trigger
+  never fires for them; a direct RPC call would run outside event context),
+  but public EXECUTE on a definer function still violates least privilege.
+  Do NOT revoke blindly — confirm no legitimate direct caller first
+  (staged remediation), since breaking `ensure_rls` would silently leave
+  future tables without RLS.
+- **S3 — MEDIUM (hardening): leaked-password protection disabled**
+  (last observed via dashboard; re-confirm on the Auth page in the same
+  session as the policy fix). Dashboard toggle, no code impact.
 - **S4 — PROCESS (fixed locally): the `20261010` proposal's false
   restriction.** Header rewritten with the OR-logic warning; assumption
   tests added. No prod effect (never applied).
@@ -151,8 +170,9 @@ UNVERIFIED — read-only dashboard pack saved at
 
 ## 7. Blocked / needs owner action
 
-1. Paste the `supabase-live-checks.sql` result grids (Q1–Q9) → closes
-   column/policy/grant/trigger/function/dependency verification.
+1. Q1–Q9 read-only results INCORPORATED (§2) — remaining live-verification
+   gap: Auth page re-confirmation (providers, leaked-password toggle) and
+   any PostgREST log review beyond the 24h window.
 2. External-consumer sweep COMPLETE (see §8) — owner to review the
    classification, especially the five dependent tables and the unknowns.
 3. Approve staging option (fresh vs reactivate) + create it.
@@ -193,19 +213,20 @@ Question: does anything outside the Winlerr repo read/write production
   `env pull` (the only decrypt path) is forbidden by task rules, so
   per-project URL comparison via CLI is BLOCKED. Server-side-only usage
   would not appear in public bundles regardless.
-- **DB-internal dependents (OWNER-VERIFIED pattern, Q4/Q9 grids pending):**
+- **DB-internal dependents (VERIFIED via read-only checks 2026-10-10):**
   RLS policies on five additional live tables reference `admin_profiles`
   with `id = auth.uid()`:
   `failed_submissions`, `feature_suggestions`, `newsletter_campaigns`,
   `prototype_requests`, `waitlist_leads`. None of these tables exist in
   tracked migrations — the live DB is substantially larger than the repo
-  represents. Read-only dependency queries found no views or foreign keys
-  referencing the table and no ordinary function source beyond the
-  already-known unrelated RLS helper.
-- **Logs:** PostgREST request logs (dashboard Log Explorer) could show
-  anon-key queries against `admin_profiles`, but the CLI has no logs
-  surface and retention windows are short — an empty search proves nothing.
-  Method documented; not executed (needs owner dashboard session).
+  represents. Dependency queries confirmed: no views, no foreign keys,
+  and no ordinary function source referencing the table beyond the
+  `rls_auto_enable()` event-trigger helper.
+- **Logs (read-only checks 2026-10-10):** a PostgREST log query matched
+  zero `admin_profiles` events in the queried 24h window. Limited
+  evidence only — does not rule out historical access or requests outside
+  that search. CLI has no logs surface; deeper review needs an owner
+  dashboard session.
 
 ### Classification
 
@@ -216,10 +237,9 @@ Question: does anything outside the Winlerr repo read/write production
   decisions reading the table — the earlier "no active consumer" statement
   is retracted. They MUST be preserved: dropping or tightening
   `admin_profiles` access without accounting for them risks breaking those
-  tables' policies. Read-only dependency queries found no views or foreign
-  keys referencing the table and no ordinary function source beyond the
-  already-known unrelated RLS helper — the five policy dependencies stand
-  as the complete known list, pending Q4/Q9 grid re-confirmation.
+  tables' policies. Dependency absence beyond these five is VERIFIED
+  (Q9a/b/c: no views, no FKs, no function-source matches) — the five
+  policy dependencies stand as the complete known list.
 - **CONFIRMED FACTS (owner-verified, content never read):** the table holds
   one row (an earlier listing reported zero — discrepancy recorded, cause
   unknown: later insert, transient read, or listing error; no conclusion
@@ -233,11 +253,10 @@ Question: does anything outside the Winlerr repo read/write production
 - **EXTERNAL CONSUMERS NOT FOUND IN SOURCES CHECKED:** GitHub exact-ref
   search, accessible repo code search, three deployed bundles checked.
 - **STILL UNKNOWN:** (a) server-side-only consumers (invisible to bundle
-  inspection; Vercel env values unreadable without `env pull`), (b) full
-  DB-internal dependency confirmation (needs Q9 grids), (c) historical
-  PostgREST traffic (needs dashboard logs), (d) contents/roles of the two
-  private backup repos (deliberately unopened), (e) who owns the single
-  existing profile row (content never read). Auth signup posture is now
+  inspection; Vercel env values unreadable without `env pull`), (b) traffic
+  older than the queried 24h log window, (c) contents/roles of the two
+  private backup repos (deliberately unopened), (d) who owns the single
+  existing profile row (content never read). Auth signup posture is
   RESOLVED (dashboard 2026-10-10: signup on, email confirm on, anon
   sign-ins off) — it narrows but does not close the S1(c) hypothesis,
   which still awaits a staging test.
