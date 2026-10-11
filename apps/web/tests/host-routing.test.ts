@@ -132,6 +132,14 @@ describe("mapLegacyPath", () => {
     expect(mapLegacyPath("/winlerros/preview")).toBe("/winlerros/preview");
   });
 
+  it("strips the legacy prefix off app routes that were never nested", () => {
+    expect(mapLegacyPath("/winlerros/login")).toBe("/login");
+    expect(mapLegacyPath("/winlerros/signup")).toBe("/signup");
+    expect(mapLegacyPath("/winlerros/auth/callback")).toBe("/auth/callback");
+    expect(mapLegacyPath("/winlerros/dashboard")).toBe("/dashboard");
+    expect(mapLegacyPath("/winlerros/dashboard/setup")).toBe("/dashboard/setup");
+  });
+
   it("leaves app, marketing, and API paths alone", () => {
     for (const path of ["/login", "/dashboard", "/about", "/api/leads", "/"]) {
       expect(mapLegacyPath(path)).toBeNull();
@@ -152,6 +160,11 @@ describe("resolveRedirect (marketing app routes and legacy paths to OS)", () => 
 
   it("moves legacy entry and alias paths to OS destinations", () => {
     expect(resolveRedirect("www.winlerr.vip", "/winlerros", "GET")).toEqual({ hostname: OS, pathname: "/" });
+    expect(resolveRedirect("www.winlerr.vip", "/winlerros/login", "GET")).toEqual({ hostname: OS, pathname: "/login" });
+    expect(resolveRedirect("www.winlerr.vip", "/winlerros/dashboard/setup", "GET")).toEqual({
+      hostname: OS,
+      pathname: "/dashboard/setup",
+    });
     expect(resolveRedirect("www.winlerr.vip", "/winlerros/onboarding", "GET")).toEqual({
       hostname: OS,
       pathname: "/winlerros/onboarding",

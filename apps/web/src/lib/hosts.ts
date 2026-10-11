@@ -115,7 +115,15 @@ export function mapLegacyPath(pathname: string): string | null {
   if (pathname === "/winlaos") return "/";
   if (pathname === "/winlaos/onboarding") return "/winlerros/onboarding";
   if (pathname === "/winlaos/preview") return "/winlerros/preview";
-  if (pathname.startsWith("/winlerros/")) return pathname;
+  // Legacy deep links that prefixed app routes with /winlerros strip down
+  // to the real app route (no such nested routes exist).
+  if (pathname.startsWith("/winlerros/")) {
+    const rest = pathname.slice("/winlerros".length);
+    if (rest === "/login" || rest === "/signup" || rest === "/auth/callback" || rest === "/dashboard" || rest.startsWith("/dashboard/")) {
+      return rest;
+    }
+    return pathname;
+  }
   return null;
 }
 
