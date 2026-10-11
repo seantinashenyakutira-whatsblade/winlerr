@@ -260,3 +260,30 @@ unknown). No emergency action is claimed; the decision on containment
 timing sits with the owner. PR #14 (prior reconciliation) has merged; this
 report now gates PR #15, which must stay unmerged until owner review,
 green CI, and an explicit containment decision are all recorded.
+
+## 9. Workspace ledger reconciliation proposal (2026-10-11, no writes made)
+
+- Ledger state (VERIFIED via `migration list`): applied `20260925064611`,
+  `20260926000000`; `20261011000000` pending; `20261012000000` (workspace)
+  present locally, absent from ledger.
+- Live state (VERIFIED read-only inspection): `organizations` +
+  `organization_members` exist with RLS on; columns, defaults,
+  constraints, unique indexes, all six policies, and trigger absence match
+  the migration's intent. The migration's own §0 precondition correctly
+  refused to run against them in SQL Editor (guard proven working).
+- GAP: table GRANTS on the two tables were not part of the verified set.
+  Equivalence is therefore NOT fully established — `migration repair` is
+  NOT recommended yet.
+- Proposed sequence (each step needs explicit owner approval; step 1 is
+  read-only):
+  1. Dashboard SELECT on `information_schema.role_table_grants` for both
+     tables; compare against intent (anon: nothing; authenticated:
+     SELECT/INSERT/UPDATE/DELETE only; service_role: full).
+  2. If grants match: `supabase migration repair --status applied
+     20261012000000` (records the version WITHOUT executing SQL), then
+     re-run `migration list` to confirm. Pending set becomes
+     `20261011` only, preserving timestamp order for the eventual push.
+  3. If grants differ: do NOT repair — scope a grant-only follow-up
+     migration instead, then repair.
+  4. Only after 1–3: consider `db push` for `20261011` under separate
+     explicit approval (its own preconditions re-validate live state).
