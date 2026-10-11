@@ -21,7 +21,7 @@
 ## Onboarding form contract (Codex)
 
 - Fields: business name (→ `name`), workspace address (→ `slug`, lowercase/hyphen hint). Validate client-side with the same rules (`organizationNameSchema`, `organizationSlugSchema` exported from `@winlerr/workspace`).
-- Submit → `createOrganizationAction` → on `ok`, navigate to the workspace (path TBD with routing); on `slug-taken`, prompt for another address; on `unauthorized`, send to `/login?next=<onboarding>`.
+- Submit → `createOrganizationAction` → on `ok` with a returned organization, navigate to `/dashboard`, which renders the user's real results from `listOrganizationsAction`; on `slug-taken`, prompt for another address; on `unauthorized`, send to `/login?next=/dashboard/setup`.
 - Loading/error/empty states mirror the auth forms (`role="alert"` errors, pending labels). Stable element ids to agree with Codex: `workspace-name`, `workspace-slug`.
 
 ## Explicit dependencies (NOT faked, NOT in this slice)
