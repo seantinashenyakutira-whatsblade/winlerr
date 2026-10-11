@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
+import { HeroVideo } from "@/components/HeroVideo";
 
 export const metadata: Metadata = {
   title: "Systems",
@@ -60,18 +61,21 @@ export default function SystemsPage() {
   return (
     <main className="min-h-screen bg-surface text-ink">
       <SiteNav />
-      <section className="mx-auto max-w-6xl px-4 pt-28 sm:px-6 sm:pt-32">
-        <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Systems</p>
-        <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
-          Practical AI systems built for Zambian businesses.
-        </h1>
-        <p className="mt-4 max-w-2xl text-base text-ink-muted">
-          Start with a free professional website, then connect the systems that answer customer
-          enquiries, take bookings, and close sales around the clock.
-        </p>
-        <p className="mt-3 max-w-2xl text-sm text-ink-muted">
-          No long contracts or hidden setup fees. Add only the systems your business actually needs.
-        </p>
+      <section className="relative isolate overflow-hidden px-4 pb-10 pt-28 sm:px-6 sm:pb-14 sm:pt-32">
+        <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-50" />
+        <div className="relative z-10 mx-auto max-w-6xl">
+          <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Systems</p>
+          <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Practical AI systems built for Zambian businesses.
+          </h1>
+          <p className="mt-4 max-w-2xl text-base text-ink-muted">
+            Start with a free professional website, then connect the systems that answer customer
+            enquiries, take bookings, and close sales around the clock.
+          </p>
+          <p className="mt-3 max-w-2xl text-sm text-ink-muted">
+            No long contracts or hidden setup fees. Add only the systems your business actually needs.
+          </p>
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">

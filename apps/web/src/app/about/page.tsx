@@ -3,6 +3,7 @@ import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
 import { VoiceNoteReplay } from "@/components/VoiceNote";
+import { HeroVideo } from "@/components/HeroVideo";
 
 export const metadata: Metadata = {
   title: "About",
@@ -16,18 +17,24 @@ export default function AboutPage() {
     <main className="min-h-screen bg-surface text-ink">
       <SiteNav />
 
-      <section className="mx-auto max-w-3xl px-4 pt-28 sm:px-6 sm:pt-32">
-        <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">About</p>
-        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-          Built in Zambia, for Zambian businesses.
-        </h1>
-        <div className="mt-6 space-y-4">
-          <p className="text-base leading-relaxed text-ink-muted">
+      <section className="relative isolate overflow-hidden px-4 pb-10 pt-28 sm:px-6 sm:pb-14 sm:pt-32">
+        <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-50" />
+        <div className="relative z-10 mx-auto max-w-3xl">
+          <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">About</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Built in Zambia, for Zambian businesses.
+          </h1>
+          <p className="mt-6 text-base leading-relaxed text-ink-muted">
             I started Winlerr after watching business owners in Lusaka lose sales simply because
             they could not reach their phones in time. A customer asks for prices on WhatsApp,
             waits hours for a reply, and buys elsewhere. Good local businesses were not losing on
             quality, but on response speed.
           </p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-3xl px-4 pb-8 sm:px-6">
+        <div className="space-y-4">
           <p className="text-base leading-relaxed text-ink-muted">
             Most owners here run everything from one device while managing staff, stock, and
             customers. When enquiries arrive during busy rushes or late at night, messages sit
