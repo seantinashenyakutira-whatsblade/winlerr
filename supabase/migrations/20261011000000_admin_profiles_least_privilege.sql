@@ -203,15 +203,18 @@ create policy "admin_profiles_owner_select"
   using (auth.uid() = id);
 
 -- §4. Dependent tables: replace existence-only "Admins can..." policies with
--- role-gated admin-manage policies. Design decisions (see report §8):
---   * Gate: role IN ('owner','admin') — explicit owner directive
---     (2026-10-10): owner accounts retain administrator capabilities;
---     'viewer' is excluded and gains nothing from merely holding a row.
---     The pre-apply check stands: confirm the existing profile row's
---     role is 'owner' or 'admin' before apply.
---   * One FOR ALL policy per table (admin-manage semantics: privileged
---     roles read + moderate). A viewer profile — or any other role value —
---     matches nothing.
+-- role-gated admin policies that preserve each table's existing command
+-- scope (see report §8):
+--   * failed_submissions: administrator ALL (+ public INSERT preserved).
+--   * newsletter_campaigns: administrator ALL; no public INSERT exists and
+--     none is created.
+--   * feature_suggestions, prototype_requests, waitlist_leads:
+--     administrator SELECT, UPDATE, DELETE only — NO new administrator
+--     INSERT policy (admin inserts go through service_role; public INSERT
+--     policies stay exactly as validated in §0).
+-- Gate: role IN ('owner','admin') — explicit owner directive; 'viewer'
+-- gains nothing. Pre-apply check: confirm the existing profile row's role
+-- is 'owner' or 'admin' before apply.
 --   * Nested read is safe: the subquery sees only the caller's own row
 --     through §3 (no recursion — admin_profiles policies read no other
 --     tables), and the SELECT grant on admin_profiles is retained (§6), so
@@ -225,6 +228,9 @@ declare
   t text;
   r record;
   v_leftover int;
+  v_cmd text;
+  v_cmds text[];
+  v_policy text;
   v_pred text := 'EXISTS (SELECT 1 FROM public.admin_profiles WHERE id = auth.uid() AND role IN (''owner'',''admin''))';
 begin
   foreach t in array array[
@@ -251,10 +257,28 @@ begin
     if v_leftover > 0 then
       raise exception 'hardening aborted: unrecognized admin_profiles policy remains on % — review manually', t;
     end if;
-    execute format(
-      'CREATE POLICY %I ON public.%I FOR ALL TO authenticated USING (%s) WITH CHECK (%s)',
-      'admins_manage_' || t, t, v_pred, v_pred);
-    raise notice 'hardening: created admin-manage policy on %', t;
+    -- Per-table command scope. WITH CHECK is only valid on ALL/UPDATE;
+    -- SELECT- and DELETE-only policies take USING alone (Postgres rejects
+    -- WITH CHECK there), which is equally restrictive for those commands.
+    v_cmds := case t
+      when 'failed_submissions' then array['ALL']
+      when 'newsletter_campaigns' then array['ALL']
+      else array['SELECT', 'UPDATE', 'DELETE']
+    end;
+    foreach v_cmd in array v_cmds loop
+      v_policy := 'admins_manage_' || t ||
+        case when v_cmd = 'ALL' then '' else '_' || lower(v_cmd) end;
+      if v_cmd in ('ALL', 'UPDATE') then
+        execute format(
+          'CREATE POLICY %I ON public.%I FOR %s TO authenticated USING (%s) WITH CHECK (%s)',
+          v_policy, t, v_cmd, v_pred, v_pred);
+      else
+        execute format(
+          'CREATE POLICY %I ON public.%I FOR %s TO authenticated USING (%s)',
+          v_policy, t, v_cmd, v_pred);
+      end if;
+      raise notice 'hardening: created % on %', v_policy, t;
+    end loop;
   end loop;
 end
 $$;
@@ -318,9 +342,10 @@ revoke truncate, references, trigger, maintain
 revoke insert on public.newsletter_campaigns from anon;
 
 -- §7. Read-only post-deployment verification (run after approved apply).
--- Policy state: expect one admin_profiles_owner_select policy; one
--- admins_manage_* (ALL, authenticated) policy per dependent table; the four
--- validated Anyone INSERT policies; and no anonymous newsletter INSERT.
+-- Policy state: expect one admin_profiles_owner_select policy;
+-- admins_manage_failed_submissions (ALL) + admins_manage_newsletter_campaigns
+-- (ALL) + admins_manage_{feature_suggestions,prototype_requests,waitlist_leads}_{select,update,delete};
+-- the four validated Anyone INSERT policies; and no anonymous newsletter INSERT.
 --   select schemaname, tablename, policyname, roles, cmd, qual, with_check
 --   from pg_policies where schemaname='public' and tablename in
 --   ('admin_profiles','failed_submissions','feature_suggestions',
