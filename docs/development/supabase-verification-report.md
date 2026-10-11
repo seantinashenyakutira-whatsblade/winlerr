@@ -261,31 +261,38 @@ timing sits with the owner. PR #14 (prior reconciliation) has merged; this
 report now gates PR #15, which must stay unmerged until owner review,
 green CI, and an explicit containment decision are all recorded.
 
-## 9. Workspace ledger reconciliation proposal (2026-10-11, no writes made)
+## 9. Workspace ledger reconciliation proposal (grant evidence verified 2026-10-11; no writes made)
 
 - Ledger state (VERIFIED via `migration list`): applied `20260925064611`,
   `20260926000000`; `20261013000000` (renamed hardening proposal, was
   `20261011000000`) pending; `20261012000000` (workspace) pending ledger
   entry although its effects exist live (see proposal below).
-- Live state (VERIFIED read-only inspection): `organizations` +
+- Live state (VERIFIED read-only checks): `organizations` +
   `organization_members` exist with RLS on; columns, defaults,
   constraints, unique indexes, all six policies, and trigger absence match
   the migration's intent. The migration's own §0 precondition correctly
   refused to run against them in SQL Editor (guard proven working).
-- GAP: table GRANTS on the two tables were not part of the verified set.
-  Equivalence is therefore NOT fully established — `migration repair` is
-  NOT recommended yet.
-- Proposed sequence (each step needs explicit owner approval; step 1 is
-  read-only):
-  1. Dashboard SELECT on `information_schema.role_table_grants` for both
-     tables; compare against intent (anon: nothing; authenticated:
-     SELECT/INSERT/UPDATE/DELETE only; service_role: full).
-  2. If grants match: `supabase migration repair --status applied
-     20261012000000` (records the version WITHOUT executing SQL), then
-     re-run `migration list` to confirm. Pending set becomes
-     `20261013` (renamed hardening file) only, preserving timestamp order
-     for the eventual push.
-  3. If grants differ: do NOT repair — scope a grant-only follow-up
-     migration instead, then repair.
-  4. Only after 1–3: consider `db push` for `20261013` under separate
-     explicit approval (its own preconditions re-validate live state).
+- Grants (VERIFIED read-only ACL inspection, project `uqdeuiaymoolyroppwhy`):
+  no explicit `PUBLIC` grants; `anon` has no effective table privileges;
+  `authenticated` has SELECT, INSERT, UPDATE, DELETE only (no TRUNCATE,
+  REFERENCES, TRIGGER, MAINTAIN); `service_role` has full privileges
+  including maintenance-class. This matches the migration's intent exactly
+  — the grant prerequisite is now satisfied by current read-only evidence.
+  No row contents were read; no writes or DDL performed.
+- Proposed sequence (each step needs explicit owner approval):
+  1. Owner explicitly authorizes reconciling the already-existing
+     workspace schema (this step — approval recorded, not assumed).
+  2. Re-verify `supabase migration list --linked` and the target project
+     ref immediately before acting.
+  3. Only after authorization: `supabase migration repair --status applied
+     20261012000000`. This records migration history WITHOUT executing the
+     workspace migration SQL. NOT EXECUTED in this task.
+  4. Re-run `supabase migration list --linked` and verify that
+     `20261013000000_admin_profiles_least_privilege.sql` is the only
+     remaining pending migration.
+  5. Request SEPARATE explicit authorization before applying the hardening
+     migration (`db push`). Neither operation has happened.
+- Outstanding decisions (unchanged, still required): acceptance of the
+  FOR ALL scope on `failed_submissions`/`newsletter_campaigns`; approved
+  provisioning of the intended platform operators (existing row role +
+  any new operator rows); separate authorization for the hardening apply.
