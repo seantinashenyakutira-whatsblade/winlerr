@@ -1,6 +1,6 @@
 /**
  * Static safety invariants for the least-privilege hardening proposal
- * (20261011000000). These checks inspect SQL text only: they do not execute
+ * (20261013000000). These checks inspect SQL text only: they do not execute
  * PostgreSQL, validate the live catalog, or prove effective RLS/ACL behavior.
  * Staging runtime smoke tests and the read-only catalog queries in the
  * migration remain required before production deployment.
@@ -9,7 +9,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const MIGRATIONS_DIR = new URL("../../../supabase/migrations/", import.meta.url);
-const MIGRATION_URL = new URL("20261011000000_admin_profiles_least_privilege.sql", MIGRATIONS_DIR);
+const MIGRATION_URL = new URL("20261013000000_admin_profiles_least_privilege.sql", MIGRATIONS_DIR);
 const sql = readFileSync(MIGRATION_URL, "utf8");
 const lines = sql.split("\n").filter(line => !line.trim().startsWith("--"));
 const code = lines.join("\n");
@@ -56,7 +56,7 @@ describe("least-privilege hardening proposal", () => {
   it("keeps the superseded migration out of the pending sequence", () => {
     const files = readdirSync(MIGRATIONS_DIR);
     expect(files.some(file => file.startsWith("20261010000000"))).toBe(false);
-    expect(files).toContain("20261011000000_admin_profiles_least_privilege.sql");
+    expect(files).toContain("20261013000000_admin_profiles_least_privilege.sql");
   });
 
   it("creates or drops no tables and contains no data-modifying statements", () => {
