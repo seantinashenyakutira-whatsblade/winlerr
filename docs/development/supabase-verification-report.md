@@ -279,19 +279,22 @@ green CI, and an explicit containment decision are all recorded.
   including maintenance-class. This matches the migration's intent exactly
   — the grant prerequisite is now satisfied by current read-only evidence.
   No row contents were read; no writes or DDL performed.
-- Proposed sequence (each step needs explicit owner approval):
-  1. Owner explicitly authorizes reconciling the already-existing
-     workspace schema (this step — approval recorded, not assumed).
-  2. Re-verify `supabase migration list --linked` and the target project
-     ref immediately before acting.
-  3. Only after authorization: `supabase migration repair --status applied
-     20261012000000`. This records migration history WITHOUT executing the
-     workspace migration SQL. NOT EXECUTED in this task.
-  4. Re-run `supabase migration list --linked` and verify that
-     `20261013000000_admin_profiles_least_privilege.sql` is the only
-     remaining pending migration.
-  5. Request SEPARATE explicit authorization before applying the hardening
-     migration (`db push`). Neither operation has happened.
+- Proposed sequence — AUTHORIZATION STATUS: NOTHING BELOW IS AUTHORIZED.
+  - **Workspace migration repair: AWAITING EXPLICIT OWNER AUTHORIZATION.**
+    Authorization has NOT YET BEEN GRANTED.
+  - `supabase migration repair --status applied 20261012000000` has NOT
+    BEEN EXECUTED. When authorized and executed, it records migration
+    history only; it does not execute workspace migration SQL.
+  - Immediately before any future execution, re-verify the linked
+    Supabase project reference `uqdeuiaymoolyroppwhy` (`supabase projects
+    list`) and `supabase migration list --linked`.
+  - After separately authorized repair: re-run `migration list` and
+    verify that `20261013000000_admin_profiles_least_privilege.sql` is
+    the only remaining pending migration.
+  - **Hardening migration application is a separate operation requiring
+    separate explicit owner authorization. It is NOT AUTHORIZED and has
+    NOT BEEN EXECUTED.** Neither a repair nor a push has happened; this
+    report proposes the order only.
 - Outstanding decisions (unchanged, still required): acceptance of the
   FOR ALL scope on `failed_submissions`/`newsletter_campaigns`; approved
   provisioning of the intended platform operators (existing row role +
