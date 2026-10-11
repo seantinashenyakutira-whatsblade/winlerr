@@ -6,12 +6,14 @@
  *   edge) + `winlerr.vercel.app` (platform default): marketing site.
  * - `os.winlerr.vip`: WinlerrOS application entry.
  *
- * Routing policy (deliberately minimal):
- * - Only `GET /` on the OS host rewrites to the existing `/winlerros` page.
- *   Every other path — auth, dashboard, APIs, marketing deep links,
- *   compatibility aliases — passes through untouched on every host.
- * - There are NO host-to-host redirects in code, so www <-> os loops are
- *   impossible. Apex -> www is handled by Vercel, not here.
+ * Routing policy:
+ * - OS root `/` rewrites (internal) to the existing `/winlerros` page.
+ * - On MARKETING hosts only, GET/HEAD navigations to app routes redirect
+ *   (308) to the OS origin, and legacy `/winlerros*` + `/winlaos*` paths
+ *   redirect to their OS destinations (query strings preserved by the
+ *   caller). API routes, POST/PUT/DELETE, marketing pages, and unknown
+ *   hosts never redirect — so www <-> os loops are impossible and local
+ *   dev, previews, and form/API posts keep working.
  *
  * Security:
  * - Callers must pass the authoritative `host` header. `x-forwarded-host`
@@ -72,14 +74,87 @@ export function getHostKind(rawHost: string | null | undefined): HostKind {
 
 /**
  * Resolve the internal rewrite target for a request, or null to pass
- * through. The ONLY rewrite is OS root `/` -> `/winlerros`; query strings
- * are preserved by the caller (middleware clones nextUrl, keeping search).
+ * through. Rewrites (URL unchanged in the browser):
+ * - OS root `/` -> `/winlerros` (OS host only).
+ * - Legacy `/winlaos*` aliases -> their `/winlerros*` destinations on
+ *   NON-marketing hosts (marketing hosts redirect instead, handled by
+ *   resolveRedirect). Query strings are preserved by the caller
+ *   (middleware clones nextUrl, keeping search).
  */
 export function resolveRewrite(
   rawHost: string | null | undefined,
   pathname: string | null | undefined
 ): string | null {
-  if (getHostKind(rawHost) !== "os") return null;
-  if ((pathname ?? "") === "/") return OS_ENTRY_PATH;
+  const path = pathname ?? "";
+  if (getHostKind(rawHost) === "os" && path === "/") return OS_ENTRY_PATH;
+  // NOTE: /winlerros itself is deliberately NOT rewritten here (it would
+  // loop back to /). Only the /winlaos* aliases rewrite, on non-marketing
+  // hosts (marketing hosts redirect instead).
+  if (getHostKind(rawHost) !== "marketing") {
+    if (path === "/winlaos") return "/";
+    if (path === "/winlaos/onboarding") return "/winlerros/onboarding";
+    if (path === "/winlaos/preview") return "/winlerros/preview";
+  }
+  return null;
+}
+
+/** App routes that live on the OS origin (exact paths). */
+export const OS_APP_PATHS: readonly string[] = [
+  "/login",
+  "/signup",
+  "/auth/callback",
+  "/dashboard",
+];
+
+/** App route prefixes that live on the OS origin (dashboard subtree). */
+export const OS_APP_PREFIXES: readonly string[] = ["/dashboard/"];
+
+/** Legacy marketing-host paths mapped to OS destinations (path only). */
+export function mapLegacyPath(pathname: string): string | null {
+  if (pathname === "/winlerros") return "/";
+  if (pathname === "/winlaos") return "/";
+  if (pathname === "/winlaos/onboarding") return "/winlerros/onboarding";
+  if (pathname === "/winlaos/preview") return "/winlerros/preview";
+  // Legacy deep links that prefixed app routes with /winlerros strip down
+  // to the real app route (no such nested routes exist).
+  if (pathname.startsWith("/winlerros/")) {
+    const rest = pathname.slice("/winlerros".length);
+    if (rest === "/login" || rest === "/signup" || rest === "/auth/callback" || rest === "/dashboard" || rest.startsWith("/dashboard/")) {
+      return rest;
+    }
+    return pathname;
+  }
+  return null;
+}
+
+export interface HostRedirect {
+  /** Absolute destination origin host (always the OS host). */
+  hostname: string;
+  /** Destination path on that host. Caller preserves the query string. */
+  pathname: string;
+}
+
+function isAppPath(pathname: string): boolean {
+  if ((OS_APP_PATHS as readonly string[]).includes(pathname)) return true;
+  return OS_APP_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+/**
+ * Resolve a marketing -> OS redirect, or null to pass through.
+ * Only GET/HEAD navigations on MARKETING hosts redirect; everything else
+ * (API routes, POST/PUT/DELETE, marketing pages, OS/unknown hosts) passes
+ * through untouched.
+ */
+export function resolveRedirect(
+  rawHost: string | null | undefined,
+  pathname: string | null | undefined,
+  method: string | null | undefined
+): HostRedirect | null {
+  if (method !== "GET" && method !== "HEAD") return null;
+  if (getHostKind(rawHost) !== "marketing") return null;
+  const path = pathname ?? "";
+  if (isAppPath(path)) return { hostname: OS_HOST, pathname: path };
+  const legacy = mapLegacyPath(path);
+  if (legacy !== null) return { hostname: OS_HOST, pathname: legacy };
   return null;
 }

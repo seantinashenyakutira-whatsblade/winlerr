@@ -6,7 +6,7 @@ import { WinlerrLogo } from "@/components/winlerros/brand";
 export const metadata: Metadata = {
   title: "WinlerrOS",
   description: "A calmer way to manage the everyday work behind your business.",
-  alternates: { canonical: "/winlerros" },
+  alternates: { canonical: "https://os.winlerr.vip/" },
 };
 
 const features = [

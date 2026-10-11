@@ -1,13 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      { source: "/winlaos", destination: "/winlerros", permanent: true },
-      { source: "/winlaos/onboarding", destination: "/winlerros/onboarding", permanent: true },
-      { source: "/winlaos/preview", destination: "/winlerros/preview", permanent: true },
-    ];
-  },
+  // NOTE: legacy /winlaos* aliases are handled in middleware.ts (host-aware:
+  // marketing hosts redirect to OS destinations, other hosts rewrite
+  // internally). They must NOT also live in redirects() — config-level
+  // redirects take precedence over middleware and would bypass the
+  // host-aware mapping with a wrong-host hop.
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
