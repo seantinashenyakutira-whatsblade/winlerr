@@ -13,13 +13,13 @@ The product UI is denser than the marketing site while retaining its crisp typog
 - `/winlerros/preview` shows the responsive dashboard shell with preview-only empty-state content.
 - `/winlaos`, `/winlaos/onboarding`, and `/winlaos/preview` permanently redirect to their `/winlerros` equivalents.
 - `/signup` and `/login` use the real signup and sign-in forms, with email confirmation and callback behavior supplied by the auth integration.
-- `/dashboard` remains protected by the server-side `getViewer()` session guard and passes the authenticated email and sign-out action into the shell.
-- `/dashboard/setup` is an interactive UI-only workspace setup preview; its state remains in memory and is not sent to a server.
+- `/dashboard` remains protected by the server-side `getViewer()` session guard. It displays only organizations returned by `listOrganizationsAction`; a successful empty list and a failed/unavailable read have separate states. Customer, sales, and activity metrics are not represented as live data.
+- `/dashboard/setup` is protected by the same session guard and creates an organization through `createOrganizationAction({ name, slug })`. The shared workspace schemas validate both fields. Duplicate addresses, validation errors, unauthenticated requests, and backend failures are shown as errors; success navigation happens only after an organization is returned.
 
 ## Integration boundary
 
-Authentication is integrated through the existing auth actions, callback route, session cookies, and guarded dashboard. This UI work does not change those services. Organization creation, membership authorization, persistence, and workspace setup remain unimplemented; the setup flow explicitly identifies itself as a preview.
+Authentication remains integrated through the existing auth actions, callback route, session cookies, and guarded dashboard. This UI work does not change those services. Workspace actions use the authenticated session and the `@winlerr/workspace` contract. The organization migration remains a proposal until deployed, so database availability must be confirmed before relying on workspace creation in an environment.
 
 ## Verification boundary
 
-Static checks and browser layout review do not prove provider behavior, cookie security, callback validity, or workspace persistence. Validate those behaviors with the configured Supabase project and non-production accounts before release.
+Static checks and browser layout review do not prove provider behavior, cookie security, callback validity, or workspace persistence. Use injected action tests for onboarding outcomes. Validate provider behavior with a non-production Supabase project before release; do not test workspace writes against production.
