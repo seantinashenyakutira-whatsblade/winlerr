@@ -6,13 +6,13 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   ChevronDown,
-  CircleAlert,
   LayoutDashboard,
   Menu,
   X,
 } from "lucide-react";
 import type { OrganizationWithRole, WorkspaceErrorCode } from "@winlerr/workspace";
 import { WinlerrLogo } from "@/components/winlerros/brand";
+import { ErrorExperience } from "@/components/error-experience";
 
 export function DashboardShell({
   preview = false,
@@ -101,9 +101,16 @@ export function DashboardShell({
 
             <section aria-label="Workspace data" className="mt-8">
               {organizations === null ? (
-                <div role="alert" className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950 sm:p-6">
-                  <div className="flex items-start gap-3"><CircleAlert size={19} className="mt-0.5 shrink-0" /><div><h2 className="font-semibold">Workspace data is unavailable</h2><p className="mt-1 leading-6">{workspaceError === "unauthorized" ? "Your session could not be verified for workspace data. Please sign in again." : "We couldn’t load your workspaces. Workspace storage may not be available yet. Please try again later."}</p>{workspaceError === "unauthorized" && <Link href="/login?next=%2Fdashboard" className="mt-3 inline-flex font-semibold underline underline-offset-2">Sign in again</Link>}</div></div>
-                </div>
+                <ErrorExperience
+                  compact
+                  variant={
+                    workspaceError === "unauthorized"
+                      ? "session-expired"
+                      : workspaceError === "forbidden"
+                        ? "access-denied"
+                        : "workspace-unavailable"
+                  }
+                />
               ) : hasOrganizations ? (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {organizations?.map((organization) => (
