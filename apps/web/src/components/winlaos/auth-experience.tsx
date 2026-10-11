@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
+import type { ReactNode } from "react";
 import { WinlaMark } from "@/components/winlaos/brand";
 
 type AuthMode = "login" | "signup";
@@ -15,7 +16,7 @@ const stateCopy: Record<string, { title: string; body: string; tone: "info" | "e
   loading: { title: "Connecting securely", body: "Loading state preview. The live route will show progress while the auth service responds.", tone: "info" },
 };
 
-export function AuthExperience({ mode }: { mode: AuthMode }) {
+export function AuthExperience({ mode, form }: { mode: AuthMode; form?: ReactNode }) {
   const search = useSearchParams();
   const state = search.get("state");
   const notice = state ? stateCopy[state] : undefined;
@@ -47,12 +48,14 @@ export function AuthExperience({ mode }: { mode: AuthMode }) {
           </div>}
 
           <div className="mt-8 rounded-[24px] border border-[#e6e3d9] bg-white p-6 shadow-[0_12px_32px_rgba(28,52,41,.06)] sm:p-8">
+            {form ?? (<>
             <label htmlFor="auth-email" className="mb-2 block text-sm font-medium text-[#243d32]">Work email</label>
             <div className="relative"><Mail size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#829087]"/><input id="auth-email" name="email" autoComplete="email" type="email" placeholder="you@business.co.zm" className="winla-input pl-10" disabled /></div>
             <label htmlFor="auth-password" className="mb-2 mt-5 block text-sm font-medium text-[#243d32]">Password</label>
             <div className="relative"><LockKeyhole size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#829087]"/><input id="auth-password" name="password" autoComplete={signup ? "new-password" : "current-password"} type="password" placeholder="At least 8 characters" className="winla-input pl-10" disabled /></div>
             <p className="mt-3 rounded-xl bg-[#faf8f2] px-3.5 py-3 text-xs leading-5 text-[#69766d]">Account authentication is waiting for the backend integration to merge. No credentials are submitted from this preview.</p>
             <button type="button" disabled className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#173b32] px-5 text-sm font-semibold text-white opacity-55">{signup ? "Create account" : "Sign in"}<ArrowRight size={16}/></button>
+            </>)}
             <p className="mt-5 text-center text-sm text-[#66746b]">{signup ? "Already have an account? " : "New to WinlaOS? "}<Link href={signup ? "/login" : "/signup"} className="font-semibold text-[#a65435] underline decoration-[#d9b09a] underline-offset-4">{signup ? "Sign in" : "Create an account"}</Link></p>
           </div>
           <p className="mt-7 text-center text-xs text-[#849087]">Your account session will be secured with httpOnly cookies.</p>
