@@ -3,11 +3,11 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { safeNextPath } from "@winlerr/auth";
 import { getViewer } from "@/lib/auth-actions";
-import { AuthExperience } from "@/components/winlaos/auth-experience";
+import { AuthExperience } from "@/components/winlerros/auth-experience";
 import { SignupForm } from "@/components/auth/signup-form";
 
 export const metadata: Metadata = {
-  title: "Create account",
+  title: "Create a WinlerrOS account",
   description: "Create your WinlerrOS account to access your dashboard.",
   robots: { index: false, follow: false },
 };
