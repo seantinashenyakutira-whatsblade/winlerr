@@ -1,6 +1,6 @@
 /**
  * Static safety invariants for the least-privilege hardening proposal
- * (20261011000000). These checks inspect SQL text only: they do not execute
+ * (20261013000000). These checks inspect SQL text only: they do not execute
  * PostgreSQL, validate the live catalog, or prove effective RLS/ACL behavior.
  * Staging runtime smoke tests and the read-only catalog queries in the
  * migration remain required before production deployment.
@@ -9,7 +9,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const MIGRATIONS_DIR = new URL("../../../supabase/migrations/", import.meta.url);
-const MIGRATION_URL = new URL("20261011000000_admin_profiles_least_privilege.sql", MIGRATIONS_DIR);
+const MIGRATION_URL = new URL("20261013000000_admin_profiles_least_privilege.sql", MIGRATIONS_DIR);
 const sql = readFileSync(MIGRATION_URL, "utf8");
 const lines = sql.split("\n").filter(line => !line.trim().startsWith("--"));
 const code = lines.join("\n");
@@ -56,7 +56,7 @@ describe("least-privilege hardening proposal", () => {
   it("keeps the superseded migration out of the pending sequence", () => {
     const files = readdirSync(MIGRATIONS_DIR);
     expect(files.some(file => file.startsWith("20261010000000"))).toBe(false);
-    expect(files).toContain("20261011000000_admin_profiles_least_privilege.sql");
+    expect(files).toContain("20261013000000_admin_profiles_least_privilege.sql");
   });
 
   it("creates or drops no tables and contains no data-modifying statements", () => {
@@ -86,7 +86,20 @@ describe("least-privilege hardening proposal", () => {
     expect(code).not.toMatch(/role\s*=\s*'{1,2}viewer'{1,2}/i);
     expect(code).not.toMatch(/IN\s*\([^)]*'{1,2}viewer'{1,2}/i);
     for (const table of DEPENDENT_TABLES) expect(code).toContain(table);
-    expect(code).toMatch(/for all to authenticated/i);
+    expect(code).toMatch(/FOR %s TO authenticated/i);
+  });
+
+  it("preserves each table's administrator command scope", () => {
+    // failed_submissions + newsletter_campaigns: single ALL policy each.
+    expect(code).toMatch(/when 'failed_submissions' then array\['ALL'\]/i);
+    expect(code).toMatch(/when 'newsletter_campaigns' then array\['ALL'\]/i);
+    // The other three: SELECT + UPDATE + DELETE, never admin INSERT.
+    expect(code).toMatch(/else array\['SELECT', 'UPDATE', 'DELETE'\]/i);
+    // WITH CHECK is only emitted for ALL/UPDATE (invalid on SELECT/DELETE).
+    expect(code).toMatch(/if v_cmd in \('ALL', 'UPDATE'\) then/i);
+    // No administrator INSERT policy is created on any dependent table.
+    expect(code).not.toMatch(/create policy[^;]*for insert to authenticated[^;]*admin/i);
+    expect(code).not.toMatch(/admins_manage_\w+_insert/i);
   });
 
   it("validates and preserves only the four known public INSERT policies", () => {
