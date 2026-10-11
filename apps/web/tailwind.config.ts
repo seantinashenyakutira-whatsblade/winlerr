@@ -17,6 +17,7 @@ const config: Config = {
         accent: {
           400: "var(--orange-400)",
           500: "var(--orange-500)",
+          600: "var(--orange-700)",
         },
         border: "var(--border)",
       },

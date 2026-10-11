@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/winlaos", destination: "/winlerros", permanent: true },
+      { source: "/winlaos/onboarding", destination: "/winlerros/onboarding", permanent: true },
+      { source: "/winlaos/preview", destination: "/winlerros/preview", permanent: true },
+    ];
+  },
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,

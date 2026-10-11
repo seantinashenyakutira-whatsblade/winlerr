@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { loginUrl } from "@winlerr/auth";
 import { getViewer, signOutAction } from "@/lib/auth-actions";
-import { DashboardShell } from "@/components/winlaos/dashboard-shell";
+import { DashboardShell } from "@/components/winlerros/dashboard-shell";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "WinlerrOS Dashboard",
   description: "Your WinlerrOS dashboard.",
   robots: { index: false, follow: false },
 };
