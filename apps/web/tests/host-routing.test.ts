@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { safeNextPath } from "@winlerr/auth";
-import { OS_ENTRY_PATH, getHostKind, normalizeHost, resolveRewrite } from "../src/lib/hosts";
+import {
+  OS_ENTRY_PATH,
+  getHostKind,
+  mapLegacyPath,
+  normalizeHost,
+  resolveRedirect,
+  resolveRewrite,
+} from "../src/lib/hosts";
 
 describe("normalizeHost", () => {
   it("lowercases and trims the authoritative host header", () => {
@@ -42,7 +49,7 @@ describe("getHostKind", () => {
   });
 });
 
-describe("resolveRewrite (root rewrite only, no host redirects)", () => {
+describe("resolveRewrite (root rewrite only)", () => {
   it("rewrites the OS root to the WinlerrOS entry page", () => {
     expect(resolveRewrite("os.winlerr.vip", "/")).toBe(OS_ENTRY_PATH);
     expect(resolveRewrite("os.winlerr.vip", "/")).toBe("/winlerros");
@@ -81,9 +88,8 @@ describe("resolveRewrite (root rewrite only, no host redirects)", () => {
       "/systems",
       "/docs",
       "/get-started",
-      "/winlerros",
-      "/winlerros/onboarding",
-      "/winlerros/preview",
+      "/api/leads",
+      "/api/auth/session",
     ];
     for (const host of ["os.winlerr.vip", "www.winlerr.vip"]) {
       for (const path of marketingPaths) {
@@ -92,11 +98,102 @@ describe("resolveRewrite (root rewrite only, no host redirects)", () => {
     }
   });
 
-  it("preserves compatibility aliases for the legacy /winlaos paths", () => {
-    for (const path of ["/winlaos", "/winlaos/onboarding", "/winlaos/preview"]) {
-      expect(resolveRewrite("os.winlerr.vip", path)).toBeNull();
+  it("rewrites legacy /winlaos aliases internally on OS and unknown hosts", () => {
+    expect(resolveRewrite("os.winlerr.vip", "/winlaos")).toBe("/");
+    expect(resolveRewrite("os.winlerr.vip", "/winlaos/onboarding")).toBe("/winlerros/onboarding");
+    expect(resolveRewrite("os.winlerr.vip", "/winlaos/preview")).toBe("/winlerros/preview");
+    expect(resolveRewrite("localhost:3000", "/winlaos")).toBe("/");
+    expect(resolveRewrite("winlerr-git-x.vercel.app", "/winlaos/preview")).toBe("/winlerros/preview");
+  });
+
+  it("never rewrites legacy aliases on marketing hosts (they redirect instead)", () => {
+    for (const path of ["/winlaos", "/winlaos/onboarding", "/winlaos/preview", "/winlerros"]) {
       expect(resolveRewrite("www.winlerr.vip", path)).toBeNull();
     }
+  });
+
+  it("never rewrites /winlerros itself (would loop back to /)", () => {
+    for (const host of ["os.winlerr.vip", "www.winlerr.vip", "localhost:3000"]) {
+      expect(resolveRewrite(host, "/winlerros")).toBeNull();
+    }
+  });
+});
+
+describe("mapLegacyPath", () => {
+  it("maps the legacy entry to the OS root", () => {
+    expect(mapLegacyPath("/winlerros")).toBe("/");
+    expect(mapLegacyPath("/winlaos")).toBe("/");
+  });
+
+  it("maps legacy aliases onto OS destinations without losing the page", () => {
+    expect(mapLegacyPath("/winlaos/onboarding")).toBe("/winlerros/onboarding");
+    expect(mapLegacyPath("/winlaos/preview")).toBe("/winlerros/preview");
+    expect(mapLegacyPath("/winlerros/onboarding")).toBe("/winlerros/onboarding");
+    expect(mapLegacyPath("/winlerros/preview")).toBe("/winlerros/preview");
+  });
+
+  it("leaves app, marketing, and API paths alone", () => {
+    for (const path of ["/login", "/dashboard", "/about", "/api/leads", "/"]) {
+      expect(mapLegacyPath(path)).toBeNull();
+    }
+  });
+});
+
+describe("resolveRedirect (marketing app routes and legacy paths to OS)", () => {
+  const OS = "os.winlerr.vip";
+
+  it("moves app routes from marketing hosts to the OS origin", () => {
+    for (const host of ["www.winlerr.vip", "winlerr.vip", "winlerr.vercel.app"]) {
+      for (const path of ["/login", "/signup", "/auth/callback", "/dashboard", "/dashboard/setup"]) {
+        expect(resolveRedirect(host, path, "GET")).toEqual({ hostname: OS, pathname: path });
+      }
+    }
+  });
+
+  it("moves legacy entry and alias paths to OS destinations", () => {
+    expect(resolveRedirect("www.winlerr.vip", "/winlerros", "GET")).toEqual({ hostname: OS, pathname: "/" });
+    expect(resolveRedirect("www.winlerr.vip", "/winlerros/onboarding", "GET")).toEqual({
+      hostname: OS,
+      pathname: "/winlerros/onboarding",
+    });
+    expect(resolveRedirect("www.winlerr.vip", "/winlaos", "GET")).toEqual({ hostname: OS, pathname: "/" });
+    expect(resolveRedirect("www.winlerr.vip", "/winlaos/preview", "HEAD")).toEqual({
+      hostname: OS,
+      pathname: "/winlerros/preview",
+    });
+  });
+
+  it("never redirects POST/PUT/DELETE (API and form posts stay put)", () => {
+    for (const method of ["POST", "PUT", "DELETE", "PATCH"]) {
+      expect(resolveRedirect("www.winlerr.vip", "/login", method)).toBeNull();
+      expect(resolveRedirect("www.winlerr.vip", "/api/auth/session", method)).toBeNull();
+      expect(resolveRedirect("www.winlerr.vip", "/winlerros", method)).toBeNull();
+    }
+  });
+
+  it("never redirects on the OS host (no loops back to www)", () => {
+    for (const path of ["/", "/login", "/dashboard", "/winlerros", "/api/leads"]) {
+      expect(resolveRedirect("os.winlerr.vip", path, "GET")).toBeNull();
+    }
+  });
+
+  it("never redirects unknown hosts (localhost, previews keep working)", () => {
+    for (const host of ["localhost:3000", "127.0.0.1:3000", "winlerr-git-x.vercel.app", "evil.example", null]) {
+      expect(resolveRedirect(host, "/login", "GET")).toBeNull();
+      expect(resolveRedirect(host, "/winlerros", "GET")).toBeNull();
+      expect(resolveRedirect(host, "/", "GET")).toBeNull();
+    }
+  });
+
+  it("never redirects marketing pages or API routes", () => {
+    for (const path of ["/", "/about", "/systems", "/docs", "/get-started", "/api/leads", "/api/auth/session", "/sitemap.xml"]) {
+      expect(resolveRedirect("www.winlerr.vip", path, "GET")).toBeNull();
+    }
+  });
+
+  it("does not confuse lookalike paths with app routes", () => {
+    expect(resolveRedirect("www.winlerr.vip", "/dashboardsetup", "GET")).toBeNull();
+    expect(resolveRedirect("www.winlerr.vip", "/login-help", "GET")).toBeNull();
   });
 });
 

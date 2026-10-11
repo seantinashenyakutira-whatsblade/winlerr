@@ -8,7 +8,8 @@
 
 Code slice (this PR): host-aware routing ships in
 `apps/web/src/lib/hosts.ts` + `apps/web/src/middleware.ts` — `os /` rewrites
-to `/winlerros`; everything else passes through on every host. What follows
+to `/winlerros`; marketing-host app routes and legacy entry paths 308 to
+their OS destinations; everything else passes through on every host. What follows
 is the exact live configuration to approve.
 
 ## 1. Environment audit (`NEXT_PUBLIC_APP_URL` / `NEXT_PUBLIC_SITE_URL`)
@@ -72,33 +73,32 @@ Apply + redeploy Production after approval. Verify with a real signup to an
 owner-controlled address: the confirmation link must start with
 `https://os.winlerr.vip/auth/callback?next=…`.
 
-## 4. Vercel + Cloudflare runbook (proposed, NOT applied)
+## 4. Vercel + Cloudflare state (VERIFIED live 2026-10-11, read-only)
 
-Preconditions (verified 2026-10-11, read-only): `os.winlerr.vip` is NXDOMAIN;
+`os.winlerr.vip` now resolves via Vercel DNS (`vercel-dns-017.com` chain)
+and returns HTTP 200 — serving the marketing homepage (`<title>Winlerr —
+Digital growth systems…`), i.e. the domain is associated but no OS
+routing is live yet. No owner action was taken in this slice: no domain
+was added, no DNS record created/changed, no Vercel setting altered.
 `www.winlerr.vip` resolves to Cloudflare edge (proxied); project `winlerr`
 serves `www.winlerr.vip`, `winlerr.vip` (308 -> www), `winlerr.vercel.app`.
 
-1. **Associate the domain in Vercel** (owner, dashboard or CLI):
-   Project `winlerr` -> Settings -> Domains -> Add `os.winlerr.vip`.
-   Assign to the **Production** environment on the current project. Do not
-   create a second project. Vercel will display the required DNS target —
-   **copy it exactly; it is the only valid value for step 2.**
-2. **Create the Cloudflare DNS record** (owner, Cloudflare dashboard for
-   zone `winlerr.vip`): Type `CNAME`, Name `os`, Target `<exact value from
-Vercel step 1 — TBD, never assumed>`. Set proxy to **DNS-only
-   (grey-cloud)** unless Vercel's domain screen explicitly requires proxied
-   for this hostname. TTL Auto. Create NO other records (no wildcards).
-3. **Certificate:** wait for Vercel Domains to show `os.winlerr.vip` =
-   Valid/Issued (automatic ACME once DNS resolves; typically minutes).
-4. **Verify DNS + routing:**
-   - `nslookup os.winlerr.vip` resolves to the Vercel-provided target chain.
-   - `curl -sI https://os.winlerr.vip/` -> 200; `curl -sI
-https://www.winlerr.vip/` -> 200 (unchanged marketing).
-   - Browser matrix: `os/` renders the WinlerrOS entry (same content as
-     `www/winlerros`); `os/login`, `os/signup`, `os/auth/callback`,
-     `os/dashboard`, `os/dashboard/setup` all 200/redirect-to-login
-     correctly; `www/` still renders the marketing homepage; every
-     `/winlaos*` alias still 308s to `/winlerros*`.
+1. ~~Associate the domain in Vercel + create the Cloudflare CNAME~~ —
+   ALREADY LIVE (owner action outside this task): DNS resolves and the
+   domain serves HTTP 200. No action needed here.
+2. **Certificate:** confirm Vercel Domains shows `os.winlerr.vip` =
+   Valid/Issued (automatic ACME; typically minutes after DNS resolves).
+3. **Verify DNS + routing:**
+   - `nslookup os.winlerr.vip` resolves to the Vercel target chain.
+   - `curl -sI https://os.winlerr.vip/` -> 200 WinlerrOS entry (same
+     content as the OS landing, canonical `https://os.winlerr.vip/`);
+     `curl -sI https://www.winlerr.vip/` -> 200 unchanged marketing.
+   - `curl -sI https://www.winlerr.vip/winlerros` -> 308 to
+     `https://os.winlerr.vip/`; app routes on www (`/login`, `/dashboard`,
+     …) 308 to the same path on `os`; POSTs and `/api/*` never redirect.
+   - Browser matrix: `os/` renders the WinlerrOS entry; `os/login`,
+     `os/signup`, `os/auth/callback`, `os/dashboard`, `os/dashboard/setup`
+     behave correctly; `www/` still renders the marketing homepage.
 5. **Rollback (does not touch www):** remove `os.winlerr.vip` from Vercel
    Domains, delete the `os` CNAME in Cloudflare, keep this PR's code (it is
    inert without DNS: unknown/absent host = passthrough).
