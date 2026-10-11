@@ -31,8 +31,10 @@ one is required.
    authoritative `host` header, classifies it against an explicit allowlist
    (`apps/web/src/lib/hosts.ts`), and performs exactly one internal
    **rewrite**: `os.winlerr.vip /` -> `/winlerros`. Everything else passes
-   through on every host. No host-to-host redirects exist in code, so
-   www <-> os loops are structurally impossible.
+   through on every host. Marketing-to-OS 308 redirects exist ONLY for
+   GET/HEAD navigations to app routes and legacy entry paths (see
+   Amendment 2026-10-11 below); loops stay impossible because the OS host
+   never redirects and unknown hosts never redirect.
 2. **Unknown hosts pass through.** `localhost`, `127.0.0.1`, Vercel preview
    `*.vercel.app` (except the known `winlerr.vercel.app` marketing alias),
    and anything unlisted get kind `unknown`: no rewrite, no redirect, no
@@ -83,6 +85,21 @@ one is required.
   split SEO equity and risk loops.
 - **Blocking unknown hosts with 404**: rejected — would break previews and
   local dev; passthrough is the safe default.
+
+## Amendment 2026-10-11 — legacy and app-route redirects to the OS origin
+
+Live DNS changed the picture: `os.winlerr.vip` now resolves (Vercel edge)
+and serves HTTP 200 (currently the marketing homepage — the app-level
+routing in this slice is what moves it to WinlerrOS). The original
+"no redirects" stance is amended narrowly:
+
+- Marketing-host GET/HEAD navigations to `/login`, `/signup`,
+  `/auth/callback`, `/dashboard*` 308-redirect to the same path on
+  `os.winlerr.vip` (query preserved). `www/winlerros` redirects to the OS
+  root `/`; `/winlerros/*` and `/winlaos*` map to same-or-mapped OS paths.
+- Still no redirects on the OS host, for non-GET/HEAD methods, for API
+  routes, for marketing pages, or for unknown hosts. `/winlerros` page
+  canonical is now absolute `https://os.winlerr.vip/`.
 
 ## References
 
