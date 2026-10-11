@@ -3,7 +3,11 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Check, Compass, Layers3, ShieldCheck } from "lucide-react";
 import { WinlerrLogo } from "@/components/winlerros/brand";
 
-export const metadata: Metadata = { title: "WinlerrOS", description: "A calmer way to manage the everyday work behind your business." };
+export const metadata: Metadata = {
+  title: "WinlerrOS",
+  description: "A calmer way to manage the everyday work behind your business.",
+  alternates: { canonical: "/winlerros" },
+};
 
 const features = [
   { icon: Compass, title: "Know what needs attention", text: "Keep customer conversations and follow-ups from getting lost in the rush." },

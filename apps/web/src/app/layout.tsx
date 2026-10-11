@@ -3,7 +3,7 @@ import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { RouteAssistants } from "@/components/route-assistants";
 import "./globals.css";
 
-const SITE_URL = "https://winlerr.vip";
+const SITE_URL = "https://www.winlerr.vip";
 
 const sans = Inter({
   subsets: ["latin"],

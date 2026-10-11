@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { ARTICLES } from "@/lib/docs";
 
-const BASE = "https://winlerr.vip";
+const BASE = "https://www.winlerr.vip";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
