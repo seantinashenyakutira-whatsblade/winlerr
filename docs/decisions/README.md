@@ -14,6 +14,8 @@ ADRs capture significant architectural choices with context, options, decision, 
 | # | Title | Status | Date |
 |---|-------|--------|------|
 | 0001 | [Monorepo](0001-monorepo.md) | Established Decision | 2026-08-21 |
+| 0002 | [WinlaOS Core: Auth, Data Access, and Pre-Signup Onboarding](0002-winlaos-core-auth-data.md) | Proposed | 2026-10-10 |
+| 0003 | [WinlerrOS Subdomain Routing](0003-winlerros-subdomain-routing.md) | Proposed | 2026-10-11 |
 
 ## Adding a Decision
 
