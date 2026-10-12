@@ -3,6 +3,7 @@ import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
 import { ARTICLES } from "@/lib/docs";
+import { HeroVideo } from "@/components/HeroVideo";
 
 export const metadata: Metadata = {
   title: "Docs",
@@ -16,14 +17,17 @@ export default function DocsIndexPage() {
     <main className="min-h-screen bg-surface text-ink">
       <SiteNav />
 
-      <section className="mx-auto max-w-3xl px-4 pt-28 sm:px-6 sm:pt-32">
-        <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Docs</p>
-        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-          How Winlerr works.
-        </h1>
-        <p className="mt-4 text-base text-ink-muted">
-          Start with what Winlerr is, then the free website, then the systems that sit on top of it.
-        </p>
+      <section className="relative isolate overflow-hidden px-4 pb-10 pt-28 sm:px-6 sm:pb-14 sm:pt-32">
+        <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-50" />
+        <div className="relative z-10 mx-auto max-w-3xl">
+          <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Docs</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            How Winlerr works.
+          </h1>
+          <p className="mt-4 text-base text-ink-muted">
+            Start with what Winlerr is, then the free website, then the systems that sit on top of it.
+          </p>
+        </div>
       </section>
 
       <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">

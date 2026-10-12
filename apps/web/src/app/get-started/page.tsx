@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
 import { LeadForm } from "@/components/sections/lead-form";
+import { HeroVideo } from "@/components/HeroVideo";
 
 export const metadata: Metadata = {
   title: "Get started",
@@ -30,23 +31,26 @@ export default function GetStartedPage() {
     <main className="min-h-screen bg-surface text-ink">
       <SiteNav />
 
-      <section className="mx-auto max-w-3xl px-4 pt-28 sm:px-6 sm:pt-32">
-        <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Get started</p>
-        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-          Ready to win more customers?
-        </h1>
-        <p className="mt-4 text-base text-ink-muted">
-          Tell us about your business. We&apos;ll get your free website live and set up your first
-          system. Already have an account?{" "}
-          <a className="underline" href="/login">
-            Sign in
-          </a>{" "}
-          — or{" "}
-          <a className="underline" href="/signup">
-            create one
-          </a>
-          .
-        </p>
+      <section className="relative isolate overflow-hidden px-4 pb-10 pt-28 sm:px-6 sm:pb-14 sm:pt-32">
+        <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-50" />
+        <div className="relative z-10 mx-auto max-w-3xl">
+          <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Get started</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Ready to win more customers?
+          </h1>
+          <p className="mt-4 text-base text-ink-muted">
+            Tell us about your business. We&apos;ll get your free website live and set up your first
+            system. Already have an account?{" "}
+            <a className="underline" href="/login">
+              Sign in
+            </a>{" "}
+            — or{" "}
+            <a className="underline" href="/signup">
+              create one
+            </a>
+            .
+          </p>
+        </div>
       </section>
 
       <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">

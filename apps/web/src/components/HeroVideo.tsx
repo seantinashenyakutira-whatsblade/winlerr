@@ -5,112 +5,119 @@ import * as React from "react";
 const VIDEO_SRC = "/video/hero-loop.mp4";
 const POSTER_SRC = "/video/hero-poster.jpg";
 
+type NetworkInformation = EventTarget & {
+  effectiveType?: string;
+  saveData?: boolean;
+};
+
 /**
- * Decorative background video for the hero.
- *
- * Layering contract: sits *behind* the hero copy, the dashboard mock and the
- * floating chips, at low opacity under a white wash, so hero copy stays
- * legible. `aria-hidden` because it carries no information.
- *
- * Playback is driven from an effect rather than the `autoPlay` attribute on
- * purpose. `autoPlay` would fetch and play the file on phones too, even
- * though the element is hidden below `sm`. With `preload="none"` and play()
- * gated on viewport + motion preference, a phone never downloads the video at
- * all. Pausing happens when the hero scrolls out of view.
- *
- * Degradation ladder, in order:
- *   1. Viewport under `sm`, or `prefers-reduced-motion` -> poster only, hidden
- *      <video>, never fetched.
- *   2. Video 404 / decode error -> poster only.
- *   3. Otherwise -> muted, looping, playsInline background video.
+ * Decorative hero background shared by the public Winlerr marketing and OS
+ * landing pages. The poster is the first paint and stays in place until the
+ * browser confirms playback, so rejected autoplay and slow media requests
+ * degrade to a usable static hero.
  */
 export function HeroVideo({ className }: { className?: string }) {
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [canAnimate, setCanAnimate] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
   const [videoOk, setVideoOk] = React.useState(true);
-  const [reduceMotion, setReduceMotion] = React.useState(false);
-  const [isDesktop, setIsDesktop] = React.useState(false);
 
-  // Both gates start pessimistic so the first paint is the poster.
   React.useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const desktopQuery = window.matchMedia("(min-width: 640px)");
-
-    const sync = () => {
-      setReduceMotion(motionQuery.matches);
-      setIsDesktop(desktopQuery.matches);
+    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+    const syncPreferences = () => {
+      const slowConnection =
+        connection?.saveData === true ||
+        connection?.effectiveType === "2g" ||
+        connection?.effectiveType === "slow-2g";
+      setCanAnimate(!motionQuery.matches && !slowConnection);
     };
 
-    sync();
-    motionQuery.addEventListener("change", sync);
-    desktopQuery.addEventListener("change", sync);
+    syncPreferences();
+    motionQuery.addEventListener("change", syncPreferences);
+    connection?.addEventListener("change", syncPreferences);
+
     return () => {
-      motionQuery.removeEventListener("change", sync);
-      desktopQuery.removeEventListener("change", sync);
+      motionQuery.removeEventListener("change", syncPreferences);
+      connection?.removeEventListener("change", syncPreferences);
     };
   }, []);
 
-  const showVideo = videoOk && isDesktop && !reduceMotion;
-
-  // Play when eligible and on-screen; pause when off-screen.
   React.useEffect(() => {
-    const node = videoRef.current;
-    if (!node) return;
+    const target = wrapRef.current;
+    if (!target || !canAnimate || !("IntersectionObserver" in window)) return;
 
-    if (!showVideo) {
-      node.pause();
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.05 },
+    );
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [canAnimate]);
+
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (!isVisible || !canAnimate || !videoOk) {
+      video.pause();
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            void node.play().catch(() => undefined);
-          } else {
-            node.pause();
-          }
-        }
-      },
-      { threshold: 0.05 },
-    );
+    // The muted/inline attributes cover normal autoplay policy. Calling
+    // play() as well handles browsers that need an explicit playback request.
+    video.muted = true;
+    video.playsInline = true;
+    void video
+      .play()
+      .then(() => setIsPlaying(!video.paused))
+      .catch(() => {
+        // Keep the poster visible if browser policy or media support blocks play.
+      });
 
-    observer.observe(wrapRef.current ?? node);
-    return () => observer.disconnect();
-  }, [showVideo]);
+    return () => video.pause();
+  }, [canAnimate, isVisible, videoOk]);
+
+  const showVideo = canAnimate && isVisible && videoOk;
 
   return (
     <div ref={wrapRef} aria-hidden="true" className={className}>
-      {/* Poster is the permanent base layer: it is what phones and
-          reduced-motion users see, and it holds the space so there is no
-          layout shift while the video loads. */}
       <img
         src={POSTER_SRC}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
+        fetchPriority="high"
+        decoding="async"
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+          showVideo && isPlaying ? "opacity-0" : "opacity-100"
+        }`}
       />
 
-      {/* Hidden below `sm` and under reduced motion, so the poster is what
-          shows. preload="none" keeps phones from downloading the file. */}
-      {videoOk ? (
+      {showVideo ? (
         <video
           ref={videoRef}
-          className={`absolute inset-0 h-full w-full object-cover ${reduceMotion ? "hidden" : "hidden sm:block"}`}
+          className="absolute inset-0 h-full w-full object-cover"
           src={VIDEO_SRC}
           poster={POSTER_SRC}
+          autoPlay
           loop
           muted
           playsInline
-          preload="none"
-          onError={() => setVideoOk(false)}
+          preload="metadata"
+          onPlaying={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onWaiting={() => setIsPlaying(false)}
+          onError={() => {
+            setIsPlaying(false);
+            setVideoOk(false);
+          }}
         />
       ) : null}
 
-      {/* White wash between video and hero copy, so text contrast holds.
-          Strongest at the top where the headline sits, clearing toward the
-          bottom so the video still reads behind the dashboard mock. */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/30 to-white/0" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/60 to-white/45" />
     </div>
   );
 }

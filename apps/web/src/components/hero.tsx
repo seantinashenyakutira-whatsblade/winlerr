@@ -25,7 +25,7 @@ export function Hero() {
       {/* Background video layer. z-0 keeps it above <main>'s opaque
           background (a negative z-index here would paint it behind it and hide
           it completely); the hero copy, dashboard mock and chips sit at z-10. */}
-      <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-40 sm:opacity-60" />
+      <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-50" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 text-center sm:px-6">
         <div className="mb-6 flex items-center justify-center gap-3">
