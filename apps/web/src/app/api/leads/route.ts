@@ -58,8 +58,13 @@ export async function POST(request: Request) {
   const supabaseUrl = process.env["NEXT_PUBLIC_SUPABASE_URL"];
   const supabaseAnonKey = process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"];
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("leads route: Supabase env missing, returning stub response");
-    return NextResponse.json({ ok: true, stub: true });
+    // Fail loudly: a successful-looking response here would silently discard
+    // a real customer submission. The frontend treats non-2xx as an error.
+    console.warn("leads route: Supabase env missing, rejecting submission");
+    return NextResponse.json(
+      { ok: false, error: "Service temporarily unavailable. Please try again." },
+      { status: 503 },
+    );
   }
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
