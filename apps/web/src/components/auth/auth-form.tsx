@@ -3,9 +3,11 @@
 /**
  * AuthForm — shared email/password form shell (backend slice).
  * Codex owns visual design: keep the onSubmit contract
- * (values → Promise<{ ok, errorMessage? }>) and these element ids stable.
+ * (values → Promise<{ ok, errorMessage?, navigate? }>) and these element ids
+ * stable. A successful result can explicitly remain on the current page.
  */
 import { useState, type FormEvent } from "react";
+import { safeNextPath } from "@winlerr/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +19,7 @@ export interface AuthFormProps {
   onSubmit: (values: { email: string; password: string }) => Promise<{
     ok: boolean;
     errorMessage?: string;
+    navigate?: boolean;
   }>;
   onSuccessNavigateTo: (next: string) => void;
   extraBelowForm?: React.ReactNode;
@@ -43,7 +46,7 @@ export function AuthForm({
     try {
       const result = await onSubmit({ email: email.trim(), password });
       if (result.ok) {
-        onSuccessNavigateTo(next);
+        if (result.navigate !== false) onSuccessNavigateTo(safeNextPath(next));
       } else {
         setError(result.errorMessage ?? "Something went wrong. Please try again.");
       }
