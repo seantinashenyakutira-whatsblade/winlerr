@@ -102,6 +102,14 @@ Services are separate deployment units (Vercel functions / Cloudflare Workers / 
 - AI-initiated writes to DB, external APIs, or customer comms require human approval or explicit tightly-scoped policy.
 - Model selection & routing is configuration, not code branching.
 
+The first local execution kernel lives in `@winlerr/automation`. It accepts an
+explicit tool call, enforces the agent's tool allowlist and the intersection
+of tool, agent and caller scopes, validates a strict Zod input object, and requires a
+human approval checkpoint for customer communications, financial actions,
+external writes and destructive actions. It records state and metadata-only
+audit events through interfaces; it does not call providers, customer systems,
+or a database. See [Agent Runtime](agent-runtime.md) and proposed ADR 0004.
+
 ## 9. Environment Strategy
 
 - `.env.example` documents all required variables; `.env` is gitignored.
