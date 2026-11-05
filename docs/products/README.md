@@ -1,17 +1,24 @@
-# Products — Winlerr
+# Winlerr product catalogue
 
-Product documentation will live here as products are defined.
+The public product catalogue is rendered from [`apps/web/src/data/product-catalogue.ts`](../../apps/web/src/data/product-catalogue.ts). Product detail pages, catalogue cards, the systems overview, and the sitemap use that typed data source.
 
-Each product should have its own document describing purpose, user journeys, domain model, and integration points.
+## Initial catalogue
 
-## Planned Apps
+| Offering                           | Public route                                   | Category                                |
+| ---------------------------------- | ---------------------------------------------- | --------------------------------------- |
+| Free Professional Business Website | `/products/free-professional-business-website` | Websites                                |
+| Lead Response                      | `/products/lead-response`                      | Business automation systems             |
+| WhatsApp AI Agent                  | `/products/whatsapp-ai-agent`                  | AI agents                               |
+| Social DM Agent                    | `/products/social-dm-agent`                    | AI agents                               |
+| Booking System                     | `/products/booking-system`                     | Business automation systems             |
+| Customer Follow-up                 | `/products/customer-follow-up`                 | Business automation systems             |
+| AI Receptionist                    | `/products/ai-receptionist`                    | AI agents; business operations          |
+| WinlerrOS                          | `/products/winlerros`                          | WinlerrOS platform; business operations |
 
-- **web** — `apps/web`
-- **dashboard** — `apps/dashboard`
-- **client-portal** — `apps/client-portal`
-- **lead-response** — `apps/lead-response`
-- **booking** — `apps/booking`
-- **crm** — `apps/crm`
-- **whatsapp-agent** — `apps/whatsapp-agent`
+## Availability and pricing
 
-> No product features are implemented at the foundation stage. This directory is a placeholder for future product docs.
+Availability and pricing require the reviewed Systems Lab catalogue specification. Until that contract is approved, public entries use a confirmation label and the `pricing` field remains `null`. The website must not present proposed workflows as operational or invent prices.
+
+## Product documentation
+
+Keep public product facts in the typed catalogue. Add implementation architecture, operational runbooks, and integration contracts here only after those details are reviewed and confirmed by the owning team.

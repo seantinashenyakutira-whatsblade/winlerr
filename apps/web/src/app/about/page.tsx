@@ -8,7 +8,7 @@ import { HeroVideo } from "@/components/HeroVideo";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Winlerr is built in Zambia, for Zambian businesses: a free professional website first, then the AI systems that answer, qualify, and follow up every lead.",
+    "Winlerr is built in Zambia for businesses exploring a clearer online presence and connected customer workflows.",
   alternates: { canonical: "/about" },
 };
 
@@ -26,9 +26,9 @@ export default function AboutPage() {
           </h1>
           <p className="mt-6 text-base leading-relaxed text-ink-muted">
             I started Winlerr after watching business owners in Lusaka lose sales simply because
-            they could not reach their phones in time. A customer asks for prices on WhatsApp,
-            waits hours for a reply, and buys elsewhere. Good local businesses were not losing on
-            quality, but on response speed.
+            they could not reach their phones in time. A customer asks for prices on WhatsApp, waits
+            hours for a reply, and buys elsewhere. Good local businesses were not losing on quality,
+            but on response speed.
           </p>
         </div>
       </section>
@@ -48,9 +48,9 @@ export default function AboutPage() {
             especially on WhatsApp.
           </p>
           <p className="text-base leading-relaxed text-ink-muted">
-            That is why we build your professional website for free first. It gives your business a
-            credible presence without costing a single Kwacha upfront. Once that foundation is
-            live, we connect the AI systems that answer, qualify, and follow up with leads 24/7.
+            That is why the Winlerr catalogue starts with a professional business website and
+            explores systems for customer enquiries, conversations, bookings, and follow-up. We
+            discuss scope, current availability, and pricing before any work begins.
           </p>
           <p className="text-base leading-relaxed text-ink-muted">
             We are early-stage and working closely with our first client cohort, so every business
@@ -58,8 +58,8 @@ export default function AboutPage() {
             carefully and speak plainly. We will never sell you systems you do not need.
           </p>
           <p className="text-base leading-relaxed text-ink-muted">
-            If you are ready to stop losing enquiries, message me directly on WhatsApp. I will get
-            your free website live and help your business grow.
+            If you want to explore what fits your business, tell us how you work today and we can
+            discuss the available options.
           </p>
           <p className="text-sm font-semibold text-ink">— Sean, Founder, Winlerr</p>
         </div>
@@ -79,13 +79,15 @@ export default function AboutPage() {
 
       <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6">
         <div className="rounded-card border border-border bg-surface-tint p-8 text-center">
-          <h2 className="font-display text-2xl font-bold tracking-tight">Ready to win more customers?</h2>
+          <h2 className="font-display text-2xl font-bold tracking-tight">
+            Ready to explore your options?
+          </h2>
           <p className="mx-auto mt-3 max-w-lg text-sm text-ink-muted">
-            Tell us about your business and we will get your free website live.
+            Tell us about your business and the customer workflow you want to improve.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button href="/get-started" size="lg">
-              Get your free website
+              Request a consultation
             </Button>
             <Button href="/docs" variant="secondary" size="lg">
               Read the docs

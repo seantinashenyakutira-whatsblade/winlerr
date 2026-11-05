@@ -1,15 +1,20 @@
-import { cn } from "@/lib/utils";
-
-const STATS = [
+const PRINCIPLES = [
   {
-    value: "Reply in <60s",
-    note: "Target response SLA — what the system is built to hit.",
-    accent: true,
-    span: "sm:col-span-2",
+    title: "Clear first responses",
+    note: "Set expectations for how new enquiries are acknowledged.",
   },
-  { value: "24/7 coverage", note: "Nights, weekends, holidays.", accent: false, span: "" },
-  { value: "Hours saved weekly", note: "Time back for selling.", accent: false, span: "" },
-  { value: "More qualified leads", note: "Scored before you call.", accent: false, span: "" },
+  {
+    title: "Useful hand-offs",
+    note: "Keep a person involved when a conversation needs judgement.",
+  },
+  {
+    title: "Visible next steps",
+    note: "Make follow-ups and customer commitments easier to track.",
+  },
+  {
+    title: "A fit for your business",
+    note: "Shape requirements and integrations around your workflow.",
+  },
 ];
 
 export function Outcomes() {
@@ -17,23 +22,20 @@ export function Outcomes() {
     <section aria-label="Outcomes" className="bg-surface-tint">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
         <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          What running on Winlerr looks like.
+          Designed for clear customer operations.
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-sm text-ink-muted">
-          Targets and value propositions — not customer claims. Figures to be replaced with measured results.
+          Explore the workflow goals behind the Winlerr catalogue, then confirm product fit and
+          availability with us.
         </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {STATS.map((stat) => (
+          {PRINCIPLES.map(item => (
             <div
-              key={stat.value}
-              className={cn(
-                "rounded-card border p-6 shadow-card",
-                stat.span,
-                stat.accent ? "border-transparent bg-accent-500 text-white" : "border-border bg-surface",
-              )}
+              key={item.title}
+              className="rounded-card border border-border bg-surface p-6 shadow-card"
             >
-              <p className="font-display text-2xl font-bold sm:text-3xl">{stat.value}</p>
-              <p className={cn("mt-2 text-sm", stat.accent ? "text-white/80" : "text-ink-muted")}>{stat.note}</p>
+              <p className="font-display text-xl font-bold">{item.title}</p>
+              <p className="mt-2 text-sm text-ink-muted">{item.note}</p>
             </div>
           ))}
         </div>

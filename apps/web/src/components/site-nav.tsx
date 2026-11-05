@@ -4,10 +4,12 @@ import * as React from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const LINKS = [
   { label: "Home", href: "/" },
   { label: "Systems", href: "/systems" },
+  { label: "Products", href: "/products" },
   { label: "Docs", href: "/docs" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/get-started" },
@@ -28,26 +30,33 @@ export function SiteNav() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all",
-        scrolled ? "bg-surface/80 shadow-card backdrop-blur-md" : "bg-transparent",
+        scrolled ? "bg-surface/80 shadow-card backdrop-blur-md" : "bg-transparent"
       )}
     >
-      <nav aria-label="Primary" className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight">
+      <nav
+        aria-label="Primary"
+        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6"
+      >
+        <Link
+          href="/"
+          aria-label="Winlerr home"
+          className="flex items-center gap-2 font-display text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        >
           <span className="flex h-8 w-8 items-center justify-center rounded-card bg-ink font-mono text-sm text-white">
             W/
           </span>
           winlerr
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-1 rounded-pill border border-border bg-surface/70 px-2 py-1.5 backdrop-blur-md md:flex">
-          {LINKS.map((link) => (
-            <a
+          {LINKS.map(link => (
+            <Link
               key={link.href}
               href={link.href}
-              className="rounded-pill px-4 py-1.5 text-sm text-ink-muted transition-colors hover:bg-surface-tint hover:text-ink"
+              className="rounded-pill px-4 py-1.5 text-sm text-ink-muted transition-colors hover:bg-surface-tint hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -61,7 +70,8 @@ export function SiteNav() {
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          aria-controls="mobile-primary-menu"
+          onClick={() => setOpen(v => !v)}
           className="flex h-10 w-10 items-center justify-center rounded-card border border-border md:hidden"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -69,18 +79,27 @@ export function SiteNav() {
       </nav>
 
       {open && (
-        <div className="fixed inset-0 top-16 z-40 flex flex-col gap-1 bg-surface p-4 md:hidden">
-          {LINKS.map((link) => (
-            <a
+        <div
+          id="mobile-primary-menu"
+          className="fixed inset-0 top-16 z-40 flex flex-col gap-1 bg-surface p-4 md:hidden"
+        >
+          {LINKS.map(link => (
+            <Link
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="rounded-card px-4 py-3 text-lg font-medium hover:bg-surface-tint"
+              className="rounded-card px-4 py-3 text-lg font-medium hover:bg-surface-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <Button href="/get-started" variant="dark" size="lg" className="mt-4" onClick={() => setOpen(false)}>
+          <Button
+            href="/get-started"
+            variant="dark"
+            size="lg"
+            className="mt-4"
+            onClick={() => setOpen(false)}
+          >
             Get started
           </Button>
         </div>
