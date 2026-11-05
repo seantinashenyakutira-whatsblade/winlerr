@@ -3,92 +3,60 @@ import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { Footer } from "@/components/sections/footer";
 import { Button } from "@/components/ui/button";
-import { HeroVideo } from "@/components/HeroVideo";
+import { PRODUCT_CATALOGUE, PRODUCT_CATEGORIES } from "@/data/product-catalogue";
 
 export const metadata: Metadata = {
-  title: "Systems",
+  title: "Business systems",
   description:
-    "Six Winlerr systems — lead response, WhatsApp AI agent, social DM agent, booking, customer follow-up, and AI receptionist — on one platform.",
+    "Explore Winlerr business automation systems and AI agents for customer enquiries, appointments, and follow-up.",
   alternates: { canonical: "/systems" },
 };
 
-const SYSTEMS = [
-  {
-    name: "Lead Response",
-    slug: "lead-response",
-    summary: "Every enquiry triaged and answered in seconds.",
-    detail:
-      "Calls, form submissions, WhatsApp messages, and DMs land in one queue, get a qualified first response, and are scored so you know who is ready to buy before you call.",
-  },
-  {
-    name: "WhatsApp AI Agent",
-    slug: "whatsapp-ai-agent",
-    summary: "Customer conversations on autopilot, 24/7.",
-    detail:
-      "The channel Zambian customers already use, handled continuously. Your agent answers questions, captures the details you need, and hands off to a human at the right moment.",
-  },
-  {
-    name: "Social DM Agent",
-    slug: "social-dm-agent",
-    summary: "Facebook and Instagram messages handled, qualified, and routed.",
-    detail:
-      "DMs from your Facebook and Instagram pages are answered from the same dashboard as everything else, then qualified and routed to the right person or system.",
-  },
-  {
-    name: "Booking System",
-    slug: "booking-system",
-    summary: "Appointments without the back-and-forth.",
-    detail:
-      "Let customers book the time that suits them instead of negotiating over messages. Confirmations and reminders go out automatically.",
-  },
-  {
-    name: "Customer Follow-up",
-    slug: "customer-follow-up",
-    summary: "Quotes chased. Reviews requested. Nobody forgotten.",
-    detail:
-      "Every open quote and promised follow-up is tracked and chased for you, so enquiries do not go quiet between the first message and the sale.",
-  },
-  {
-    name: "AI Receptionist",
-    slug: "ai-receptionist",
-    summary: "A front desk that never sleeps.",
-    detail:
-      "Answers after hours, on weekends, and on holidays. It captures the enquiry, books or qualifies it, and lets you get to work in the morning to a warm pipeline.",
-  },
-];
+const SYSTEMS = PRODUCT_CATALOGUE.filter(product =>
+  product.category.some(category => category === "business-automation" || category === "ai-agents")
+);
 
 export default function SystemsPage() {
   return (
     <main className="min-h-screen bg-surface text-ink">
       <SiteNav />
-      <section className="relative isolate overflow-hidden px-4 pb-10 pt-28 sm:px-6 sm:pb-14 sm:pt-32">
-        <HeroVideo className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-50" />
-        <div className="relative z-10 mx-auto max-w-6xl">
-          <p className="font-mono text-xs uppercase tracking-wide text-ink-muted">Systems</p>
+      <section className="px-4 pb-10 pt-28 sm:px-6 sm:pb-14 sm:pt-32">
+        <div className="mx-auto max-w-6xl">
+          <p className="font-mono text-xs uppercase tracking-wide text-brand-600">
+            Business systems
+          </p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Practical AI systems built for Zambian businesses.
+            Practical systems for everyday customer work.
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-ink-muted">
-            Start with a free professional website, then connect the systems that answer customer
-            enquiries, take bookings, and close sales around the clock.
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted">
+            Explore the Winlerr systems catalogue for customer enquiries, appointments, and
+            follow-up. We confirm current availability, requirements, and fit with you.
           </p>
           <p className="mt-3 max-w-2xl text-sm text-ink-muted">
-            No long contracts or hidden setup fees. Add only the systems your business actually needs.
+            Product details and pricing are shared after we understand your business needs.
           </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
         <div className="grid gap-4 md:grid-cols-2">
-          {SYSTEMS.map((system) => (
+          {SYSTEMS.map(system => (
             <Link
-              key={system.name}
-              href={`/systems/${system.slug}`}
+              key={system.slug}
+              href={`/products/${system.slug}`}
               className="block rounded-card border border-border bg-surface p-6 shadow-card transition-colors hover:bg-surface-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
-              <h2 className="font-display text-lg font-bold">{system.name}</h2>
-              <p className="mt-2 text-sm font-medium text-brand-600">{system.summary}</p>
-              <p className="mt-3 text-sm text-ink-muted">{system.detail}</p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-[11px] uppercase tracking-wide text-brand-600">
+                  {system.category.map(category => PRODUCT_CATEGORIES[category]).join(" · ")}
+                </span>
+                <span className="rounded-pill border border-border px-2.5 py-1 text-xs text-ink-muted">
+                  {system.availability}
+                </span>
+              </div>
+              <h2 className="mt-4 font-display text-lg font-bold">{system.name}</h2>
+              <p className="mt-2 text-sm font-medium text-brand-600">{system.shortDescription}</p>
+              <p className="mt-3 text-sm text-ink-muted">{system.customerProblem}</p>
             </Link>
           ))}
         </div>
@@ -97,18 +65,18 @@ export default function SystemsPage() {
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="rounded-card border border-border bg-surface-tint p-8 text-center">
           <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-            Not sure which one to start with?
+            Not sure which system fits?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-ink-muted">
-            Tell us how your business handles enquiries today and we will tell you which system
-            closes the biggest gap first.
+            Tell us how your business handles enquiries and follow-up today. We can discuss product
+            fit and current availability.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button href="/get-started" size="lg">
-              Get your free website
+              Request a consultation
             </Button>
-            <Button href="/docs/systems-overview" variant="secondary" size="lg">
-              Read the docs
+            <Button href="/products" variant="secondary" size="lg">
+              Browse all products
             </Button>
           </div>
         </div>

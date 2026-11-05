@@ -45,9 +45,9 @@ export function Hero() {
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-base text-ink-muted sm:text-lg">
-          A free professional website for your business, live in days.
+          A professional online home for your business.
           <br />
-          Then the AI systems that answer, qualify, and follow up — WhatsApp-first, always on.
+          Then explore systems designed for enquiries, conversations, and follow-up.
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -67,10 +67,12 @@ export function Hero() {
               <span className="h-3 w-3 rounded-full bg-accent-400" />
               <span className="h-3 w-3 rounded-full bg-accent-500" />
               <span className="h-3 w-3 rounded-full bg-brand-400" />
-              <span className="ml-2 font-mono text-xs text-ink-muted">Live dashboard preview</span>
+              <span className="ml-2 font-mono text-xs text-ink-muted">
+                Product interface preview
+              </span>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              {[0, 1, 2].map((card) => (
+              {[0, 1, 2].map(card => (
                 <div key={card} className="rounded-card border border-border bg-surface-tint p-4">
                   <div className="mb-3 h-2.5 w-2/3 rounded-pill bg-ink/10" />
                   <div className="mb-2 h-2.5 w-full rounded-pill bg-ink/10" />
@@ -108,7 +110,7 @@ export function Hero() {
 
         <p className="mt-8 flex items-center justify-center gap-2 text-xs text-ink-muted">
           <Sparkles className="h-3.5 w-3.5" />
-          Built in Zambia, for Zambian businesses. No upfront cost for your website.
+          Built in Zambia, for Zambian businesses. Ask us about current product availability.
         </p>
       </div>
     </section>
